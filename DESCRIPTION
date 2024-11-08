@@ -25,7 +25,8 @@ Imports:
     tools,
     sysfonts,
     showtext,
-    kableExtra
+    kableExtra,
+    plotrix
 Suggests: 
     knitr,
     rmarkdown,

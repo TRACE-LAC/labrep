@@ -160,7 +160,7 @@ plot_cumulative_proportion <- function(data_proportion) {
               "VSR" = "#2274BB",
               "H1N1" = "#F4802D",
               "H1N1 2009" = "#9DB2D0")
-  if (!any(cases == 0)) {
+  if (any(cases == 0)) {
     index <- which(cases == 0)
     cases <- cases[-index]
     labels <- labels[-index]
