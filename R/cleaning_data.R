@@ -155,3 +155,39 @@ clean_tosferina_data <- function(report_data) {
   }
   return(report_data)
 }
+
+#' @title Función para reemplazar espacios en los nombres de las columnas con
+#' guiones bajos
+#' @export
+clean_colnames_spaces <- function(df) {
+  colnames(df) <- epitrix::clean_labels(colnames(df))
+  return(df)
+}
+
+#' @title Función que remueve los sufijos
+#' @export
+clean_colnames_suffixes <- function(df) {
+  colnames(df) <- gsub("\\.\\.\\.[0-9]+$", "", colnames(df))
+  return(df)
+}
+
+#' @title Función que rellena los años
+#' @export
+fill_down_year <- function(df, column_name) {
+  df <- df %>%
+    tidyr::fill({{ column_name }}, .direction = "down")
+  
+  # Devolver el data frame limpio
+  return(df)
+}
+
+#' @title Función que limpia la información historica
+#' @export
+clean_historic_data <- function(tabla) {
+  tabla <- tabla %>%
+    clean_colnames_suffixes() %>%
+    clean_colnames_spaces() %>%
+    fill_down_year("ano") %>% 
+    slice(1:32)
+  return(tabla)
+}
