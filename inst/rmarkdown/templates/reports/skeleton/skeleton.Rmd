@@ -381,12 +381,6 @@ plot_cumulative_proportion(data_proportion = viruses_cumulative_proportion)
 
 
 ```{r distribution-epiweek-todo}
-#viruses_epiweeks <- get_distribution_epiweek(report_data = report_data_clean)
-#other_viruses_epiweek <- 
-#sars_cumulative_proportion <- get_viruses_cumulative_proportion(viruses_age_group,                                                               test_distribution_epiweek)
-
-
-#test_distribution_epiweek
 viruses_prop_epiweek <-
   get_cases_prop_epiweek(filmarray_data = filmarray_data_cleaned,
                          other_virs_data = other_viruses_cleaned_data,
