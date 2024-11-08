@@ -103,7 +103,7 @@ get_cases_filmarray <- function(report_data,
   viruses_age_group <- data.frame()
   for (virus in cols_viruses) {
       filmarray_vrs <- virus$filmarray
-      if (filmarray_vrs$col_name %in% names(report_data) &&
+      if (all(filmarray_vrs$col_name %in% names(report_data)) &&
           !("" %in% filmarray_vrs$values)) {
         for (col_name in filmarray_vrs$col_name) {
           positive_cases <-
