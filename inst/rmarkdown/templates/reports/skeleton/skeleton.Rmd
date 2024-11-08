@@ -45,6 +45,10 @@ params:
     label: "Semana epidemiológica"
     input: text
     value: 23
+  year:
+    label: "Año"
+    input: text
+    value: 2024
 editor_options: 
   markdown: 
     wrap: 72
@@ -61,11 +65,7 @@ knitr::opts_chunk$set(
 knitr::opts_knit$set(eval.after = "fig.cap")
 
 library(dplyr)
-source("C:/Users/geral/Documents/TRACE/labrep/R/checking_data.R", local = knitr::knit_global())
-source("C:/Users/geral/Documents/TRACE/labrep/R/import_data.R", local = knitr::knit_global())
-source("C:/Users/geral/Documents/TRACE/labrep/R/plotting_data.R", local = knitr::knit_global())
-source("C:/Users/geral/Documents/TRACE/labrep/R/cleaning_data.R", local = knitr::knit_global())
-source("C:/Users/geral/Documents/TRACE/labrep/R/utils.R", local = knitr::knit_global())
+library(labrep)
 sysfonts::font_add_google("Montserrat", "Montserrat")
 showtext::showtext_auto()
 print(params$fci_data)
@@ -169,7 +169,7 @@ diagnóstico de los principales agentes a los que se les atribuye el
 IRAG.
 
 ```{r filmarray-data}
-filmarray_data <- import_data_viral_circulation(report_data = c("C:/Users/geral/Documents/TRACE/labrep/data/FILMARRAY RESPIRATORIO.xlsx"),
+filmarray_data <- import_data_viral_circulation(report_data = params$fci_data,
                                                 sheet = 1,
                                                 skip = 3)
 filmarray_data_cleaned <- clean_filmarray_data(filmarray_data = filmarray_data)
@@ -185,7 +185,7 @@ filmarray_age_groups <-
 ```{r other-viruses-data}
 other_viruses_data <-
   import_data_viral_circulation(report_data =
-                                  c("C:/Users/geral/Documents/TRACE/labrep/data/OTROSVIRUS_SE 23.xlsx"),
+                                  params$other_viruses,
                                 skip = 0,
                                 sheet = 1)
 other_viruses_cleaned_data  <- clean_data_other_viruses(other_viruses_data)
@@ -202,7 +202,6 @@ viruses_age_groups <-
 
 
 ```{r sars-data}
-#sars_data <- import_data_viral_circulation(report_data = #c("C:/Users/geral/Documents/TRACE/labrep/data/df_other_virus_202252.cs#v"), header = TRUE)
 sars_age_groups <- get_cases_sars(other_viruses_cleaned_data,
                                   age_groups = TRUE)
 sars_viruses_age_groups <- get_distribution_age_vr_sars(viruses_age_groups,
@@ -305,7 +304,7 @@ irag_inusitado_age_groups <-
   get_distribution_surveillance(other_viruses_cleaned_data,
                                 include_sars = TRUE,
                                 surveillance_type = "irag_inusitado")
-irag_inusitado_age_groups <- irag_inusitado_age_groups  %>% arrange(grupo_edad)
+irag_inusitado_age_groups <- irag_inusitado_age_groups %>% arrange(grupo_edad)
 ```
 
 ```{r plot-distribution-irag-inusitado-age-groups, include=TRUE, fig.height=5, fig.width=10}
@@ -373,7 +372,7 @@ text_vrs_cumulative <- get_text_viruses(dataset = viruses_cumulative_proportion,
 Dentro de la circulación viral acumulada predominan `r text_vrs_cumulative` cada uno respectivamente en las `r total_cases` muestras positivas de las `r total_samples` analizadas (figura 6).
 
 ```{r plot-cumulative-proportion, fig.height=8, fig.width=12, include=TRUE, fig.cap="Proporción acumulada de los virus respiratorios, Laboratorio de Salud Pública"}
-plot_cumulative_proportion(viruses_cumulative_proportion)
+plot_cumulative_proportion(data_proportion = viruses_cumulative_proportion)
 ```
 
 ```{r distribution-epiweek-todo}
@@ -386,20 +385,27 @@ plot_cumulative_proportion(viruses_cumulative_proportion)
 viruses_prop_epiweek <-
   get_cases_prop_epiweek(filmarray_data = filmarray_data_cleaned,
                          other_virs_data = other_viruses_cleaned_data,
+                         epiweek = params$epiweek)
+sars_prop_epiweeks <-
+  get_cases_prop_epiweek(filmarray_data = filmarray_data_cleaned,
+                         other_virs_data = other_viruses_cleaned_data,
                          include_sars = TRUE,
-                         epiweek = 23)
-
+                         epiweek = "all")
+sars_prop_epiweeks$total_samples <- sum(sars_prop_epiweeks$cases_epiweek$casos)
+total_samples_prop <- nrow(filmarray_data_cleaned) + nrow(other_viruses_cleaned_data)
+viruses_prop_text <-
+  get_prop_text(dataset = viruses_prop_epiweek$cases_epiweek)
+sars_prop_text <-
+  get_prop_text(dataset = sars_prop_epiweeks$cases_epiweek)
 ```
 
 ```{r plot-cumulative-proportion-sars, fig.height=8, fig.width=14, include=TRUE, fig.cap="Proporción acumulada de los virus respiratorios, Laboratorio de Salud Pública"}
-plot_cumulative_proportion(viruses_prop_epiweek$cases_epiweek)
+plot_cumulative_proportion(sars_prop_epiweeks$cases_epiweek)
 ```
 
-En  la circulación viral estuvo con predominio de VSR (22.1%), Rinovirus (10.0%) y Adenovirus (6.0%); en las `r viruses_prop_epiweek$total_samples` muestras analizadas para esta semana.
+En `r params$epiweek` la circulación viral estuvo con predominio de `r viruses_prop_text`; en las `r viruses_prop_epiweek$total_samples` muestras analizadas para esta semana.
 
-TODO
-
-Dentro de la circulación viral acumulada a params$epiweek al incluir el virus de SARS CoV 2 en la distribución de los virus respiratorios, se observa que predominan los Rinovirus (22%), SARS Cov2 (20%), y VSR (19%) de las 3.367 muestras positivas de las 14.394 muestras analizadas (figura 7).
+Dentro de la circulación viral acumulada a `r params$epiweek` al incluir el virus de SARS CoV 2 en la distribución de los virus respiratorios, se observa que predominan `r sars_prop_text` de las `r sars_prop_epiweeks$total_samples` muestras positivas de las `r total_samples_prop` muestras analizadas (figura 7).
 
 
 ```{r distribution-influenza}
@@ -420,9 +426,7 @@ text_influenza <- get_text_viruses(dataset = total_dist_influenza,
                                    tam = nrow(total_dist_influenza))
 ```
 
-#TODO Comentar acerca del cambio
-
-En cuanto al comportamiento de los virus de Influenza acumulado a SE params$epiweek como de costumbre en las primeras semanas del año ha circulado el virus de Influenza A (2.9%), el virus de la Influenza A(H1N1) pdm09 (65.8%) e Influenza A(H3) (26.0%) en `r total_cases_influenza` muestras positivas. (Figura 8)
+En cuanto al comportamiento de los virus de Influenza acumulado a SE `r params$epiweek` como de costumbre en las primeras semanas del año ha circulado el virus de `r text_influenza` en `r total_cases_influenza` muestras positivas. (Figura 8)
 
 ```{r distribution_influeza, include=TRUE, fig.height=5, fig.width=10, fig.cap="Distribución de tipos y subtipos de Influenza, Laboratorio de Salud Pública"}
 plot_distribution_epiweek(distribution_influenza$influenza_epiweeks,
@@ -449,9 +453,7 @@ Multiplex, que en tiempo real detecta Bordetella pertussis, Bordetella
 parapertussis y Bordetella holmesii.
 
 ```{r tosferina-data}
-tosferina_data <- import_data_viral_circulation(report_data = c("C:/Users/geral/Documents/TRACE/labrep/data/tosferina SE23.xlsx"), sheet = 1,
-                                                col_names = TRUE)
-tosferina_data <- readxl::read_excel("C:/Users/geral/Documents/TRACE/labrep/data/tosferina SE23.xlsx")
+tosferina_data <- readxl::read_excel(params$tosferina)
 ```
 
 ```{r distribution-tosferina-epiweek}
