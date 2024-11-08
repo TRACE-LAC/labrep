@@ -1,6 +1,9 @@
 default:
-  age_categorie_conditionals: [ "age_num < 2", "age_num >= 2 && age_num <= 4", "age_num >= 5 && age_num <= 14", "age_num >= 15 && age_num <= 39", "age_num >=40 && age_num <= 59", "age_num >= 60"]
-  age_categorie_labels: [ "<2 años", "2 a 4 años", "5 a 14 años", "15 a 39 años", "40 a 59 años", "60 y más"]
+  age_category_conditionals:
+  age_categories:
+    conditionals: [ "age_num < 2", "age_num >= 2 && age_num <= 4", "age_num >= 5 && age_num <= 14", "age_num >= 15 && age_num <= 39", "age_num >=40 && age_num <= 59", "age_num >= 60"]
+    age_categories: [ "< 2 años", "2 a 4 años", "5 a 14 años", "15 a 39 años", "40 a 59 años", "60 y más"]
+    labels: ["menor de 2 años", "entre 2 y 4 años", "entre 5 y 14 años", "entre 15 y 39 años", "entre 40 y 59 años", "entre 60 y más años"]
   age_categorie_labels_tosferina: [ "< o = 1 mes", "2 a 3 meses", "4 a 5 meses", "6 a 11 meses", "1 a 4 años", "5 a 14 años", "15 a 44 años", "45 y mas años"]
   respiratory_virus_column_names: [ "influenza_a_h1_2009", "influenza_a_h1", "influenza_a_h3", "influenza_b", "metapneumovirus_humano", "rinovirus_enterovirus_humano", "virus_sincitial_respiratorio", "adenovirus"]
   respiratory_virus_names: [ "H1N1 2009", "H1N1", "H3N1", "Influenza B", "Metapneumovirus", "Rinovirus", "VSR", "Adenovirus"]
@@ -9,6 +12,138 @@ default:
   respiratory_virus_detected_names: ["Adenovirus", "Rinovirus", "Bocavirus", "Parainfluenza", "Influenza b", "H3N1", "Metapneumovirus", "VSR", "H1N1"]
   respiratory_virus_detected: [ "adenovirus", "rinovirus", "bocavirus", "parainfluenza", "influenza_b", "h3", "metapneumovirus", "virus_sincitial_respiratorio", "h1"]
   influeza_types: [ "influenza_b", "h3", "h1"]
-  influeza_columns: [ "influenza_b", "influenza_a_h3", "influenza_a_h1_2009"]
+  influeza_events: [ "influenza_a", "h1n1", "h1n1_pdm09", "h3n2", "influenza_b"]
   influeza_columns_names: [ "Influenza B", "H3N1", "H1N1 2009"]
   respiratory_virus_test_exceptions: [ "muestra_insuficiente_no_se_procesa", "no_se_procesa_ifi_tiempo_de_toma_de_muestra_superior_a_7_dias_nota_2", "no_se_observan_virus_respiratorios", "muestra_escasa_de_celulas"]
+  other_viruses:
+    epiweek: 
+      col_valid: "semanaepidemiologicavegeneral"
+      cols_clean: ["semanaepidemiologicavegeneral1"]
+    invalid_results:
+      col_name: "virusdetectadosvegeneral"
+      values:
+      - "muestra_no_apta"
+      - "muestra_insuficiente"
+      - "la_prueba_no_se_realiza"
+      - "no_cumple"
+      - "no_se_procesa"
+      - "resultado_indeterminado"
+  filmarray_data:
+    epiweek: 
+      col_valid: "se"
+    age_groups:
+      col_valid: "grupo_edad"
+      cols_clean: ["grupo_de_edad"]
+  tosferina_data:
+    age_groups:
+      col_valid: "grupo_edad"
+      cols_clean: ["grupo_de_edad"]
+    result_interpretation:
+      col_valid: "interpretacion_del_resultado"
+      cols_clean: ["interpretacion_de_resultados"]
+    gender:
+      col_valid: "genero"
+  viruses:
+  - name: "influenza_a"
+    filmarray:
+      col_name: influenza_a
+      values: "DETECTADO"
+    other_viruses:
+      col_name: "influenzaaporrtpcrvegeneral"
+      values: ["positivo"]
+      col_subtypes: "virusdetectadosvegeneral"
+      original_value: ["positivo"]
+      valid_result: TRUE
+    label: "A no subtipificado"
+    subtypes: ["h1n1", "h1n1_pdm09", "h3n2"]
+  - name: "h1n1"
+    filmarray:
+      col_name: "influenza_a_h1"
+      values: "DETECTADO"
+    other_viruses:
+      col_name: "virusdetectadosvegeneral"
+      values: [""]
+    label: "H1N1"
+  - name: "h1n1_pdm09"
+    filmarray:
+      col_name: "influenza_a_h1_2009"
+      values: "DETECTADO"
+    other_viruses:
+      col_name: "virusdetectadosvegeneral"
+      values: ["h1n1_pdm09", "hn1_pdm09", "pdm09", "a_pdm09", "h1n1pdm09"]
+    label: "H1N1 2009"
+  - name: "h3n2"
+    filmarray:
+      col_name: "influenza_a_h3"
+      values: "DETECTADO"
+    other_viruses:
+      col_name: "virusdetectadosvegeneral"
+      values: ["a_h3"]
+    label: "H3N2"
+  - name: "influenza_b"
+    filmarray:
+      col_name: "influenza_b"
+      values: "DETECTADO"
+    other_viruses:
+      col_name: "influenzabporrtpcrvegeneral"
+      values: ["positivo"]
+      valid_result: TRUE
+    label: "Influenza B"
+  - name: "otros_virus"
+    filmarray:
+      col_name: "rinovirus_enterovirus_humano"
+      values: "DETECTADO"
+    other_viruses:
+      col_name: "virusdetectadosvegeneral"
+      values: ["enterovirus", "coronavirus_nl63"]
+    label: "Otros Virus"
+  - name: "bocavirus"
+    filmarray:
+      col_name: ""
+      values: ""
+    other_viruses:
+      col_name: "virusdetectadosvegeneral"
+      values: ["bocavoirus_hbov", "bocavorus", "bocavirus"]
+    label: "Bocavirus"
+  - name: "metapneumovirus"
+    filmarray:
+      col_name: "metapneumovirus_humano"
+      values: "DETECTADO"
+    other_viruses:
+      col_name: "virusdetectadosvegeneral"
+      values: ["metapneumovirus", "metaneumovirus"]
+    label: "Metapneumovirus"
+  - name: "rinovirus"
+    filmarray:
+      col_name: "rinovirus_enterovirus_humano"
+      values: "DETECTADO"
+    other_viruses:
+      col_name: "virusdetectadosvegeneral"
+      values: ["rinovirus", "rhinovirus"]
+    label: "Rinovirus"
+  - name: "parainfluenza"
+    filmarray:
+      col_name: ["virus_parainfluenza_1", "virus_parainfluenza_2", "virus_parainfluenza_3", "virus_parainfluenza_4"]
+      values: "DETECTADO"
+    other_viruses:
+      col_name: "virusdetectadosvegeneral"
+      values: ["parainfluenza_tipo_1", "parainfluenza_tipo_2", "parainfluenza_tipo_3", "parainfluenza_1", "piv2", "parainfluenza_3"]
+    label: "Parainfluenza"
+  - name: "vsr"
+    filmarray:
+      col_name: "virus_sincitial_respiratorio"
+      values: "DETECTADO"
+    other_viruses:
+      col_name: "virussincitialrespiratoriovsrporrtpcrvegeneral"
+      values: ["positivo"]
+      valid_result: TRUE
+    label: "VSR"
+  - name: "adenovirus"
+    filmarray:
+      col_name: ["adenovirus"]
+      values: "DETECTADO"
+    other_viruses:
+      col_name: "adenovirusadvporrtpcrvegeneral"
+      values: ["positivo"]
+      valid_result: TRUE
+    label: "Adenovirus"
