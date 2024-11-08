@@ -878,10 +878,8 @@ get_results_tosferina <- function(report_data, results = "positivo",
                                   report_data[[col_results]],
                                   fixed = TRUE)] <-
     "Negativo para Bordetella"
-  cases <- report_data[grep("Positivo", report_data[[col_results]],
-                            fixed = TRUE) 
-                       || grep("Negativo", report_data[[col_results]],
-                               fixed = TRUE), ]
+  cases <- report_data[grepl("Positivo|Negativo", report_data[[col_results]],
+                             fixed = TRUE), ]
   na_values <- which(is.na(report_data[[col_results]]))
   if (length(na_values) > 0) {
     cases <- report_data[-na_values, ]
