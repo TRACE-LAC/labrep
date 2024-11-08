@@ -41,6 +41,10 @@ params:
     label: "Datos Tosferina"
     input: file
     value: ""
+  historic_data:
+    label: "Datos Historicos"
+    input: file
+    value: ""
   epiweek:
     label: "Semana epidemiológica"
     input: text
@@ -163,6 +167,24 @@ después continúan su análisis con: panel respiratorio  Allplex y reacción en
 cadena de la polimerasa con transcriptasa inversa (RT-PCR) para el
 diagnóstico de los principales agentes a los que se les atribuye el
 IRAG.
+
+```{r historic-data}
+SHEET_NAME <- "POR PERIODO"
+INDICADOR <- 2
+tables <- get_all_tables(params$historic_data, SHEET_NAME)
+tabla <- get_selected_table(tables, INDICADOR)
+tabla <- clean_historic_data(tabla = tabla)
+historic_epi_times <- get_historic_epi_times(tabla = tabla)
+```
+
+En el análisis del comportamiento de los virus respiratorios por periodo epidemiológico desde el 2022 se observa que se ha mantenido la circulación de virus como Rinovirus, Adenovirus y VSR. Para los tres años entre los periodos 3 al 6 coincide con el pico respiratorio que se presenta en todos los años (Figura 1).
+
+```{r plot-historic-data, include=TRUE, fig.height=6, fig.width=8,fig.cap="Circulación de virus respiratorios por período epidemiológico Año 2022 - 2024, Laboratorio de Salud Pública Bogotá."}
+plot_historic_epi_time(stacked_data = historic_epi_times$stacked_data,
+                       line_data = historic_epi_times$line_data,
+                       tabla = tabla)
+```
+
 
 ```{r filmarray-data}
 filmarray_data <- import_data_viral_circulation(report_data = params$fci_data,
