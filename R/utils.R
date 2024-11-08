@@ -202,6 +202,17 @@ get_tosferina_text_sex <- function(dataset, figure) {
   return(text_values)
 }
 
+#' @title Obtener el texto de la proporción acumulada con Sars CoV 2
+#' @export
+get_prop_text <- function(dataset) {
+  top_viruses <- dataset %>%
+    dplyr::arrange(dplyr::desc(!!dplyr::sym("porcentaje")))
+  top_viruses <- top_viruses[1:3, ]
+  text_viruses <- get_text_viruses(dataset = top_viruses,
+                                   tam = nrow(top_viruses))
+  return(text_viruses)
+}
+
 #' @title Obtener el texto de los virus por grupo de edad
 #' @export
 get_text_viruses <- function(dataset, tam) {
