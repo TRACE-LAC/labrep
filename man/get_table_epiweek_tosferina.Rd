@@ -4,7 +4,7 @@
 \alias{get_table_epiweek_tosferina}
 \title{Obtener la tabla de casos por semana epidemiológica de Tosferina}
 \usage{
-get_table_epiweek_tosferina(report_data)
+get_table_epiweek_tosferina(report_data, epiweek)
 }
 \description{
 Obtener la tabla de casos por semana epidemiológica de Tosferina

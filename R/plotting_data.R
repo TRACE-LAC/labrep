@@ -24,7 +24,7 @@ plot_age_group_distribution <- function(report_data,
                 "age_categories")$age_categories
   if (include_sars) {
     colors <- c(colors, "SARS CoV 2" = "#145765",
-                "H3N1" = "#19AFE5")
+                "H3N1" = "#4F81BD")
   } else {
     colors <- c(colors, "H3N1" = "#145765")
   }

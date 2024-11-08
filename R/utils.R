@@ -287,10 +287,12 @@ get_influenza_viruses <- function(viruses, events) {
 
 #' @title Obtener la tabla de casos por semana epidemiológica de Tosferina
 #' @export
-get_table_epiweek_tosferina <- function(report_data) {
+get_table_epiweek_tosferina <- function(report_data, epiweek) {
   table_data <- data.frame(SE = report_data$semana_epidemiologica,
                            positivos = report_data$porcentaje)
   table_data$SE <- as.numeric(table_data$SE)
+  table_data <- table_data %>%
+    dplyr::arrange(.data$SE <= as.numeric(epiweek))
   table_data <- table_data %>%
     dplyr::arrange(.data$SE)
   return(table_data)

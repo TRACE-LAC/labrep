@@ -185,7 +185,6 @@ plot_historic_epi_time(stacked_data = historic_epi_times$stacked_data,
                        tabla = tabla)
 ```
 
-
 ```{r filmarray-data}
 filmarray_data <- import_data_viral_circulation(report_data = params$fci_data,
                                                 sheet = 1,
@@ -239,7 +238,6 @@ perc_sars_age_group <-
   get_perc_viruses_age(dataset = sars_viruses_age_groups)
 ```
 
-
 Para esta semana, por grupo de edad, el `r perc_vrs_age_group`% de pacientes positivos para virus respiratorios diferentes al SARS-CoV-2 en `r current_year` corresponden a
 la población de menores de 5 años (figura 2) y si se incluye al
 SARS-CoV-2 los menores corresponden al `r perc_sars_age_group` % (figura 3).
@@ -248,25 +246,21 @@ SARS-CoV-2 los menores corresponden al `r perc_sars_age_group` % (figura 3).
 plot_age_group_distribution(viruses_age_groups)
 ```
 
-
-\newpage
-
 ```{r paragraph-viruses-age-groups}
 text_cons_viruses <-
   get_cons_viruses_age_text(dataset = viruses_age_groups,
                             text_group = ", para los niños entre 2 y 4 años 
                             se presentan casos de ")
-# Preguntar por Bocavirus
 ```
 
 En la figura 3 se presenta el consolidado de los virus respiratorios por los diferentes grupos de edad, en los niños menores de 2 años las mayores frecuencias son de casos de `r text_cons_viruses`.
 
-
 ```{r plot-distribution-sars, include=TRUE, fig.height=5, fig.width=10, fig.cap="Distribución porcentual de virus respiratorios y SARS-CoV-2 por grupo de edad, Laboratorio de Salud Pública Bogotá."}
-#sars_data <- import_data_viral_circulation(report_data = #c("C:/Users/geral/Documents/TRACE/labrep/data/df_other_virus_202252.cs#v"), header = TRUE)
 plot_age_group_distribution(sars_viruses_age_groups, var_y = "casos",
                             include_sars = TRUE)
 ```
+
+\newpage
 
 ```{r paragraph-sars-age-groups}
 text_cons_vrs_sars <-
@@ -274,8 +268,6 @@ text_cons_vrs_sars <-
                             text_group = ", en el grupo de 2 a 4
 años, ")
 ```
-
-\pagenumbering{arabic}
 
 Al incluir el virus de SARS-CoV-2 en la cuenta de los virus
 respiratorios, se observa que, en los menores de 2 años años las
@@ -328,18 +320,12 @@ irag_inusitado_age_groups <- irag_inusitado_age_groups %>% arrange(grupo_edad)
 ```{r plot-distribution-irag-inusitado-age-groups, include=TRUE, fig.height=5, fig.width=10}
 plot_age_group_distribution(irag_inusitado_age_groups,
                             include_sars = TRUE)
-# datos_convertidos <- tidyr::spread(irag_inusitado_distribution, key = grupo_edad, value = casos:etiqueta)
-# 
-# tabla <- gridExtra::tableGrob(irag_inusitado_distribution, theme = gridExtra::ttheme_default(base_size = 10))
-# gridExtra::grid.arrange(plot_irag_inusitado, tabla, ncol = 1, heights = c(2, 1))
 ```
 
 En la figura 5 se puede observar el comportamiento de los virus
 identificados tanto por la vigilancia centinela como por la vigilancia
 del IRAG inusitado, mediante las dos metodologías: panel respiratorio Allplex y
 RT-PCR.
-
-\newpage
 
 ```{r distribution-test-epiweek}
 test_distribution_epiweek <-
@@ -354,8 +340,6 @@ plot_distribution_epiweek(report_data =
                           var_fill = "etiqueta",
                           positives =
                           test_distribution_epiweek$cases_epiweeks)
-
-#cases_epiweeks <- get_cases_epiweeks(test_distribution_epiweek)
 ```
 
 ```{r distribution-epiweek}
@@ -389,9 +373,12 @@ text_vrs_cumulative <- get_text_viruses(dataset = viruses_cumulative_proportion,
 
 Dentro de la circulación viral acumulada predominan `r text_vrs_cumulative` cada uno respectivamente en las `r total_cases` muestras positivas de las `r total_samples` analizadas (figura 6).
 
+\newpage
+
 ```{r plot-cumulative-proportion, fig.height=8, fig.width=12, include=TRUE, fig.cap="Proporción acumulada de los virus respiratorios, Laboratorio de Salud Pública"}
 plot_cumulative_proportion(data_proportion = viruses_cumulative_proportion)
 ```
+
 
 ```{r distribution-epiweek-todo}
 #viruses_epiweeks <- get_distribution_epiweek(report_data = report_data_clean)
@@ -421,10 +408,11 @@ sars_prop_text <-
 plot_cumulative_proportion(sars_prop_epiweeks$cases_epiweek)
 ```
 
-En `r params$epiweek` la circulación viral estuvo con predominio de `r viruses_prop_text`; en las `r viruses_prop_epiweek$total_samples` muestras analizadas para esta semana.
+En la semana `r params$epiweek` la circulación viral estuvo con predominio de `r viruses_prop_text`; en las `r viruses_prop_epiweek$total_samples` muestras analizadas para esta semana.
 
 Dentro de la circulación viral acumulada a `r params$epiweek` al incluir el virus de SARS CoV 2 en la distribución de los virus respiratorios, se observa que predominan `r sars_prop_text` de las `r sars_prop_epiweeks$total_samples` muestras positivas de las `r total_samples_prop` muestras analizadas (figura 7).
 
+\newpage
 
 ```{r distribution-influenza}
 distribution_influenza <-
@@ -446,14 +434,13 @@ text_influenza <- get_text_viruses(dataset = total_dist_influenza,
 
 En cuanto al comportamiento de los virus de Influenza acumulado a SE `r params$epiweek` como de costumbre en las primeras semanas del año ha circulado el virus de `r text_influenza` en `r total_cases_influenza` muestras positivas. (Figura 8)
 
-```{r distribution_influeza, include=TRUE, fig.height=5, fig.width=10, fig.cap="Distribución de tipos y subtipos de Influenza, Laboratorio de Salud Pública"}
+```{r distribution_influeza, include=TRUE, fig.height=4, fig.width=10, fig.cap="Distribución de tipos y subtipos de Influenza, Laboratorio de Salud Pública"}
 plot_distribution_epiweek(distribution_influenza$influenza_epiweeks,
                           var_x = "semanaepidemiologicavegeneral",
                           var_y = "casos",
                           var_fill = "etiqueta",
                           influenza = TRUE,
                           positives = distribution_influenza$cases_epiweeks)
-# Cambiar el color del gráfico
 ```
 
 \newpage
@@ -479,13 +466,13 @@ tosferina_cleaned_data <- clean_tosferina_data(report_data = tosferina_data)
 total_cases_tosferina <- nrow(tosferina_cleaned_data)
 cases_epiweeks_tosferina <-
   get_cases_tosferina(report_data = tosferina_cleaned_data)
+table_epiweek <- get_table_epiweek_tosferina(cases_epiweeks_tosferina,
+                                             epiweek = params$epiweek)
 ```
-
 
 Se ha observado la siguiente positividad en `r total_cases_tosferina` muestras analizadas como se aprecia en la tabla 2:
 
 ```{r table-tosferina-epiweek, include=TRUE, fig.height=5, fig.width=10}
-table_epiweek <- get_table_epiweek_tosferina(cases_epiweeks_tosferina)
 plot_table_epiweek_tosferina(data_epiweek = table_epiweek,
                              distribution_epiweek = cases_epiweeks_tosferina)
 ```
@@ -540,7 +527,7 @@ tosferina_text_sex <- get_tosferina_text_sex(total_dist_tosferina, figure = 11)
 
 `r tosferina_text_sex$text`
 
-```{r distribution_tosferina_sex, include=TRUE, fig.height=6, fig.width=10, fig.cap="Distribución porcentual de casos de tosferina confirmados en el Laboratorio de Salud Pública, según género"}
+```{r distribution_tosferina_sex, include=TRUE, fig.height=5, fig.width=10, fig.cap="Distribución porcentual de casos de tosferina confirmados en el Laboratorio de Salud Pública, según género"}
 plot_results_tosferina(results_sex_tosferina,
                        column = "genero",
                        label_x = "Genero",
