@@ -1,69 +1,205 @@
+#' @title Agrupar los datos por columnas, ordenarlas y definir un
+#' porcentaje
+#' @export
 group_columns_total <- function(disease_data,
                                 event_name = "adenovirus",
                                 col_names,
                                 wt_percentage = FALSE,
                                 total_cases = 0,
                                 event_label = NULL,
-                                sum_cases = FALSE) {
-  config_path <- "C:/Users/geral/Documents/TRACE/tmp/sivirep/inst/extdata/config.yml"
-  categorie_labels <- config::get(file = config_path, "age_categorie_labels")
-  
+                                sum_cases = FALSE,
+                                col_order = NULL,
+                                etiqueta = TRUE) {
+  config_path <- system.file("extdata", "config.yml", package = "labrep")
+  categorie_labels <- config::get(file = config_path,
+                                  "age_categorie_labels")
   if (!sum_cases) {
     disease_data_grouped  <- disease_data %>% dplyr::group_by(
-      dplyr::across(dplyr::all_of(col_names))) %>% dplyr::summarise(casos = dplyr::n(), .groups = "drop")   
+      dplyr::across(dplyr::all_of(col_names))) %>%
+      dplyr::summarise(casos = dplyr::n(), .groups = "drop")   
   } else {
-    disease_data_grouped  <- disease_data %>% dplyr::group_by(
-      dplyr::across(dplyr::all_of(col_names))) %>% dplyr::summarise(casos = sum(.data$casos),
-                                                                    .groups = "drop")
+    disease_data_grouped <-
+      disease_data %>%
+      dplyr::group_by(dplyr::across(dplyr::all_of(col_names))) %>%
+      dplyr::summarise(casos = sum(.data$casos), .groups = "drop")
   }
   
   if (wt_percentage) {
-    disease_data_grouped  <-  disease_data_grouped %>% dplyr::mutate(porcentaje = round((disease_data_grouped$casos/total_cases)*100, 1))
-    if (!("etiqueta" %in% col_names)) {
-      disease_data_grouped  <-  disease_data_grouped %>% dplyr::mutate(evento = event_name, etiqueta = event_label) 
+    if (total_cases == 0) {
+      total_cases <- sum(disease_data_grouped$casos)
     }
+    disease_data_grouped  <-  disease_data_grouped %>%
+      dplyr::mutate(porcentaje =
+                      round((disease_data_grouped$casos/total_cases)*100, 1))
   }
-  
+  if (!("etiqueta" %in% col_names) && etiqueta) {
+    disease_data_grouped  <-  disease_data_grouped %>%
+      dplyr::mutate(evento = event_name, etiqueta = event_label) 
+  }
   if (is.null(event_label)) {
     for (label in categorie_labels) {
-      if (!any(disease_data_grouped == label) || is.na(any(disease_data_grouped == label))) {
+      if (!any(disease_data_grouped == label) ||
+          is.na(any(disease_data_grouped == label))) {
         new_row <- data.frame(grupo_edad = label, casos = 0, porcentaje  = 0, evento = event_name, etiqueta = event_label)
         disease_data_grouped <- rbind(disease_data_grouped, new_row)
       }
     }
   }
-  
   if ("semanaepidemiologicavegeneral" %in% col_names) {
     for (i in 1:52) {
       if (!any(disease_data_grouped$semanaepidemiologicavegeneral == i) 
           || is.na(any(disease_data_grouped$semanaepidemiologicavegeneral == i))) {
-        new_row <- data.frame(semanaepidemiologicavegeneral = i, casos = 0, porcentaje  = 0, evento = event_name, etiqueta = event_label)
+        if ("porcentaje" %in% col_names) {
+          new_row <- data.frame(semanaepidemiologicavegeneral = i,
+                                casos = 0,
+                                porcentaje  = 0,
+                                evento = event_name,
+                                etiqueta = event_label)
+        } else {
+          new_row <- data.frame(semanaepidemiologicavegeneral = i,
+                                casos = 0,
+                                evento = event_name,
+                                etiqueta = event_label)
+        }
         disease_data_grouped <- rbind(disease_data_grouped, new_row)
       }
     }
   }
+  if (!is.null(col_order)) {
+    disease_data_grouped <- disease_data_grouped %>%
+      dplyr::arrange(dplyr::desc(!!dplyr::sym(col_order)))
+  }
   return(disease_data_grouped)
 }
 
-get_distribution_age_group <- function(report_data, positive_value = "DETECTADO") {
-  config_path <- "C:/Users/geral/Documents/TRACE/tmp/sivirep/inst/extdata/config.yml"
-  column_names <- config::get(file = config_path, "respiratory_virus_column_names")
-  names <- config::get(file = config_path, "respiratory_virus_names")
-  viruses_by_age_group <- data.frame()
-  
-  i <- 1
-  for (column in column_names) {
-    positive_cases <- report_data[eval(parse(text = paste0("report_data$", column, " == ", '"', positive_value, '"'))), ]
-    positive_cases_by_age_group <- group_columns_total(positive_cases, "grupo_edad", event_name = column, wt_percentage = TRUE, total_cases = nrow(positive_cases), event_label = names[i])
-    viruses_by_age_group <- rbind(viruses_by_age_group, positive_cases_by_age_group)
-    i <- i + 1
+#' @title Obtener los casos de los virus de la base de datos filmarray de
+#' base de datos de la Fundación Cardio Infantil
+#' @export
+get_cases_filmarray <- function(report_data,
+                                positive_value = "DETECTADO",
+                                age_groups = TRUE,
+                                epiweek = NULL,
+                                vrs_influenza = NULL) {
+  config_path <- system.file("extdata", "config.yml", package = "labrep")
+  cols_viruses <- config::get(file = config_path, "viruses")
+  col_age_groups <- config::get(file = config_path,
+                                "filmarray_data")$age_groups$col_valid
+  col_epiweek <- config::get(file = config_path,
+                             "filmarray_data")$epiweek$col_valid
+  if (!is.null(vrs_influenza)) {
+    cols_viruses <-
+      get_influenza_viruses(viruses = cols_viruses,
+                            events = vrs_influenza)
   }
-  viruses_by_age_group <- viruses_by_age_group[-which(is.na(viruses_by_age_group$grupo_edad)), ]
-  viruses_by_age_group <- viruses_by_age_group[-which(viruses_by_age_group$grupo_edad == "SD"), ]
-  return(viruses_by_age_group)
+  if (!is.null(epiweek)  && epiweek != "all") {
+    col_epiweek <- config::get(file = config_path,
+                               "filmarray_data")$epiweek$col_valid
+    report_data <-
+      report_data[which(report_data[[col_epiweek]]
+                              == as.numeric(epiweek)), ]
+  }
+  viruses_age_group <- data.frame()
+  for (virus in cols_viruses) {
+      filmarray_vrs <- virus$filmarray
+      if (filmarray_vrs$col_name %in% names(report_data) &&
+          !("" %in% filmarray_vrs$values)) {
+        for (col_name in filmarray_vrs$col_name) {
+          positive_cases <-
+            report_data[report_data[[col_name]]
+                        == filmarray_vrs$values, ]
+          if (!is.null(epiweek)) {
+              positive_cases <- group_columns_total(disease_data = positive_cases,
+                                                    event_name = virus$name,
+                                                    col_names = col_epiweek,
+                                                    event_label = virus$label) 
+          }
+          if (age_groups) {
+            positive_cases_age_group <-
+              group_columns_total(positive_cases,
+                                  col_age_groups,
+                                  event_name = virus$name,
+                                  wt_percentage = TRUE,
+                                  total_cases = nrow(positive_cases),
+                                  event_label = virus$label)
+            positive_cases_age_group <-
+              complete_age_categories(data_grouped = positive_cases_age_group,
+                                      event_name = virus$name,
+                                      event_label = virus$label)
+            positive_cases_age_group$total_casos <-
+              nrow(positive_cases)
+            viruses_age_group <-
+              rbind(viruses_age_group, positive_cases_age_group)
+          } else {
+            positive_cases$total_casos <-
+              nrow(positive_cases)
+            viruses_age_group <-
+              rbind(viruses_age_group, positive_cases)
+          }
+        }
+      }
+  }
+  na_values <- which(is.na(
+    viruses_age_group[[col_age_groups]]))
+  if (length(na_values) > 0) {
+    viruses_age_group <-
+      viruses_age_group[-na_values, ]
+  }
+  sd_values <- which(viruses_age_group[[col_age_groups]]
+                      == "SD")
+  if (length(sd_values) > 0) {
+    viruses_age_group <-
+      viruses_age_group[-sd_values, ]
+  }
+  return(viruses_age_group)
 }
 
-generate_age_groups_sars <- function(report_data,
+#' @title Obtener la distribución de casos por semana epidemiológicas
+#' @export
+get_distribution_epiweek <- function(report_data,
+                                     positive_value = "DETECTADO",
+                                     col_epiweek = "se") {
+  config_path <- system.file("extdata", "config.yml", package = "labrep")
+  column_names <- config::get(file = config_path,
+                              "respiratory_virus_column_names")
+  names <- config::get(file = config_path,
+                       "respiratory_virus_names")
+  viruses_age_group <- data.frame()
+  i <- 1
+  for (column in column_names) {
+    positive_cases <-
+      report_data[eval(parse(text = paste0("report_data$",
+                                           column,
+                                           " == ", '"',
+                                           positive_value, '"'))), ]
+    positive_cases_age_group <-
+      group_columns_total(positive_cases,
+                          col_group_age,
+                          event_name = column,
+                          wt_percentage = TRUE,
+                          total_cases = nrow(positive_cases),
+                          event_label = names[i])
+    viruses_age_group <-
+      rbind(viruses_age_group, positive_cases_age_group)
+    i <- i + 1
+  }
+  na_values <- which(is.na(
+    viruses_age_group[[col_epiweek]]))
+  if (length(na_values) > 0) {
+    viruses_age_group <-
+      viruses_age_group[-na_values, ]
+  }
+  sd_values <- which(viruses_age_group[[col_epiweek]]
+                     == "SD")
+  if (length(sd_values) > 0) {
+    viruses_age_group <-
+      viruses_age_group[-sd_values, ]
+  }
+  return(viruses_age_group)
+}
+
+#' @title Generar los grupos de edad para la base de datos Otro Virus
+#' @export
+generate_age_groups_viruses <- function(report_data,
                                      event_name = "adenovirus",
                                      wt_percentage = FALSE,
                                      total_cases = 0,
@@ -90,7 +226,7 @@ generate_age_groups_sars <- function(report_data,
         data_grouped$casos[data_grouped$rangodeedadvegeneral == "entre_50_y_59_anos"][1], 
         na.rm = TRUE)
   
-  data_grouped$rangodeedadvegeneral[data_grouped$rangodeedadvegeneral == "1_ano"]  <- "<2 años"
+  data_grouped$rangodeedadvegeneral[data_grouped$rangodeedadvegeneral == "1_ano"]  <- "< 2 años"
   data_grouped$rangodeedadvegeneral[data_grouped$rangodeedadvegeneral == "entre_1_y_4_anos"]  <- "2 a 4 años"
   data_grouped$rangodeedadvegeneral[data_grouped$rangodeedadvegeneral == "60_y_mas_anos"]  <- "60 y más"
   
@@ -117,59 +253,187 @@ generate_age_groups_sars <- function(report_data,
   if (total_cases > 0) {
     data_grouped  <-  data_grouped %>% dplyr::mutate(
       porcentaje = round((data_grouped$casos/total_cases)*100, 1))
-  }
-  else {
+  } else {
     data_grouped  <-  data_grouped %>% dplyr::mutate(
       porcentaje = 0.0)
   }
   
-  data_grouped  <-  data_grouped %>% dplyr::mutate(evento = event_name, etiqueta = event_label)
+  data_grouped  <-  data_grouped %>%
+    dplyr::mutate(evento = event_name, etiqueta = event_label)
   
-  config_path <- "C:/Users/geral/Documents/TRACE/tmp/sivirep/inst/extdata/config.yml"
-  categorie_labels <- config::get(file = config_path, "age_categorie_labels")
-  
-  for (label in categorie_labels) {
-    if (!any(data_grouped == label) || is.na(any(data_grouped == label))) {
-      new_row <- data.frame(grupo_edad = label,
-                            casos = 0,
-                            porcentaje = 0,
-                            evento = event_name,
-                            etiqueta = event_label)
-      data_grouped <- rbind(data_grouped, new_row)
-    }
-  }
+  data_grouped <-
+    complete_age_categories(data_grouped = data_grouped,
+                            event_name = event_name,
+                            event_label = event_label)
   
   return(data_grouped)
   
 }
 
-get_distribution_age_group_sars <- function(report_data, positive_value = "DETECTADO") {
+#' @title Obtener la distribución de casos de la base de datos Otros Virus
+#' @export
+get_cases_other_viruses <- function(report_data,
+                                    epiweek = NULL,
+                                    age_groups = FALSE,
+                                    vrs_influenza = NULL) {
+  config_path <- system.file("extdata", "config.yml", package = "labrep")
+  cols_viruses <- config::get(file = config_path, "viruses")
+  invalid_results <- config::get(file = config_path, "other_viruses")$invalid_results
+  positive_cases <- data.frame()
+  col_epiweek <- config::get(file = config_path,
+                             "other_viruses")$epiweek$col_valid
+  if (!is.null(epiweek) && epiweek != "all") {
+    report_data <- report_data %>%
+      dplyr::filter(!!dplyr::sym(col_epiweek) == as.numeric(epiweek))
+  }
+  if (!is.null(vrs_influenza)) {
+    cols_viruses <-
+      get_influenza_viruses(viruses = cols_viruses,
+                            events = vrs_influenza)
+  }
+  for (virus in cols_viruses) {
+    other_vrs <- virus$other_viruses
+    if (other_vrs$col_name %in% names(report_data) && !("" %in% other_vrs$values)) {
+      # tener en cuenta si varios virus de otros virus estan en una misma celda
+      cases_virus <- report_data
+      if ("valid_result" %in% names(other_vrs)) {
+        for (value in invalid_results$values) {
+          if (value != "") {
+            cases_virus <- cases_virus[which(!stringr::str_detect(
+              invalid_results$col_name, value)), ]
+          }
+        }
+      }
+      if ("col_subtypes" %in% names(other_vrs)) {
+        subtypes_values <-
+          get_subtypes_values(viruses = cols_viruses,
+                                        subtypes = virus$subtypes)
+        other_vrs$values <- subtypes_values
+        cases_virus <- cases_virus[
+          which(stringr::str_detect(cases_virus[[other_vrs$col_name]],
+                                     other_vrs$original_value)), ]
+      }
+      positive_cases_virus <- data.frame()
+      for (value in other_vrs$values) {
+        if (value != "") {
+          if ("col_subtypes" %in% names(other_vrs)) {
+            cases_virus <- cases_virus[which(!stringr::str_detect(
+              cases_virus[[other_vrs$col_name]], value)), ]
+          } else {
+            cases_virus <- cases_virus[which(stringr::str_detect(
+              cases_virus[[other_vrs$col_name]], value)), ]
+          }
+          if (!is.null(epiweek)) { 
+            cases_virus <- group_columns_total(disease_data = cases_virus,
+                                         event_name = virus$name,
+                                         col_names = col_epiweek,
+                                         event_label = virus$label)  
+          }
+          positive_cases_virus <- rbind(positive_cases_virus, cases_virus)
+        }
+      }
+      if (age_groups) {
+        cases_age_groups <-
+          generate_age_groups_viruses(report_data = cases_virus,
+                                      event_name = virus$name,
+                                      wt_percentage = TRUE,
+                                      total_cases = nrow(cases_virus),
+                                      event_label = virus$label)
+        cases_age_groups$total_casos <- nrow(cases_virus)
+        positive_cases <- rbind(positive_cases, cases_age_groups)
+      } else {
+        positive_cases_virus$total_casos <- nrow(cases_virus)
+        positive_cases <- rbind(positive_cases, positive_cases_virus)
+      }
+    }
+  }
+  return(positive_cases)
+}
+
+get_dist_fci_other_vrs <- function(fci_data, vrs_data) {
+  dist_fci_other_vrs <- rbind(fci_data, vrs_data)
+  dist_fci_other_vrs <- dist_fci_other_vrs %>%
+    dplyr::group_by(dplyr::across(dplyr::all_of(
+      c("evento", "grupo_edad","etiqueta")))) %>%
+    dplyr::summarise(casos = sum(casos),
+                     total_casos = sum(total_casos),
+                     .groups = "drop")
+  dist_fci_other_vrs <- dist_fci_other_vrs %>%
+    dplyr::mutate(porcentaje =
+                    round((.data$casos * 100)/.data$total_casos))
+  dist_fci_other_vrs <- dist_fci_other_vrs %>%
+    dplyr::select(.data$grupo_edad,
+                  .data$casos,
+                  .data$porcentaje,
+                  .data$evento,
+                  .data$etiqueta)
+  return(dist_fci_other_vrs)
+}
+
+#' @title Obtener la distribución de casos de Sars CoV 2
+#' @export
+get_cases_sars <- function(report_data,
+                           positive_value = "DETECTADO",
+                           age_groups = FALSE,
+                           epiweek = NULL) {
+  config_path <- system.file("extdata", "config.yml", package = "labrep")
+  col_epiweek <- config::get(file = config_path,
+                             "other_viruses")$epiweek$col_valid
   
   viruses_age_group <- data.frame()
-  report_data$resultadonuevocoronavirussarscov2vegeneral <- epitrix::clean_labels(report_data$resultadonuevocoronavirussarscov2vegeneral)
-  report_data$rangodeedadvegeneral <- epitrix::clean_labels(report_data$rangodeedadvegeneral)
-  positive_cases_sars <- report_data[report_data$resultadonuevocoronavirussarscov2vegeneral == "positivo_para_nuevo_coronavirus_sars_cov_2", ]
+  positive_cases_sars <-
+    report_data[report_data$resultadonuevocoronavirussarscov2vegeneral ==
+                  "positivo_para_nuevo_coronavirus_sars_cov_2", ]
   
   positive_cases_virusvgeneral <- report_data[which(stringr::str_detect(
     report_data$virusdetectadosvegeneral, "covid_19")), ]
   
   positive_cases_sars <- rbind(positive_cases_sars, positive_cases_virusvgeneral)
   
-  viruses_age_group <- generate_age_groups_sars(positive_cases_sars,
-                                                event_name = "sars", 
-                                                wt_percentage = TRUE, 
-                                                total_cases = nrow(positive_cases_sars), 
-                                                event_label = "SARS CoV 2")
-  
-  return(viruses_age_group)
+  if (!is.null(epiweek)) {
+    sars_epiweeks <-
+      group_columns_total(positive_cases_sars,
+                          event_name = "sars",
+                          col_names = col_epiweek,
+                          event_label = "SARS CoV 2")
+    sars_epiweeks <-
+      get_cases_epiweeks(report_data = report_data,
+                         data_grouped = sars_epiweeks,
+                         col_epiweek = col_epiweek)
+    sars_epiweeks$evento <- "sars"
+    sars_epiweeks$etiqueta <- "SARS CoV 2"
+    if (epiweek != "all") {
+      sars_epiweeks <- sars_epiweeks %>%
+        dplyr::filter(!!dplyr::sym(col_epiweek) == as.numeric(epiweek))
+    }
+    return(sars_epiweeks)
+  }
+  if (age_groups) {
+    sars_age_groups <-
+      generate_age_groups_viruses(positive_cases_sars,
+                                  event_name = "sars",
+                                  wt_percentage = TRUE,
+                                  total_cases = nrow(positive_cases_sars),
+                                  event_label = "SARS CoV 2")
+    return(sars_age_groups)
+  }
+  return(positive_cases_sars)
 }
 
+#' @title Obtener la distribución de casos de las bases de datos Filmarray y
+#' Otros Virus
+#' @export
 get_distribution_age_vr_sars <- function(data_vr, data_sars) {
   distribution_age_vr_sars <- rbind(data_vr, data_sars)
   return(distribution_age_vr_sars)
 }
 
-get_distribution_esi_sars <- function(report_data, epiweek = 0, test = "bio_molecular") {
+#' @title Obtener la distribución de casos ESI incluyendo Sars CoV 2
+#' Otros Virus
+#' @export
+get_distribution_esi_sars <- function(report_data,
+                                      epiweek = 0,
+                                      test = "bio_molecular") {
   
   viruses_age_group <- data.frame()
   report_data$resultadonuevocoronavirussarscov2vegeneral <- epitrix::clean_labels(
@@ -209,12 +473,15 @@ get_distribution_esi_sars <- function(report_data, epiweek = 0, test = "bio_mole
     !is.na(
       positive_cases_sars$fechainiciodesintomasvegeneral)), ]
   
-  viruses_age_group <- generate_age_groups_sars(positive_cases_sars)
+  viruses_age_group <- generate_age_groups_viruses(positive_cases_sars)
   
   return(viruses_age_group)
   
 }
 
+#' @title Obtener la distribución de casos de la vigilancia
+#' Otros Virus
+#' @export
 get_distribution_surveillance <- function(report_data,
                                           epiweek = 0,
                                           include_sars = FALSE,
@@ -266,26 +533,26 @@ get_distribution_surveillance <- function(report_data,
                                              is.na(.data$fluorescenciavegeneral))
       # Averiguar con SDS
     } else if (test == "fluorescencia") {
-      report_data_esi <- dplyr::filter(report_data_esi ,
-                                       .data$fluorescenciavegeneral != "la_prueba_no_se_realiza" &&
-                                         .data$fluorescenciavegeneral != "la_prueba_no_se_realiza" &&
-                                         .data$fluorescenciavegeneral != "muestra_escasa_de_células" &&
-                                         .data$fluorescenciavegeneral != "muestra_insuficiente_no_se_procesa" &&
-                                         .data$fluorescenciavegeneral 
-                                       != "no_se_procesa_ifi_tiempo_de_toma_de_muestra_superior_a_7_dias_nota_2" &&
-                                         !is.na(.data$fluorescenciavegeneral))
+      report_data_esi <-
+        dplyr::filter(
+          report_data_esi,
+          .data$fluorescenciavegeneral != "la_prueba_no_se_realiza" &&
+            .data$fluorescenciavegeneral != "la_prueba_no_se_realiza" &&
+            .data$fluorescenciavegeneral != "muestra_escasa_de_células" &&
+            .data$fluorescenciavegeneral != "muestra_insuficiente_no_se_procesa"
+          && .data$fluorescenciavegeneral 
+          != "no_se_procesa_ifi_tiempo_de_toma_de_muestra_superior_a_7_dias_nota_2" &&
+            !is.na(.data$fluorescenciavegeneral))
     }
   }
-  
-  config_path <- "C:/Users/geral/Documents/TRACE/labrep/inst/extdata/config.yml"
+  config_path <- system.file("extdata", "config.yml", package = "labrep")
   column_names <- config::get(file = config_path, "respiratory_virus_detected")
   names <- config::get(file = config_path, "respiratory_virus_detected_names")
-  
   i <- 1
   for (column in column_names) {
     positive_cases <- report_data_esi[which(stringr::str_detect(
       report_data_esi$virusdetectadosvegeneral, column)), ]
-    positive_cases_age_group <- generate_age_groups_sars(positive_cases, 
+    positive_cases_age_group <- generate_age_groups_viruses(positive_cases, 
                                                          event_name = column, 
                                                          wt_percentage = TRUE, 
                                                          total_cases = nrow(positive_cases), 
@@ -293,7 +560,6 @@ get_distribution_surveillance <- function(report_data,
     viruses_age_group <- rbind(viruses_age_group, positive_cases_age_group)
     i <- i + 1
   }
-  
   if (include_sars) {
     positive_cases <- report_data_esi[
       report_data_esi$resultadonuevocoronavirussarscov2vegeneral 
@@ -303,110 +569,29 @@ get_distribution_surveillance <- function(report_data,
     if (nrow(positive_cases_virusvgeneral) > 1) {
       positive_cases <- rbind(positive_cases, positive_cases_virusvgeneral)
     }
-    positive_cases_age_group <- generate_age_groups_sars(positive_cases, 
-                                                         event_name = "sars", 
-                                                         wt_percentage = TRUE, 
-                                                         total_cases = nrow(positive_cases), 
-                                                         event_label = "SARS CoV 2")
-    viruses_age_group <- rbind(viruses_age_group, positive_cases_age_group)
-  }
-  
-  return(viruses_age_group)
-}
-
-
-get_distribution_surveillance_2 <- function(report_data,
-                                          epiweek = 0,
-                                          include_sars = FALSE,
-                                          surveillance_type = "esi",
-                                          test = NULL) {
-  viruses_age_group <- data.frame()
-  report_data_esi <- clean_data_other_viruses(report_data)
-  
-  if (surveillance_type == "esi") {
-    report_data_esi <- report_data_esi[
-      report_data_esi$eventovegeneral == "esi_irag_centinela_345", ]
-    report_data_esi <- report_data_esi[
-      report_data_esi$clasificacionvegeneral == "ambulatorio", ]
-  } else if (surveillance_type == "irag_grave") {
-    report_data_esi <- report_data_esi[
-      report_data_esi$eventovegeneral == "esi_irag_centinela_345", ]
-    report_data_esi <- report_data_esi[
-      which(stringr::str_detect(
-        report_data_esi$clasificacionvegeneral, "hospitalizado")), ]
-  } else if (surveillance_type == "irag_inusitado") {
-    report_data_esi <- report_data_esi[
-      report_data_esi$eventovegeneral == "irag_inusitado_348", ]
-  }
-  
-  if (epiweek > 0) {
-    report_data_esi <- report_data_esi[
-      report_data_esi$semanaepidemiologicavegeneral == epiweek, ]
-  }
-  
-  # Agregar filmarray FCI-Centinela
-  
-  report_data_esi <- report_data_esi[which(
-    !is.na(
-      report_data_esi$fechainiciodesintomasvegeneral)), ]
-  
-  if (!is.null(test)) {
-    if (test == "bio_molecular") {
-      positive_cases_sars <- dplyr::filter(report_data_esi ,
-                                           .data$fluorescenciavegeneral == "la_prueba_no_se_realiza" || 
-                                             is.na(.data$fluorescenciavegeneral))
-    } else if (test == "fluorescencia") {
-      report_data_esi <- dplyr::filter(report_data_esi ,
-                                       .data$fluorescenciavegeneral != "la_prueba_no_se_realiza" &&
-                                         .data$fluorescenciavegeneral != "la_prueba_no_se_realiza" &&
-                                         .data$fluorescenciavegeneral != "muestra_insuficiente_no_se_procesa" &&
-                                         .data$fluorescenciavegeneral 
-                                       != "no_se_procesa_ifi_tiempo_de_toma_de_muestra_superior_a_7_dias_nota_2" &&
-                                         !is.na(.data$fluorescenciavegeneral))
-    }
-  }
-  
-  config_path <- "C:/Users/geral/Documents/TRACE/tmp/sivirep/inst/extdata/config.yml"
-  column_names <- config::get(file = config_path, "respiratory_virus_detected")
-  names <- config::get(file = config_path, "respiratory_virus_detected_names")
-  
-  i <- 1
-  for (column in column_names) {
-    positive_cases <- report_data_esi[which(stringr::str_detect(
-      report_data_esi$virusdetectadosvegeneral, column)), ]
-    positive_cases_age_group <- generate_age_groups_sars(positive_cases, 
-                                                         event_name = column, 
-                                                         wt_percentage = TRUE, 
-                                                         total_cases = nrow(positive_cases), 
-                                                         event_label = names[i])
-    viruses_age_group <- rbind(viruses_age_group, positive_cases_age_group)
-    i <- i + 1
-  }
-  
-  if (include_sars) {
-    positive_cases <- report_data_esi[
-      report_data_esi$resultadonuevocoronavirussarscov2vegeneral 
-      == "positivo_para_nuevo_coronavirus_sars_cov_2", ]
-    positive_cases_age_group <- generate_age_groups_sars(positive_cases, 
-                                                         event_name = "sars", 
-                                                         wt_percentage = TRUE, 
-                                                         total_cases = nrow(positive_cases), 
-                                                         event_label = "SARS CoV 2")
+    positive_cases_age_group <-
+      generate_age_groups_viruses(positive_cases,
+                                  event_name = "sars",
+                                  wt_percentage = TRUE,
+                                  total_cases = nrow(positive_cases),
+                                  event_label = "SARS CoV 2")
     viruses_age_group <- rbind(viruses_age_group, positive_cases_age_group)
   }
   return(viruses_age_group)
 }
 
+#' @title Obtener la distribución de casos por tipo de prueba
+#' @export
 get_distribution_test <- function(report_data,
                                   epiweek = 0,
                                   include_sars = FALSE,
-                                  test = NULL) {
+                                  test = NULL,
+                                  col_epiweek = NULL) {
   
   viruses_epiweek_group <- data.frame()
   report_data_test <- data.frame()
-  
   report_data_irag_grave <- report_data[
-    report_data_test$eventovegeneral == "esi_irag_centinela_345", ]
+    report_data$eventovegeneral == "esi_irag_centinela_345", ]
   report_data_irag_grave <- report_data_irag_grave[
     which(stringr::str_detect(
       report_data_irag_grave$clasificacionvegeneral, "hospitalizado")), ]
@@ -415,275 +600,335 @@ get_distribution_test <- function(report_data,
   
   report_data_test <- rbind(report_data_test, report_data_irag_grave)
   report_data_test <- rbind(report_data_test, report_data_irag)
-  
   if (epiweek > 0) {
     report_data_test <- report_data_test[
       report_data_test$semanaepidemiologicavegeneral == epiweek, ]
   }
-  
-  # config_path <- "C:/Users/geral/Documents/TRACE/labrep/inst/extdata/config.yml"
-  # exceptions <- config::get(file = config_path, "respiratory_virus_test_exceptions")
-  # 
-  # for (ex in exceptions) {
-  #   if (length(which(report_data_test$fluorescenciavegeneral == ex 
-  #                    && report_data_test$virusdetectadosvegeneral == ex)) > 0) {
-  #     report_data_test <- report_data_test[
-  #       -which(report_data_test$fluorescenciavegeneral == ex), ]
-  #   }
-  # }
-  
-  config_path <- "C:/Users/geral/Documents/TRACE/labrep/inst/extdata/config.yml"
-  column_names <- config::get(file = config_path, "respiratory_virus_detected")
-  names <- config::get(file = config_path, "respiratory_virus_detected_names")
-  
-  i <- 1
-  for (column in column_names) {
-    positive_cases <- report_data_test[which(stringr::str_detect(
-      report_data_test$virusdetectadosvegeneral, column)), ]
-    positive_cases_age_group <- group_columns_total(positive_cases, 
-                                                    event_name = column,
-                                                    col_names = "semanaepidemiologicavegeneral",
-                                                    wt_percentage = TRUE, 
-                                                    total_cases = nrow(positive_cases), 
-                                                    event_label = names[i])
-    viruses_epiweek_group <- rbind(viruses_epiweek_group, positive_cases_age_group)
-    i <- i + 1
+  config_path <- system.file("extdata", "config.yml", package = "labrep")
+  if (is.null(col_epiweek)) {
+    col_epiweek <- config::get(file = config_path,
+                               "other_viruses")$epiweek$col_valid
+    index_col <- which(col_epiweek %in% names(report_data_test))
+    if (length(index_col) == 0) {
+        stop("Por favor ingrese el nombre de la variable o ",
+             "columna que corresponde ",
+           " a la semana epidemiologica")
+    }
   }
-  
+  cases_epiweeks <-
+    get_cases_epiweeks(report_data = report_data,
+                       data_grouped = report_data_test,
+                       col_epiweek = col_epiweek,
+                       table = FALSE)
+  viruses_epiweeks <- get_cases_other_viruses(report_data = report_data_test,
+                                              epiweek = "all")
   if (include_sars) {
-    positive_cases <- report_data_test[
-      report_data_test$resultadonuevocoronavirussarscov2vegeneral 
-      == "positivo_para_nuevo_coronavirus_sars_cov_2", ]
-    positive_cases_age_group <- group_columns_total(positive_cases, 
-                                                    event_name = "sars",
-                                                    col_names = "semanaepidemiologicavegeneral",
-                                                    wt_percentage = TRUE, 
-                                                    total_cases = nrow(positive_cases), 
-                                                    event_label = "SARS CoV 2")
-    viruses_epiweek_group <- rbind(viruses_epiweek_group, positive_cases_age_group)
+    sars_epiweeks <- get_cases_sars(report_data = report_data_test,
+                                    epiweek = "all")
+    viruses_epiweeks <-
+      rbind(viruses_epiweeks, sars_epiweeks)
   }
-  if (length(which(is.na(viruses_epiweek_group$semanaepidemiologicavegeneral))) > 0) {
-    viruses_epiweek_group <- viruses_epiweek_group[-which(is.na(viruses_epiweek_group$semanaepidemiologicavegeneral)), ]
+  if (length(which(is.na(viruses_epiweeks[[col_epiweek]]))) > 0) {
+    viruses_epiweeks <-
+      viruses_epiweeks[-which(is.na(viruses_epiweeks[[col_epiweek]])), ]
   }
-  return(viruses_epiweek_group)
+  distribution_epiweeks <- list(cases_epiweeks = cases_epiweeks,
+                                viruses_epiweeks = viruses_epiweeks)
+  return(distribution_epiweeks)
 }
 
-
-get_cases_epiweeks <- function(diseases_epiweek, table = FALSE) {
-  
-  total_positive_cases <- group_columns_total(diseases_epiweek,
-                                              event_name = "positivos",
-                                              col_names = "semanaepidemiologicavegeneral",
-                                              wt_percentage = TRUE, 
-                                              total_cases = sum(diseases_epiweek$casos), 
-                                              event_label = "Positivos",
-                                              sum_cases = TRUE)
+#' @title Obtener la distribución de casos por semana epidemiológica
+#' @export
+get_cases_epiweeks <- function(report_data,
+                               data_grouped,
+                               col_epiweek,
+                               diseases_epiweek, table = FALSE) {
   if (table) {
-    total_positive_cases <- data.frame(Semana = total_positive_cases$semanaepidemiologicavegeneral,
-                                       Positivos = total_positive_cases$porcentaje)
+    table_epiweeks <- data.frame(Semana = data_grouped[[col_epiweek]],
+                                 Positivos = data_grouped$porcentaje)
+    return(table_epiweeks)
   }
-  
-  return(total_positive_cases)
+  total_positive_cases <- data.frame()
+  total_cases_epiweeks <- report_data %>%
+    dplyr::group_by(dplyr::across(dplyr::all_of(col_epiweek))) %>%
+    dplyr::summarise(total_casos = n())
+  cases_epiweeks <- data_grouped %>%
+    dplyr::group_by(dplyr::across(dplyr::all_of(col_epiweek))) %>%
+    dplyr::summarise(casos = n())
+  cases_epiweeks <- dplyr::inner_join(cases_epiweeks,
+                                      total_cases_epiweeks,
+                                      by = col_epiweek)
+  cases_epiweeks <- cases_epiweeks %>%
+    dplyr::mutate(porcentaje =
+                    round((.data$casos * 100)/.data$total_casos, 1))
+  return(cases_epiweeks)
 }
 
-get_viruses_cumulative_proportion <- function(fci_data, other_virs_data) {
-  
+#' @title Obtener la proporción acumulada de los virus
+#' @export
+get_viruses_cumulative_proportion <- function(report_data) {
   viruses_cumulative_proportion  <- data.frame()
-  
-  fci_data <- fci_data[, -1]
-  fci_data_proportion <- group_columns_total(fci_data,
-                                             event_name = "",
-                                             col_names = c("evento",
-                                                           "etiqueta"),
-                                             wt_percentage = TRUE,
-                                             total_cases = sum(fci_data$casos), 
-                                             event_label = "",
-                                             sum_cases = TRUE)
-  
-  other_virs_data_proportion <- group_columns_total(other_virs_data,
-                                                    event_name = "",
-                                                    col_names = c("evento", "etiqueta"),
-                                                    wt_percentage = TRUE,
-                                                    total_cases = sum(other_virs_data$casos), 
-                                                    event_label = "",
-                                                    sum_cases = TRUE)
-  viruses_cumulative_proportion <- rbind(fci_data_proportion,
-                                         other_virs_data_proportion)
-  viruses_cumulative_proportion <- viruses_cumulative_proportion[, -1]
-  viruses_cumulative_proportion <- group_columns_total(viruses_cumulative_proportion,
-                                                    event_name = "",
-                                                    col_names = c("etiqueta"),
-                                                    wt_percentage = TRUE,
-                                                    total_cases = sum(viruses_cumulative_proportion$casos), 
-                                                    event_label = "",
-                                                    sum_cases = TRUE)
-  
-  return(viruses_cumulative_proportion)
+  col_names <- c("evento", "etiqueta")
+  col_names_others <- c("evento", "etiqueta")
+  col_names_cumulative <- "etiqueta"
+  viruses_proportion <- report_data %>%
+    dplyr::group_by(dplyr::across(dplyr::all_of(col_names))) %>%
+    dplyr::summarise(casos = sum(.data$casos))
+  total_cases <- sum(viruses_proportion$casos)
+  viruses_proportion <- viruses_proportion %>%
+    dplyr::mutate(porcentaje =
+                    round((.data$casos * 100) / total_cases, 1))
+  return(viruses_proportion)
 }
 
-get_distribution_influenza <- function(fci_data, other_virs_data) {
-  
-  influeza_fci_data <- fci_data
-  influenza_other_virs_data <- other_virs_data
+#' @title Obtener la proporción acumulada de los virus  por semana
+#' epidemiológica
+#' @export
+get_cases_prop_epiweek <- function(filmarray_data,
+                                   other_virs_data,
+                                   include_sars = TRUE,
+                                   epiweek) {
+  cases_filmarray <- data.frame()
+  cases_other_virs <- data.frame()
   distribution_influenza <- data.frame()
-  config_path <- "C:/Users/geral/Documents/TRACE/labrep/inst/extdata/config.yml"
-  
-  if (nrow(influeza_fci_data) > 0) {
-    column_names <- config::get(file = config_path, "influeza_types")
-    names <- config::get(file = config_path, "influeza_columns_names")
+  config_path <- system.file("extdata", "config.yml", package = "labrep")
+  col_epiweek <- config::get(file = config_path,
+                             "other_viruses")$epiweek$col_valid
+  total_other_virs <- 0
+  total_filmarray <- 0
+  if (nrow(filmarray_data) > 0) {
+    cases_filmarray <- get_cases_filmarray(report_data = filmarray_data,
+                                           epiweek = epiweek,
+                                           age_groups = FALSE)
+    col_epiweek_filmarray <- config::get(file = config_path,
+                               "filmarray_data")$epiweek$col_valid
+    cases_filmarray <-
+      dplyr::rename(cases_filmarray,
+                    "semanaepidemiologicavegeneral" =
+                      !!dplyr::sym(col_epiweek_filmarray))
     
-    i <- 1
-    for (column in column_names) {
-      positive_cases <- influeza_fci_data[which(stringr::str_detect(
-        influeza_fci_data$virusdetectadosvegeneral, column)), ]
-      positive_cases_fci <- group_columns_total(positive_cases, 
-                                                event_name = column,
-                                                col_names = "semanaepidemiologicavegeneral",
-                                                wt_percentage = TRUE, 
-                                                total_cases = nrow(positive_cases), 
-                                                event_label = names[i])
-      distribution_influenza <- rbind(distribution_influenza,
-                                      positive_cases_fci)
-      i <- i + 1
-    }
+    epiweek_filmarray <- filmarray_data %>%
+      dplyr::filter(!!dplyr::sym(col_epiweek_filmarray) == epiweek)
+    total_filmarray <- nrow(epiweek_filmarray)
   }
-  
-  if (nrow(influenza_other_virs_data) > 0) {
-    column_names <- config::get(file = config_path, "influeza_columns")
-    names <- config::get(file = config_path, "influeza_columns_names")
-    positive_value <- "DETECTADO"
-    influenza_other_virs_data <- dplyr::rename(influenza_other_virs_data,
-                                          "semanaepidemiologicavegeneral" = se)
-    i <- 1
-    for (column in column_names) {
-      positive_cases <- influenza_other_virs_data[eval(
-        parse(text = paste0("influenza_other_virs_data$",
-                            column, " == ", '"', positive_value, '"'))), ]
-      positive_cases_other <- group_columns_total(positive_cases,
-                                                  col_names = "semanaepidemiologicavegeneral",
-                                                  event_name = column,
-                                                  wt_percentage = TRUE,
-                                                  total_cases = nrow(positive_cases),
-                                                  event_label = names[i])
-      distribution_influenza <- rbind(distribution_influenza, positive_cases_other)
-      i <- i + 1 
-    }
-  }
-  
-  distribution_influenza <- group_columns_total(distribution_influenza,
-                                                event_name = "",
-                                                col_names = c("semanaepidemiologicavegeneral",
-                                                              "etiqueta"),
-                                                wt_percentage = TRUE,
-                                                total_cases = sum(distribution_influenza$casos), 
-                                                event_label = "",
-                                                sum_cases = TRUE)
-  
-  return(distribution_influenza)
-}
-
-get_percentage_influenza <- function(fci_data, other_virs_data) {
-  config_path <- "C:/Users/geral/Documents/TRACE/labrep/inst/extdata/config.yml"
-  influeza_fci_data <- fci_data
-  influenza_other_virs_data <- other_virs_data
-  percentage_influenza  <- data.frame()
-  
-  if (nrow(influeza_fci_data) > 0) {
-    influeza_fci_data <- dplyr::rename(influeza_fci_data,
-                                     "semanaepidemiologicavegeneral" = se)
-    percentage_influenza <- group_columns_total(influeza_fci_data,
-                                 col_names = "semanaepidemiologicavegeneral",
-                                 event_name = "",
-                                 wt_percentage = TRUE,
-                                 total_cases = nrow(influeza_fci_data),
-                                 event_label = "")
-  }
-  
   if (nrow(other_virs_data) > 0) {
-    cases  <- group_columns_total(other_virs_data,
-                                  col_names = "semanaepidemiologicavegeneral",
-                                  event_name = "",
-                                  wt_percentage = TRUE,
-                                  total_cases = nrow(other_virs_data),
-                                  event_label = "")
-    percentage_influenza  <- rbind(percentage_influenza, cases)
+    cases_other_virs <- get_cases_other_viruses(report_data = other_virs_data,
+                                                epiweek = epiweek,
+                                                age_groups = FALSE)
+    if (include_sars) {
+      cases_sars <- get_cases_sars(report_data = other_virs_data,
+                                   age_groups = FALSE,
+                                   epiweek = epiweek)
+      cases_sars <- cases_sars %>%
+        dplyr::select(names(cases_other_virs))
+      cases_other_virs <- rbind(cases_other_virs, cases_sars)
+    }
+    epiweek_other_virs <- other_virs_data %>%
+      dplyr::filter(!!dplyr::sym(col_epiweek) == epiweek)
+    total_other_virs <- nrow(epiweek_other_virs)
   }
+  cases_epiweek <- rbind(cases_filmarray, cases_other_virs)
+  total_samples <- total_filmarray + total_other_virs
+  cases_epiweek <-
+    group_columns_total(cases_epiweek,
+                        event_name = "",
+                        col_names = c("evento",
+                                      "etiqueta"),
+                        wt_percentage = TRUE,
+                        total_cases = sum(cases_epiweek$casos), 
+                        event_label = "",
+                        sum_cases = TRUE)
+  proportion_epiweek <-
+    list(cases_epiweek = cases_epiweek,
+         total_samples = total_samples)
+  return(proportion_epiweek)
 }
 
-get_cases_tosferina <- function(report_data, result = "positivo", column = "semana_epidemiologica") {
-  report_data$interpretacion_del_resultado <- epitrix::clean_labels(report_data$interpretacion_del_resultado)
-  
-  cases <- report_data[-which(is.na(report_data$interpretacion_del_resultado)), ]
-  cases <- cases[-grep("muestra", cases$interpretacion_del_resultado), ]
-  
-  cases_grouped <- cases %>% dplyr::group_by(dplyr::across(dplyr::all_of(column))) %>% dplyr::summarise(total_casos = dplyr::n(), .groups = "drop")
-  
-  positive_cases <- cases[grep(result, cases$interpretacion_del_resultado), ]
-  
-  positive_grouped <- positive_cases %>% dplyr::group_by(dplyr::across(dplyr::all_of(column))) %>% dplyr::summarise(casos = dplyr::n(), .groups = "drop")
-  
+#' @title Obtener la distribución de casos de Influenza y sus subtipos
+#' @export
+get_cases_influenza <- function(filmarray_data,
+                                other_virs_data) {
+  cases_filmarray <- data.frame()
+  cases_other_virs <- data.frame()
+  distribution_influenza <- data.frame()
+  config_path <- system.file("extdata", "config.yml", package = "labrep")
+  events <- config::get(file = config_path, "influeza_events")
+  col_epiweek <- config::get(file = config_path,
+                                    "other_viruses")$epiweek$col_valid
+  if (nrow(filmarray_data) > 0) {
+    cases_filmarray <- get_cases_filmarray(report_data = filmarray_data,
+                                           epiweek = "all",
+                                           vrs_influenza = events,
+                                           age_groups = FALSE)
+    col_epiweek_filmarray <- config::get(file = config_path,
+                                         "filmarray_data")$epiweek$col_valid
+    cases_filmarray <-
+      dplyr::rename(cases_filmarray,
+                    "semanaepidemiologicavegeneral" =
+                      !!dplyr::sym(col_epiweek_filmarray))
+    filmarray_data <-
+      dplyr::rename(filmarray_data,
+                    "semanaepidemiologicavegeneral" =
+                      !!dplyr::sym(col_epiweek_filmarray))
+  }
+  if (nrow(other_virs_data) > 0) {
+    cases_other_virs <- get_cases_other_viruses(report_data = other_virs_data,
+                                                epiweek = "all",
+                                                vrs_influenza = events,
+                                                age_groups = FALSE)
+  }
+  cases_influenza <- rbind(cases_filmarray, cases_other_virs)
+  cases_influenza <-
+    group_columns_total(cases_influenza,
+                        event_name = "",
+                        col_names = c(col_epiweek,
+                                      "etiqueta"),
+                        wt_percentage = TRUE,
+                        total_cases = sum(cases_influenza$casos), 
+                        event_label = "",
+                        sum_cases = TRUE)
+  filmarray_epiweeks <- filmarray_data %>%
+    dplyr::select(!!dplyr::sym(col_epiweek))
+  other_virs_epiweeks <- other_virs_data %>%
+    dplyr::select(!!dplyr::sym(col_epiweek))
+  data_epiweeks <- rbind(filmarray_epiweeks, other_virs_epiweeks)
+  cases_epiweeks <-
+    get_cases_epiweeks(report_data = data_epiweeks,
+                       data_grouped = cases_influenza,
+                       col_epiweek = col_epiweek)
+  distribution_epiweeks <- list(cases_epiweeks = cases_epiweeks,
+                                influenza_epiweeks = cases_influenza)
+  return(distribution_epiweeks)
+}
+
+#' @title Obtener la distribución de casos de Tosferina
+#' @export
+get_cases_tosferina <- function(report_data, result = "positivo",
+                                column = "semana_epidemiologica",
+                                col_results = "interpretacion_del_resultado") {
+  cases <- report_data
+  tosferina_cases <- data.frame()
+  na_values <- which(is.na(report_data[[col_results]]))
+  if (length(na_values) > 0) {
+    cases <- report_data[-na_values, ]
+  }
+  muestra_values <- grep("muestra", cases[[col_results]], fixed = TRUE)
+  if (length(muestra_values) > 0) {
+    cases <- cases[-muestra_values, ]
+  }
+  cases_grouped <- cases %>%
+    dplyr::group_by(dplyr::across(dplyr::all_of(column))) %>%
+    dplyr::summarise(total_casos = dplyr::n(), .groups = "drop")
+  positive_cases <- cases[grep(result, cases[[col_results]]), ]
+  positive_grouped <- positive_cases %>%
+    dplyr::group_by(dplyr::across(dplyr::all_of(column))) %>%
+    dplyr::summarise(casos = dplyr::n(), .groups = "drop")
   data_grouped <- merge(x = positive_grouped,y = cases_grouped, 
                         by = column, all.x = TRUE)
-  
-  data_grouped <- data_grouped %>% dplyr::mutate(porcentaje = round((data_grouped$casos/data_grouped$total_casos)*100, 1))
-  
+  data_grouped <- data_grouped %>%
+    dplyr::mutate(porcentaje =
+                    round((data_grouped$casos / data_grouped$total_casos) * 100,
+                          1))
   if (column == "semana_epidemiologica") {
-    for (week in setdiff(1:52, data_grouped$semana_epidemiologica)) {
-      new_row <- data.frame(semana_epidemiologica = week, casos = 0, porcentaje  = 0, total_casos = 0)
+    for (week in setdiff(1:53, data_grouped[[column]])) {
+      new_row <- data.frame(semana_epidemiologica = week,
+                            casos = 0,
+                            porcentaje  = 0, total_casos = 0)
       data_grouped <- rbind(data_grouped, new_row)
     }
   }
-  
   if (column == "grupo_edad") {
-    config_path <- "C:/Users/geral/Documents/TRACE/tmp/sivirep/inst/extdata/config.yml"
-    categorie_labels <- config::get(file = config_path, "age_categorie_labels_tosferina")
+    config_path <- system.file("extdata", "config.yml", package = "labrep")
+    categorie_labels <- config::get(file = config_path,
+                                    "age_categorie_labels_tosferina")
     for (label in categorie_labels) {
       if (!any(data_grouped == label) || is.na(any(data_grouped == label))) {
-        new_row <- data.frame(grupo_edad = label, casos = 0, porcentaje  = 0, total_casos = 0)
+        new_row <- data.frame(grupo_edad = label, casos = 0, porcentaje  = 0,
+                              total_casos = 0)
         data_grouped <- rbind(data_grouped, new_row)
       }
     }
-    #data_grouped <- data_grouped[-grep("SD", data_grouped$grupo_edad), ]
+    report_data[[column]] <- tolower(report_data[[column]])
+    tosferina_cases <-
+      get_cases_epiweeks(report_data = report_data,
+                         data_grouped = data_grouped,
+                         col_epiweek = column)
   }
-  
-  data_grouped <- data_grouped %>% dplyr::mutate(evento = "tosferina", etiqueta = "tosferina", interpretacion_del_resultado = "Positivo para Bordetella")
-  
+  data_grouped <- data_grouped %>%
+    dplyr::mutate(evento = "tosferina",
+                  etiqueta = "tosferina",
+                  interpretacion_del_resultado = "Positivo para Bordetella")
+  if (nrow(tosferina_cases) > 0) {
+    distribution_age_group <- list(cases_age_group = data_grouped,
+                                   tosferina_cases = tosferina_cases)
+    return(distribution_age_group)
+  }
   return(data_grouped)
 }
 
-get_results_tosferina <- function(report_data, results = "positivo", columns =  c("semana_epidemiologica", "interpretacion_del_resultado")) {
-  report_data$interpretacion_del_resultado <- epitrix::clean_labels(report_data$interpretacion_del_resultado)
-  report_data$interpretacion_del_resultado[grep("positivo", report_data$interpretacion_del_resultado)] <- "Positivo para Bordetella"
-  report_data$interpretacion_del_resultado[grep("negativo", report_data$interpretacion_del_resultado)] <- "Negativo para Bordetella"
-  
-  cases <- report_data[grep("Positivo", report_data$interpretacion_del_resultado) 
-                       || grep("Negativo", report_data$interpretacion_del_resultado), ]
-  
-  cases <- cases[-which(is.na(cases$interpretacion_del_resultado)), ]
-  cases <- cases[-grep("muestra", cases$interpretacion_del_resultado), ]
-  
+#' @title Obtener los resultados de casos de Tosferina
+#' @export
+get_results_tosferina <- function(report_data, results = "positivo",
+                                  columns =  "semana_epidemiologica",
+                                  col_results =
+                                    "interpretacion_del_resultado") {
+  columns <- c(columns, col_results)
+  report_data[[col_results]][grep("positivo",
+                                  report_data[[col_results]],
+                                  fixed = TRUE)] <-
+    "Positivo para Bordetella"
+  report_data[[col_results]][grep("negativo",
+                                  report_data[[col_results]],
+                                  fixed = TRUE)] <-
+    "Negativo para Bordetella"
+  cases <- report_data[grep("Positivo", report_data[[col_results]],
+                            fixed = TRUE) 
+                       || grep("Negativo", report_data[[col_results]],
+                               fixed = TRUE), ]
+  na_values <- which(is.na(report_data[[col_results]]))
+  if (length(na_values) > 0) {
+    cases <- report_data[-na_values, ]
+  }
+  muestra_values <- grep("muestra", cases[[col_results]], fixed = TRUE)
+  if (length(muestra_values) > 0) {
+    cases <- cases[-muestra_values, ]
+  }
   total_cases <- nrow(cases)
-  
-  if ("grupo_edad" %in% columns) {
-    cases <- cases[-grep("SD", cases$grupo_edad), ]
+  config_path <- system.file("extdata", "config.yml", package = "labrep")
+  col_age_groups <- config::get(file = config_path,
+                                "tosferina_data")$age_groups$col_valid
+  if (col_age_groups %in% columns) {
+    sd_values <- grep("SD", cases[[col_age_groups]], fixed = TRUE)
+    if (length(sd_values) > 0) {
+      cases <- cases[-sd_values, ]
+    }
   }
-  
-  
-  data_grouped <- cases %>% dplyr::group_by(dplyr::across(dplyr::all_of(columns))) %>% dplyr::summarise(casos = dplyr::n(), .groups = "drop")
-  data_grouped <- data_grouped %>% dplyr::mutate(porcentaje = round((data_grouped$casos/total_cases)*100, 1))
-  
-  if ("genero" %in% columns) {
-    new_row <- data.frame(genero = "Femenino", casos = 0, porcentaje = 0, interpretacion_del_resultado = "Positivo para Bordetella")
-    data_grouped <- rbind(data_grouped, new_row)
+  data_grouped <- cases %>%
+    dplyr::group_by(dplyr::across(dplyr::all_of(columns))) %>%
+    dplyr::summarise(casos = dplyr::n(), .groups = "drop")
+  data_grouped <- data_grouped %>%
+    dplyr::mutate(porcentaje = round((data_grouped$casos / total_cases) * 100, 1))
+  col_gender <-
+    config::get(file = config_path,
+                "tosferina_data")$gender$col_valid
+  if (col_gender %in% columns) {
+    data_grouped[[col_gender]] <-
+      stringr::str_to_title(data_grouped[[col_gender]])
+    if (length(unique(data_grouped[[col_gender]])) == 1) {
+      gender <- "Femenino"
+      if (gender %in% data_grouped) {
+        gender <- "Masculino"
+      }
+      new_row <- data.frame(genero = gender,
+                            casos = 0,
+                            porcentaje = 0,
+                            interpretacion_del_resultado =
+                              "Positivo para Bordetella")
+      data_grouped <- rbind(data_grouped, new_row)
+    }
+    
   }
-  
-  data_grouped <- data_grouped %>% dplyr::mutate(evento = "tosferina", etiqueta = "tosferina")
-  
+  data_grouped <- data_grouped %>% dplyr::mutate(evento = "tosferina",
+                                                 etiqueta = "tosferina")
   return(data_grouped)
-}
-
-get_table_epiweek_tosferina <- function(report_data) {
-  report_data <- report_data[order(report_data$semana_epidemiologica), ]
-  table_data <- data.frame(SE = report_data$semana_epidemiologica, positivos = report_data$porcentaje)
-  return(table_data)
 }
