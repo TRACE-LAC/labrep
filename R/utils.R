@@ -234,7 +234,7 @@ complete_age_categories <- function(data_grouped,
   categorie_labels <- config::get(file = config_path,
                                   "age_categories")$age_categories
   for (label in categorie_labels) {
-    if (any(data_grouped == label) || is.na(any(data_grouped == label))) {
+    if (!any(data_grouped == label) || is.na(any(data_grouped == label))) {
       new_row <- data.frame(grupo_edad = label,
                             casos = 0,
                             porcentaje = 0,
