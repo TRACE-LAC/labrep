@@ -1,23 +1,12 @@
-Package: packatemplate
-Title: Your Package Title in Titlecase
+Package: labrep
+Title: Paquete para la Generación Automática del Informe de Circulación Viral
 Version: 0.0.1
 Authors@R: c(
-    person(given = "Thibaut", family = "Jombart", , email = "thibaut@data.org", role = c("aut", "cre")),
-    person(given = "Avinash", family = "Laddha", , email = "avinash@data.org", role = c("aut")),
-    person(given = "James M.", family = "Azam", , email = "james.azam@lshtm.ac.uk", role = c("aut"),
-           comment = c(ORCID = "https://orcid.org/0000-0001-5782-7330")),
-    person(given = "Jaime A.", family = "Pavlich-Mariscal", , email = "jpavlich@javeriana.edu.co", role = c("ctb"),
-           comment = c(ORCID = "https://orcid.org/0000-0002-3892-6680")),
-    person(given = "Pratik", family = "Gupte", email = "pratik.gupte@lshtm.ac.uk", role = c("aut"), 
-           comment = c(ORCID = "https://orcid.org/0000-0001-5294-7819")),
-    person(given = "Joshua W.", family = "Lambert", email = "joshua.lambert@lshtm.ac.uk", role = c("aut"),
-           comment = c(ORCID = "0000-0001-5218-3046")),
-    person(given = "Hugo", family = "Gruson", email = "hugo.gruson+R@normalesup.org", role = c("aut"),
-           comment = c(ORCID = "https://orcid.org/0000-0002-4094-1476"))
+     person(given = "Geraldine", family = "Gómez-Millán", email = "geralidine.gomez@javeriana.edu.co", role = c("aut", "cre", "ctb"),
+        comment = c(ORCID = "0009-0007-8701-0568"))
   )
-Description: Your package description. It must end with a period (".") and
-    include relevant bibliographical references if applicable, using the 
-    following format: Author et al. (2023) <doi:10.5281/zenodo.6619350>.
+Description: Herramienta para la Generación Automática del Informe de 
+             Circulación Viral
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
@@ -48,7 +37,5 @@ Config/Needs/website:
     epiverse-trace/epiversetheme
 VignetteBuilder: knitr
 Language: es_ES
-URL: https://epiverse-trace.github.io/sivirep/, https://github.com/epiverse-trace/sivirep
-BugReports: https://github.com/epiverse-trace/sivirep/issues
+BugReports: https://github.com/TRACE-LAC/labrep/issues
 Config/testthat/edition: 3
-

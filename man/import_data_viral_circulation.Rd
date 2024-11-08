@@ -5,7 +5,7 @@
 \title{Importar los datos de la circulación viral}
 \usage{
 import_data_viral_circulation(
-  report_data = c(),
+  report_data = NULL,
   header = FALSE,
   skip = 3,
   col_names = FALSE,
