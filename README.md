@@ -5,57 +5,36 @@
 <!-- `packagename` is extracted from the DESCRIPTION file -->
 <!-- `gh_repo` is extracted via a special environment variable in GitHub Actions -->
 
-# {{ packagename }}
+# labrep
 
 <!-- badges: start -->
 
 [![License:
 MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/license/mit/)
-[![R-CMD-check](https://github.com/%7B%7B%20gh_repo%20%7D%7D/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/%7B%7B%20gh_repo%20%7D%7D/actions/workflows/R-CMD-check.yaml)
-[![Codecov test
-coverage](https://codecov.io/gh/%7B%7B%20gh_repo%20%7D%7D/branch/main/graph/badge.svg)](https://app.codecov.io/gh/%7B%7B%20gh_repo%20%7D%7D?branch=main)
 [![lifecycle-concept](https://raw.githubusercontent.com/reconverse/reconverse.github.io/master/images/badge-concept.svg)](https://www.reconverse.org/lifecycle.html#concept)
 <!-- badges: end -->
 
-{{ packagename }} provides functions to ….
+labrep provee funciones para la generación automática del informe de
+circulación viral.
 
-<!-- This sentence is optional and can be removed -->
+## Instalación
 
-{{ packagename }} is developed at the [CENTER\|similar](url) at the
-[UNIVERSITY\|similar](url) as part of the [Epiverse-TRACE
-program](https://data.org/initiatives/epiverse/).
-
-## Installation
-
-You can install the development version of {{ packagename }} from
-[GitHub](https://github.com/) with:
+Puedes decargar la versión de desarrollo de labrep desde
+[GitHub](https://github.com/TRACE-LAC/labrep) con el siguiente comando:
 
 ``` r
 # install.packages("pak")
-pak::pak("{{ gh_repo }}")
+pak::pak("TRACE-LAC/labrep")
 ```
 
-## Example
+## Desarrollo
 
-These examples illustrate some of the current functionalities
+### Ciclo de vida
 
-## Development
+Este paquete actualmente está en la fase de *concepto*, como lo define
+[RECON software lifecycle](https://www.reconverse.org/lifecycle.html).
 
-### Lifecycle
+### Contribuciones
 
-This package is currently a *concept*, as defined by the [RECON software
-lifecycle](https://www.reconverse.org/lifecycle.html). This means that
-essential features and mechanisms are still being developed, and the
-package is not ready for use outside of the development team.
-
-### Contributions
-
-Contributions are welcome via [pull
-requests](https://github.com/%7B%7B%20gh_repo%20%7D%7D/pulls).
-
-### Code of Conduct
-
-Please note that the {{ packagename }} project is released with a
-[Contributor Code of
-Conduct](https://github.com/epiverse-trace/.github/blob/main/CODE_OF_CONDUCT.md).
-By contributing to this project, you agree to abide by its terms.
+La contribuciones son bienvenidas vía [pull
+requests](https://github.com/TRACE-LAC/labrep/pulls).
