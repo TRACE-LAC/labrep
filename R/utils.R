@@ -10,7 +10,7 @@ row_to_header <- function(data, row_num = 1) {
 #' @title Generar las categorias de edad
 #' @keywords internal
 generate_age_categories <- function(dataset) {
-  if (!any(names(dataset) == "grupo_edad")) {
+  if (any(names(dataset) == "grupo_edad")) {
     data_ages <- cbind(dataset, grupo_edad = NA)
     data_ages[, ncol(data_ages)] <- sapply(data_ages$edad,
                                            define_age_category)
@@ -234,7 +234,7 @@ complete_age_categories <- function(data_grouped,
   categorie_labels <- config::get(file = config_path,
                                   "age_categories")$age_categories
   for (label in categorie_labels) {
-    if (!any(data_grouped == label) || is.na(any(data_grouped == label))) {
+    if (any(data_grouped == label) || is.na(any(data_grouped == label))) {
       new_row <- data.frame(grupo_edad = label,
                             casos = 0,
                             porcentaje = 0,
