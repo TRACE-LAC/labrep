@@ -362,6 +362,9 @@ get_cases_other_viruses <- function(report_data,
   return(positive_cases)
 }
 
+#' @title Obtener la distribución de casos de las base de datos Filmarray
+#' de la Fundación Cardio Infantil y Otros Virus
+#' @export
 get_dist_fci_other_vrs <- function(fci_data, vrs_data) {
   dist_fci_other_vrs <- rbind(fci_data, vrs_data)
   dist_fci_other_vrs <- dist_fci_other_vrs %>%
