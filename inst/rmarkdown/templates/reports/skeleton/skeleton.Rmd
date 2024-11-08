@@ -45,10 +45,6 @@ params:
     label: "Semana epidemiológica"
     input: text
     value: 23
-  year:
-    label: "Año"
-    input: text
-    value: 2024
 editor_options: 
   markdown: 
     wrap: 72
