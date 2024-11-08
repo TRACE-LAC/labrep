@@ -929,3 +929,29 @@ get_results_tosferina <- function(report_data, results = "positivo",
                                                  etiqueta = "tosferina")
   return(data_grouped)
 }
+
+#' @title Obtener los tiempos epidemiologicos de los datos historicos
+#' @export
+get_historic_epi_times <- function(tabla) {
+  data <- tabla 
+  stacked_data <- data %>%
+    tidyr::pivot_longer(cols = .data$a_h1n1_pdm09:.data$otros_virus, 
+                 names_to = "Virus_Type", 
+                 values_to = "Cases") %>%
+    dplyr::mutate(YearWeek = paste(.data$ano,
+                                   sprintf("%02d",
+                                           .data$periodo_epidemiologico),
+                                   sep = "-"))
+  # Prepare line data for the line chart, ensuring YearWeek is created consistently
+  line_data <- data %>%
+    dplyr::mutate(YearWeek = paste(.data$ano, sprintf("%02d",
+                                               .data$periodo_epidemiologico),
+                            sep = "-")) %>%
+    dplyr::select(.data$YearWeek, Percent_Positivity =
+             .data$de_positividad) %>%
+    tidyr::drop_na(.data$Percent_Positivity) # Remove any NA values in Percent_Positivity
+  
+  historic_data <- list(stacked_data = stacked_data,
+                        line_data = line_data)
+  return(historic_data)
+}
