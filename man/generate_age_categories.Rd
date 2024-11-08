@@ -9,4 +9,3 @@ generate_age_categories(dataset)
 \description{
 Generar las categorias de edad
 }
-\keyword{internal}
