@@ -1,17 +1,33 @@
 ---
-title: "Reporte Automatizado de Circulación Viral"
 date: "`r Sys.Date()`"
 output:
   pdf_document: 
     number_sections: true
-    latex_engine: xelatex
   sansfont: Calibri Light
   html_document:
     number_sections: true
   word_document: 
     number_sections: true
-header-includes:
-   - \usepackage{fancyhdr}
+header-includes: |
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage[spanish, provide=*]{babel}
+  \usepackage{floatrow}
+  \floatsetup[figure]{capposition=top}
+  \usepackage{array}
+  \usepackage{fancyhdr}
+  \usepackage{graphicx}
+  \usepackage{hyperref}
+  \usepackage{pdfpages}
+  \usepackage[defaultfam,tabular,lining]{montserrat}
+  \usepackage{xcolor}
+  \usepackage[font=bf]{caption}
+  \definecolor{colortitles}{HTML}{145765}
+  \definecolor{colorborder}{HTML}{337E8C}
+  \usepackage{colortbl}
+  \arrayrulecolor{colorborder}
+  \usepackage{caption}
+  \captionsetup[table]{position=above,name=Tabla}
 params:
   fci_data:
     label: "Datos Fundación Cardio Infantil"
@@ -25,234 +41,490 @@ params:
     label: "Datos Tosferina"
     input: file
     value: ""
+  epiweek:
+    label: "Semana epidemiológica"
+    input: text
+    value: 23
+editor_options: 
+  markdown: 
+    wrap: 72
 ---
-\selectfont
 
-```{r setup, echo=FALSE, error=FALSE, fig.height=5, fig.width=5, warning=FALSE, include = FALSE, message= FALSE}
-knitr::opts_chunk$set(echo = TRUE, dev = "cairo_pdf")
-#remotes::install_github("epiverse-trace/sivirep", ref = "dev")
+```{r setup, echo=FALSE, include=FALSE}
+knitr::opts_chunk$set(
+  echo = FALSE,
+  warning = FALSE,
+  message = FALSE,
+  error = FALSE,
+  dev = "cairo_pdf"
+)
+knitr::opts_knit$set(eval.after = "fig.cap")
 
-rm(list = ls())
-
-library(sivirep)
-library(dplyr) 
-library(ggplot2)
-library(reshape2)
-library(scales)
-
+library(dplyr)
 source("C:/Users/geral/Documents/TRACE/labrep/R/checking_data.R", local = knitr::knit_global())
 source("C:/Users/geral/Documents/TRACE/labrep/R/import_data.R", local = knitr::knit_global())
 source("C:/Users/geral/Documents/TRACE/labrep/R/plotting_data.R", local = knitr::knit_global())
 source("C:/Users/geral/Documents/TRACE/labrep/R/cleaning_data.R", local = knitr::knit_global())
 source("C:/Users/geral/Documents/TRACE/labrep/R/utils.R", local = knitr::knit_global())
+sysfonts::font_add_google("Montserrat", "Montserrat")
+showtext::showtext_auto()
+print(params$fci_data)
 ```
 
+```{=tex}
+\fontsize{11.5}{13}
+\fontseries{c}
+\selectfont
+```
+
+\includepdf[pages={1}]{cover.pdf}
+
+```{=tex}
+\begin{center}
+{\color{colortitles} Alcaldesa Mayor de Bogotá\\}
+Claudia Nayibe López Hernández\\~\\
+
+
+{\color{colortitles} Secretario Distrital de Salud\\}
+Alejandro Gómez López\\~\\
+
+
+{\color{colortitles} Subsecretario de Salud Pública\\}
+Manuel Alfredo González Mayorga\\[0.4in]
+
+
+{\color{colortitles} Coordinación general del documento\\~\\}
+
+
+{\color{colortitles} Directora de Epidemiología, Análisis y Gestión de\\ 
+Políticas de Salud Colectiva\\}
+Diane Moyano Romero\\~\\
+
+
+{\color{colortitles} Subdirectora de Vigilancia en Salud Pública\\}
+Sol Yiber Beltran Aguilera\\[0.5in]
+
+
+{\color{colortitles} Autor\\~\\}
+{\color{colortitles} Laboratorio de Salud Pública\\}
+Sandra Liliana Gómez Bautista\\
+Paula Andrea Borda Osuna\\[0.6in]
+
+
+{\color{colortitles} Coordinación Editorial\\~\\}
+
+{\color{colortitles} Oficina Asesora de Comunicaciones en Salud\\}
+María Juliana Silva Amado\\~\\
+
+
+{\color{colortitles} Corrección de estilo\\}
+José Aldemar Garzón González\\~\\
+
+
+{\color{colortitles} Diseño y diagramación\\}
+Harol Giovanny León Niampira\\~\\
+
+
+{\color{colortitles} Fotografía portada\\}
+www.saludcapital.gov.co\\~\\
+
+
+{\color{colortitles}
+Secretaría Distrital de Salud\\
+Carrera 32 No. 12-81\\
+Conmutador: 364 9090\\
+Bogotá, D. C. - 2024\\
+www.saludcapital.gov.co\\}
+\end{center}
+```
+```{=tex}
 \pagenumbering{gobble}
 \pagenumbering{arabic}
-
-# Virus respiratorios
-
-Durante 2022, el Laboratorio de Salud Pública (LSP) continúa apoyando la vigilancia de la infección respiratoria aguda en Bogotá, mediante el procesamiento de muestras remitidas por instituciones centinela de los eventos: Enfermedad Similar a Influenza (ESI) que son pacientes ambulatorios, de pacientes hospitalizados por Infección Respiratoria Aguda Grave (IRAG) y de IRAG inusitado que se presente en cualquier institución de la ciudad.
-
-Las muestras previamente son procesadas por RT-PCR para SARS-CoV-2 y después continúan su análisis con: inmunofluorescencia y reacción en cadena de la polimerasa con transcriptasa inversa (RT-PCR) para el diagnóstico de los principales agentes a los que se les atribuye el IRAG.
-
-Para esta semana, por grupo de edad, el 78.2 % de pacientes positivos para virus respiratorios diferentes al SARS-CoV-2 en 2022 corresponden a la población de menores de 5 años (figura 1) y si se incluye al SARS-CoV-2 los menores corresponden al 2.1 % (figura 2).
-
-**Figura 1. Distribución porcentual de virus respiratorios por grupo de edad, Laboratorio de Salud Pública Bogotá.**
-
-```{r disease_data, echo=FALSE, error=FALSE, fig.height=5, fig.width=8, warning=FALSE, include=TRUE, message=FALSE}
-report_data <- import_data_viral_circulation(report_data = c("C:/Users/geral/Documents/TRACE/labrep/data/df_respiratory_filmarray_202252.csv"), header = TRUE)
-report_data_clean <- cleansing_viral_circulation_data(report_data)
-report_data_clean <- generate_age_categories(report_data_clean)
-viruses_age_group <- get_distribution_age_group(report_data = report_data_clean)
-plot_distribution_age_group(viruses_age_group)
-
 ```
 \newpage
 
-En la figura 1 se presenta el consolidado de los virus respiratorios por los diferentes grupos de edad. En los niños menores de 2 años las mayores frecuencias son de casos de virus: virus 
-sincicial respiratorio (VSR) (28%), de rinovirus (23 %), y de adenovirus (21 %); para los niños entre 2 y 4 años se presentan casos de VSR (23 %), rinovirus (22 %), bocavirus (11 %) y adenovirus (23 %).
-
-**Figura 2.Distribución porcentual de virus respiratorios y SARS CoV 2 por grupo de edad, Laboratorio de Salud Pública Bogotá. **
-
-```{r distribution_not, echo=FALSE, error=FALSE, fig.height=5, fig.width=10, warning=FALSE, include=TRUE, message=FALSE} 
-
-sars_data <- import_data_viral_circulation(report_data = c("C:/Users/geral/Documents/TRACE/labrep/data/df_other_virus_202252.csv"), header = TRUE)
-sars_age_group <- get_distribution_age_group_sars(sars_data)
-sars_viruses_age_group <- get_distribution_age_vr_sars(viruses_age_group, sars_age_group)
-plot_distribution_age_group(sars_viruses_age_group, var_y = "casos", include_sars = TRUE)
+```{=tex}
+\begin{flushleft}
+{\color{colortitles} \section{Virus respiratorios}}
+\end{flushleft}
 ```
+
+```{r current-year, include=FALSE}
+current_year <- format(Sys.Date(), "%Y")
+```
+
+
+Durante `r current_year`, el Laboratorio de Salud Pública (LSP) continúa
+apoyando la vigilancia de la infección respiratoria aguda en Bogotá, mediante el
+procesamiento de muestras remitidas por instituciones centinela de los
+eventos: Enfermedad Similar a Influenza (ESI) que son pacientes
+ambulatorios, de pacientes hospitalizados por Infección Respiratoria
+Aguda Grave (IRAG) y de IRAG inusitado que se presente en cualquier
+institución de la ciudad.
+
+Las muestras previamente son procesadas por RT-PCR para SARS-CoV-2 y
+después continúan su análisis con: panel respiratorio  Allplex y reacción en
+cadena de la polimerasa con transcriptasa inversa (RT-PCR) para el
+diagnóstico de los principales agentes a los que se les atribuye el
+IRAG.
+
+```{r filmarray-data}
+filmarray_data <- import_data_viral_circulation(report_data = c("C:/Users/geral/Documents/TRACE/labrep/data/FILMARRAY RESPIRATORIO.xlsx"),
+                                                sheet = 1,
+                                                skip = 3)
+filmarray_data_cleaned <- clean_filmarray_data(filmarray_data = filmarray_data)
+filmarray_data_cleaned <-
+  generate_age_categories(dataset = filmarray_data_cleaned)
+#report_data_week <- filter(filmarray_data_cleaned, se == "23")
+filmarray_age_groups <-
+  get_cases_filmarray(report_data = filmarray_data_cleaned,
+                      age_groups = TRUE)
+```
+
+
+```{r other-viruses-data}
+other_viruses_data <-
+  import_data_viral_circulation(report_data =
+                                  c("C:/Users/geral/Documents/TRACE/labrep/data/OTROSVIRUS_SE 23.xlsx"),
+                                skip = 0,
+                                sheet = 1)
+other_viruses_cleaned_data  <- clean_data_other_viruses(other_viruses_data)
+other_viruses_age_groups <-
+  get_cases_other_viruses(report_data = other_viruses_cleaned_data,
+                          age_groups = TRUE)
+```
+
+```{r distribution-age-groups}
+viruses_age_groups <-
+  get_dist_fci_other_vrs(fci_data = filmarray_age_groups,
+                         vrs_data = other_viruses_age_groups)
+```
+
+
+```{r sars-data}
+#sars_data <- import_data_viral_circulation(report_data = #c("C:/Users/geral/Documents/TRACE/labrep/data/df_other_virus_202252.cs#v"), header = TRUE)
+sars_age_groups <- get_cases_sars(other_viruses_cleaned_data,
+                                  age_groups = TRUE)
+sars_viruses_age_groups <- get_distribution_age_vr_sars(viruses_age_groups,
+                                                        sars_age_groups)
+top_sars_age_groups <-
+  group_columns_total(disease_data = sars_viruses_age_groups,
+                      sum_cases = TRUE, col_names = "grupo_edad",
+                      wt_percentage = TRUE, col_order = "porcentaje",
+                      etiqueta = FALSE)
+```
+
+
+```{r paragraph-viruses}
+perc_vrs_age_group <-
+  get_perc_viruses_age(dataset = viruses_age_groups)
+perc_sars_age_group <-
+  get_perc_viruses_age(dataset = sars_viruses_age_groups)
+```
+
+
+Para esta semana, por grupo de edad, el `r perc_vrs_age_group`% de pacientes positivos para virus respiratorios diferentes al SARS-CoV-2 en `r current_year` corresponden a
+la población de menores de 5 años (figura 2) y si se incluye al
+SARS-CoV-2 los menores corresponden al `r perc_sars_age_group` % (figura 3).
+
+```{r plot-viruses-age-groups, include=TRUE, fig.height=5, fig.width=10,fig.cap="Distribución porcentual de virus respiratorios por grupo de edad, Laboratorio de Salud Pública Bogotá."}
+plot_age_group_distribution(viruses_age_groups)
+```
+
+
+\newpage
+
+```{r paragraph-viruses-age-groups}
+text_cons_viruses <-
+  get_cons_viruses_age_text(dataset = viruses_age_groups,
+                            text_group = ", para los niños entre 2 y 4 años 
+                            se presentan casos de ")
+# Preguntar por Bocavirus
+```
+
+En la figura 3 se presenta el consolidado de los virus respiratorios por los diferentes grupos de edad, en los niños menores de 2 años las mayores frecuencias son de casos de `r text_cons_viruses`.
+
+
+```{r plot-distribution-sars, include=TRUE, fig.height=5, fig.width=10, fig.cap="Distribución porcentual de virus respiratorios y SARS-CoV-2 por grupo de edad, Laboratorio de Salud Pública Bogotá."}
+#sars_data <- import_data_viral_circulation(report_data = #c("C:/Users/geral/Documents/TRACE/labrep/data/df_other_virus_202252.cs#v"), header = TRUE)
+plot_age_group_distribution(sars_viruses_age_groups, var_y = "casos",
+                            include_sars = TRUE)
+```
+
+```{r paragraph-sars-age-groups}
+text_cons_vrs_sars <-
+  get_cons_viruses_age_text(dataset = sars_viruses_age_groups,
+                            text_group = ", en el grupo de 2 a 4
+años, ")
+```
+
 \pagenumbering{arabic}
 
-Al incluir el virus de SARS-CoV-2 en la cuenta de los virus respiratorios, se observa que, en 
-los menores de 2 años predomina el SARS-CoV-2 (25 %), VSR (21 %), rinovirus (17 %). En el grupo de 2 a 4 años, SARS-CoV-2 (17 %), VSR (19 %), rinovirus (18 %), bocavirus y adenovirus (9 %) y (19 %) respectivamente. A continuación, se presenta la circulación acumulada de los virus respiratorios de forma desagregada por tipo de vigilancia, según grupo de edad (figura 3). También se ha incluido al SARS-CoV-2.
+Al incluir el virus de SARS-CoV-2 en la cuenta de los virus
+respiratorios, se observa que, en los menores de 2 años años las
+frecuencias son para `r text_cons_vrs_sars`. A continuación, se presenta la circulación acumulada de 
+los virus respiratorios de forma desagregada por tipo de vigilancia, 
+según grupo de edad (figura 4). También se ha incluido al SARS-CoV-2.
 
 \newpage
 
-**Figura 3. Circulación de virus respiratorios por tipo de vigilancia y según grupo de edad, Laboratorio de Salud Pública. **
-
-**Distribución de virus respiratorios en casos de ESI, según grupos de edad. Bogotá**
-
-```{r distribution_cg, echo=FALSE, error=FALSE, fig.height=5, fig.width=10, warning=FALSE, include=TRUE, message=FALSE}
-data_other_viruses <- clean_data_other_viruses(sars_data)
-esi_distribution_age <- get_distribution_surveillance(data_other_viruses,
-                              include_sars = TRUE,
-                              surveillance_type = "esi")
-plot_distribution_age_group(esi_distribution_age, include_sars = TRUE)
+```{r distribution-esi-age-groups}
+esi_age_groups <-
+  get_distribution_surveillance(report_data = other_viruses_cleaned_data,
+                                include_sars = TRUE,
+                                surveillance_type = "esi")
 ```
 
-**Distribución de virus respiratorios en casos de IRA Grave, según grupos de edad. Bogotá**
 
-```{r distribution_epiweek, echo=FALSE, error=FALSE, fig.height=5, fig.width=10, warning=FALSE, include=TRUE, message=FALSE}
-irag_grave_distribution_age <- get_distribution_surveillance(data_other_viruses,
-                              include_sars = TRUE,
-                              surveillance_type = "irag_grave")
-plot_distribution_age_group(irag_grave_distribution_age, include_sars = TRUE) 
+```{r plot-distribution-esi-age-groups, include=TRUE, fig.height=5, fig.width=10, warning=FALSE, include=TRUE, message=FALSE, fig.cap="Circulación de virus respiratorios por tipo de vigilancia y según grupo de edad, Laboratorio de Salud Pública. \\linebreak \\linebreak Distribución de virus respiratorios en casos de ESI, según grupos de edad."}
+plot_age_group_distribution(esi_age_groups,
+                            include_sars = TRUE)
+```
+
+**Distribución de virus respiratorios en casos de IRA Grave, según
+grupos de edad**
+
+```{r, distribution-irag-grave-age-groups}
+irag_grave_age_groups <-
+  get_distribution_surveillance(other_viruses_cleaned_data,
+                                include_sars = TRUE,
+                                surveillance_type = "irag_grave")
+```
+
+```{r plot-distribution-irag-grave-age-groups, include=TRUE, fig.height=5, fig.width=10}
+plot_age_group_distribution(irag_grave_age_groups, include_sars = TRUE)
 ```
 
 \newpage
 
-**Distribución de virus respiratorios en casos de IRAG Inusitado, según grupos de edad. Bogotá**
+**Distribución de virus respiratorios en casos de IRAG Inusitado, según
+grupos de edad.**
 
-```{r distribution_age_d, echo=FALSE, error=FALSE, fig.height=5, fig.width=10, warning=FALSE, include=TRUE, message=FALSE}
-irag_inusitado_distribution <- get_distribution_surveillance(data_other_viruses,
-                              include_sars = TRUE,
-                              surveillance_type = "irag_inusitado")
+```{r distribution-irag-inusitado-age-groups}
+irag_inusitado_age_groups <-
+  get_distribution_surveillance(other_viruses_cleaned_data,
+                                include_sars = TRUE,
+                                surveillance_type = "irag_inusitado")
+irag_inusitado_age_groups <- irag_inusitado_age_groups  %>% arrange(grupo_edad)
+```
 
-irag_inusitado_distribution <- irag_inusitado_distribution %>% arrange(grupo_edad)
-
-plot_irag_inusitado <- plot_distribution_age_group(irag_inusitado_distribution, include_sars = TRUE)
-
+```{r plot-distribution-irag-inusitado-age-groups, include=TRUE, fig.height=5, fig.width=10}
+plot_age_group_distribution(irag_inusitado_age_groups,
+                            include_sars = TRUE)
 # datos_convertidos <- tidyr::spread(irag_inusitado_distribution, key = grupo_edad, value = casos:etiqueta)
 # 
 # tabla <- gridExtra::tableGrob(irag_inusitado_distribution, theme = gridExtra::ttheme_default(base_size = 10))
-
-plot_irag_inusitado
-
 # gridExtra::grid.arrange(plot_irag_inusitado, tabla, ncol = 1, heights = c(2, 1))
 ```
 
-En la figura 4 se puede observar el comportamiento de los virus identificados tanto por la vigilancia centinela como por la vigilancia del IRAG inusitado, mediante las dos metodologías: inmunofluorescencia y RT-PCR.
+En la figura 5 se puede observar el comportamiento de los virus
+identificados tanto por la vigilancia centinela como por la vigilancia
+del IRAG inusitado, mediante las dos metodologías: panel respiratorio Allplex y
+RT-PCR.
 
-En las semanas transcurridas de 2022 se aprecia la positividad para cualquier virus respiratorio, diferentes al SARS-CoV-2, en la siguiente tabla.
+\newpage
 
-**Figura 4. Circulación de virus respiratorios en casos de IRAG identificados por inmunofluorescencia y prueba molecular, Laboratorio de Salud Pública.** 
+```{r distribution-test-epiweek}
+test_distribution_epiweek <-
+  get_distribution_test(report_data = other_viruses_cleaned_data,
+                        include_sars = FALSE)
+```
 
-```{r distribution_test, echo=FALSE, error=FALSE, fig.height=7, fig.width=12, warning=FALSE, include=TRUE, message=FALSE}
-test_distribution_epiweek <- get_distribution_test(data_other_viruses,
-                              include_sars = FALSE)
-plot_test <- plot_distribution_epiweek(test_distribution_epiweek, 
-                            var_x = "semanaepidemiologicavegeneral",
-                            var_y = "casos",
-                            var_fill = "etiqueta")
+```{r plot-distribution-test-epiweek, include=TRUE, fig.height=7, fig.width=12, fig.cap="Circulación de virus respiratorios en casos de IRAG identificados por por panel respiratorio Allplex y prueba molecular, Laboratorio de Salud Pública."}
+plot_distribution_epiweek(report_data =
+                            test_distribution_epiweek$viruses_epiweeks,
+                          var_y = "casos",
+                          var_fill = "etiqueta",
+                          positives =
+                          test_distribution_epiweek$cases_epiweeks)
 
-cases_epiweeks <- get_cases_epiweeks(test_distribution_epiweek)
+#cases_epiweeks <- get_cases_epiweeks(test_distribution_epiweek)
+```
 
-plot_cases <- plot_test + 
-  ggplot2::geom_line(ggplot2::aes_string(x =
-                                           "semanaepidemiologicavegeneral",
-                                         y = "casos"),
-                     stat = "identity",
-                     color = "#F99D00",
-                     size = 1,
-                     group = 1) +
-  ggplot2::scale_y_continuous(sec.axis =
-                                ggplot2::sec_axis(~.*.0055, labels =
-                                                    scales::percent_format(),
-                                                  breaks = seq(0, 1, .1)))
+```{r distribution-epiweek}
+distribution_epiweek <-
+  get_cases_epiweeks(data_grouped =
+                       test_distribution_epiweek$cases_epiweeks,
+                     col_epiweek = "semanaepidemiologicavegeneral",
+                     table = TRUE)
+```
 
-plot_cases
+En las semanas transcurridas de `r current_year` se aprecia la positividad para
+cualquier virus respiratorio, diferentes al SARS-CoV-2, en la siguiente
+tabla.
 
+```{r plot-distribution-epiweek, include=TRUE, fig.height=5, fig.width=10, fig.align='center'}
+plot_table_vrs_epiweek(distribution_epiweek)
+```
+
+
+```{r viruses-cumulative-proportion}
+viruses_cumulative_proportion <-
+  get_viruses_cumulative_proportion(report_data = viruses_age_groups)
+```
+
+```{r paragraph-viruses-cumulative-proportion}
+total_cases <- sum(viruses_cumulative_proportion$casos)
+total_samples <- nrow(other_viruses_cleaned_data)
+text_vrs_cumulative <- get_text_viruses(dataset = viruses_cumulative_proportion,
+                                        tam = 4)
+```
+
+Dentro de la circulación viral acumulada predominan `r text_vrs_cumulative` cada uno respectivamente en las `r total_cases` muestras positivas de las `r total_samples` analizadas (figura 6).
+
+```{r plot-cumulative-proportion, fig.height=8, fig.width=12, include=TRUE, fig.cap="Proporción acumulada de los virus respiratorios, Laboratorio de Salud Pública"}
+plot_cumulative_proportion(viruses_cumulative_proportion)
+```
+
+```{r distribution-epiweek-todo}
+#viruses_epiweeks <- get_distribution_epiweek(report_data = report_data_clean)
+#other_viruses_epiweek <- 
+#sars_cumulative_proportion <- get_viruses_cumulative_proportion(viruses_age_group,                                                               test_distribution_epiweek)
+
+
+#test_distribution_epiweek
+viruses_prop_epiweek <-
+  get_cases_prop_epiweek(filmarray_data = filmarray_data_cleaned,
+                         other_virs_data = other_viruses_cleaned_data,
+                         include_sars = TRUE,
+                         epiweek = 23)
+
+```
+
+```{r plot-cumulative-proportion-sars, fig.height=8, fig.width=14, include=TRUE, fig.cap="Proporción acumulada de los virus respiratorios, Laboratorio de Salud Pública"}
+plot_cumulative_proportion(viruses_prop_epiweek$cases_epiweek)
+```
+
+En  la circulación viral estuvo con predominio de VSR (22.1%), Rinovirus (10.0%) y Adenovirus (6.0%); en las `r viruses_prop_epiweek$total_samples` muestras analizadas para esta semana.
+
+TODO
+
+Dentro de la circulación viral acumulada a params$epiweek al incluir el virus de SARS CoV 2 en la distribución de los virus respiratorios, se observa que predominan los Rinovirus (22%), SARS Cov2 (20%), y VSR (19%) de las 3.367 muestras positivas de las 14.394 muestras analizadas (figura 7).
+
+
+```{r distribution-influenza}
+distribution_influenza <-
+  get_cases_influenza(other_virs_data = other_viruses_cleaned_data,
+                      filmarray_data = filmarray_data_cleaned)
+```
+
+
+```{r paragraph-influenza}
+total_dist_influenza <-
+  group_columns_total(disease_data = distribution_influenza$influenza_epiweeks,
+                      sum_cases = TRUE, col_names = "etiqueta",
+                      wt_percentage = TRUE, col_order = "porcentaje",
+                      etiqueta = FALSE)
+total_cases_influenza <- sum(total_dist_influenza$casos)
+text_influenza <- get_text_viruses(dataset = total_dist_influenza,
+                                   tam = nrow(total_dist_influenza))
+```
+
+#TODO Comentar acerca del cambio
+
+En cuanto al comportamiento de los virus de Influenza acumulado a SE params$epiweek como de costumbre en las primeras semanas del año ha circulado el virus de Influenza A (2.9%), el virus de la Influenza A(H1N1) pdm09 (65.8%) e Influenza A(H3) (26.0%) en `r total_cases_influenza` muestras positivas. (Figura 8)
+
+```{r distribution_influeza, include=TRUE, fig.height=5, fig.width=10, fig.cap="Distribución de tipos y subtipos de Influenza, Laboratorio de Salud Pública"}
+plot_distribution_epiweek(distribution_influenza$influenza_epiweeks,
+                          var_x = "semanaepidemiologicavegeneral",
+                          var_y = "casos",
+                          var_fill = "etiqueta",
+                          influenza = TRUE,
+                          positives = distribution_influenza$cases_epiweeks)
+# Cambiar el color del gráfico
 ```
 
 \newpage
 
-**Tabla 1. Positividad de virus respiratorios por semana epidemiológica, Bogotá 2022 ** 
-
-```{r distribution_cases_epiweek, echo=FALSE, error=FALSE, fig.height=5, fig.width=10, warning=FALSE, include=TRUE, message=FALSE}
-distribution_epiweek <- get_cases_epiweeks(test_distribution_epiweek,
-                                           table = TRUE)
-knitr::kable(distribution_epiweek)
+```{=tex}
+\begin{flushleft}
+{\color{colortitles} \section{Tosferina}}
+\end{flushleft}
 ```
 
-Dentro de la circulación viral predominan los VSR (19 %), rinovirus (20 %), bocavirus (9 %), adenovirus (18 %), parainfluenza (9 %) y virus de influenza A H3N2 (10 %), en las 9.184 muestras analizadas (figura 5).
+El Laboratorio de Salud Pública también apoya la vigilancia de
+tosferina, con el análisis de todos los casos probables que se presenten
+en la ciudad. El análisis de la muestra se realiza mediante PCR
+Multiplex, que en tiempo real detecta Bordetella pertussis, Bordetella
+parapertussis y Bordetella holmesii.
 
-
-**Figura 5. Proporción acumulada de los virus respiratorios, Laboratorio de Salud Pública**
-
-```{r cumulative_proportion, echo=FALSE, error=FALSE, fig.height=5, fig.width=10, warning=FALSE, include=TRUE, message=FALSE}
-viruses_cumulative_proportion <- get_viruses_cumulative_proportion(viruses_age_group,                                                               test_distribution_epiweek)
-plot_cumulative_proportion(viruses_cumulative_proportion)
+```{r tosferina-data}
+tosferina_data <- import_data_viral_circulation(report_data = c("C:/Users/geral/Documents/TRACE/labrep/data/tosferina SE23.xlsx"), sheet = 1,
+                                                col_names = TRUE)
+tosferina_data <- readxl::read_excel("C:/Users/geral/Documents/TRACE/labrep/data/tosferina SE23.xlsx")
 ```
 
-En cuanto al comportamiento de los virus de influenza, estos circularon durante las seis primeras semanas del año, siendo el subtipo H3N1 el predominante (figura 6); este mismo subtipo reaparece en la semana 12 con tres casos y vuelve a mostrase desde la semana 17 de forma continua hasta la semana 52, alcanzando una positividad de 0,0 % en esta semana entre todos los virus.
-
-**Figura 6. Distribución de tipos y subtipos de Influenza, Laboratorio de Salud Pública**
-
-```{r distribution_influeza, echo=FALSE, error=FALSE, fig.height=5, fig.width=10, warning=FALSE, include=TRUE, message=FALSE}
-distribution_influenza <- get_distribution_influenza(data_other_viruses, report_data_clean)
-plot_distribution_influenza <- 
-  plot_distribution_epiweek(distribution_influenza,
-                            var_x = "semanaepidemiologicavegeneral",
-                            var_y = "casos",
-                            var_fill = "etiqueta",
-                            influenza = TRUE)
-plot_distribution_influenza
+```{r distribution-tosferina-epiweek}
+tosferina_cleaned_data <- clean_tosferina_data(report_data = tosferina_data)
+total_cases_tosferina <- nrow(tosferina_cleaned_data)
+cases_epiweeks_tosferina <-
+  get_cases_tosferina(report_data = tosferina_cleaned_data)
 ```
 
-# Tosferina
 
-El Laboratorio de Salud Pública también apoya la vigilancia de tosferina, con el análisis de todos los 
-casos probables que se presenten en la ciudad. El análisis de la muestra se realiza mediante PCR 
-Multiplex, que en tiempo real detecta Bordetella pertussis, Bordetella parapertussis y Bordetella 
-holmesii.
+Se ha observado la siguiente positividad en `r total_cases_tosferina` muestras analizadas como se aprecia en la tabla 2:
 
-Se ha observado la siguiente positividad en 1.060 muestras analizadas:
-
-**Tabla 2.** Positividad de tosferina por semana epidemiológica, Bogotá 2022
-
-```{r tosferina_epiweek, echo=FALSE, error=FALSE, fig.height=5, fig.width=10, warning=FALSE, include=TRUE, message=FALSE}
-tosferina_data <- import_data_viral_circulation(report_data = c("C:/Users/geral/Documents/TRACE/labrep/data/df_tosferina_202252.csv"), header = TRUE)
-cases_epiweeks_tosferina <- get_cases_tosferina(tosferina_data)
+```{r table-tosferina-epiweek, include=TRUE, fig.height=5, fig.width=10}
 table_epiweek <- get_table_epiweek_tosferina(cases_epiweeks_tosferina)
-knitr::kable(table_epiweek)
-  
+plot_table_epiweek_tosferina(data_epiweek = table_epiweek,
+                             distribution_epiweek = cases_epiweeks_tosferina)
 ```
 
-El comportamiento de la tosferina por grupo de edad indica que el 30.6 % de las muestras 
-recibidas pertenecen al grupo de niños menores de un mes, seguido del grupo de niños de 2 a 
-3 meses, con el 32.0 % (figura 8).
 
-**Figura 5.** Comportamiento de la positividad de tosferina en las muestras recibidas por el Laboratorio de Salud Pública 2022
-
-```{r distribution_tosferina_epiweek, echo=FALSE, error=FALSE, fig.height=5, fig.width=10, warning=FALSE, include=TRUE, message=FALSE}
-results_epiweeks_tosferina <- get_results_tosferina(tosferina_data)
-plot_results_tosferina(results_epiweeks_tosferina, cases_epiweeks_tosferina) 
+```{r distribution-tosferina-ages}
+group_ages_tosferina <- get_cases_tosferina(tosferina_cleaned_data,
+                                            column = "grupo_edad")
+results_ages_tosferina <-
+  get_results_tosferina(report_data = tosferina_cleaned_data,
+                        columns = "grupo_edad")
 ```
 
-**Figura 6.** Distribución porcentual de casos de tosferina confirmados en el Laboratorio de Salud Pública por grupo de edad
 
-```{r distribution_tosferina_ages, echo=FALSE, error=FALSE, fig.height=5, fig.width=10, warning=FALSE, include=TRUE, message=FALSE}
+```{r paragraph-tosferina}
+tosferina_group_0 <- results_ages_tosferina %>%
+  dplyr::filter(grupo_edad == "< O = 1 MES")
+per_tosferina_group_0 <- sum(tosferina_group_0$porcentaje)
+tosferina_group_2 <- results_ages_tosferina %>%
+  dplyr::filter(grupo_edad == "2 A 3 MESES")
+per_tosferina_group_2 <- sum(tosferina_group_0$porcentaje)
+```
 
-group_ages_tosferina <- get_cases_tosferina(tosferina_data, column = "grupo_edad")
-results_ages_tosferina <- get_results_tosferina(tosferina_data, columns =  c("grupo_edad", "interpretacion_del_resultado"))
-plot_results_tosferina(results_ages_tosferina, 
-                       group_ages_tosferina, 
+
+El comportamiento de la tosferina por grupo de edad indica que el `r per_tosferina_group_0` % de las muestras recibidas pertenecen al grupo de niños < o = 1 mes, seguido del grupo de 2 a 3 meses con el `r per_tosferina_group_2`% (figura 10).
+
+\newpage
+
+
+```{r plotdistribution_tosferina_ages, echo=FALSE, error=FALSE, fig.height=4, fig.width=10, warning=FALSE, include=TRUE, message=FALSE, fig.cap="Distribución porcentual de casos de tosferina confirmados en el Laboratorio de Salud Pública por grupo de edad"}
+plot_results_tosferina(report_data = results_ages_tosferina, 
                        column = "grupo_edad",
-                       stack_line = FALSE,
+                       positives = group_ages_tosferina$tosferina_cases,
                        label_x = "Grupo de edad")
 ```
 
-Con respecto al género, se observa que el 100% de los casos positivos corresponden al género femenino (figura 9). 
+\newpage
 
-**Figura 7.** Distribución porcentual de casos de tosferina confirmados en el Laboratorio de Salud Pública según género
+```{r distribution-tosferina-sex}
+results_sex_tosferina <- get_results_tosferina(tosferina_cleaned_data,
+                                               columns = "genero")
+total_dist_tosferina <-
+  group_columns_total(disease_data = results_sex_tosferina,
+                      sum_cases = TRUE, col_names = "genero",
+                      wt_percentage = TRUE, col_order = "porcentaje",
+                      etiqueta = FALSE)
+```
 
-```{r distribution_tosferina_sex, echo=FALSE, error=FALSE, fig.height=5, fig.width=10, warning=FALSE, include=TRUE, message=FALSE}
+```{r paragraph-tosferina-sex}
+tosferina_text_sex <- get_tosferina_text_sex(total_dist_tosferina, figure = 11)
+```
 
-results_sex_tosferina <- get_results_tosferina(tosferina_data, columns =  c("genero", "interpretacion_del_resultado"))
-plot_results_tosferina(results_sex_tosferina, 
+`r tosferina_text_sex$text`
+
+```{r distribution_tosferina_sex, include=TRUE, fig.height=6, fig.width=10, fig.cap="Distribución porcentual de casos de tosferina confirmados en el Laboratorio de Salud Pública, según género"}
+plot_results_tosferina(results_sex_tosferina,
                        column = "genero",
-                       label_x = "Genero", 
-                       stack_line = FALSE,
+                       label_x = "Genero",
                        show_values = FALSE)
 ```
+
+\includepdf[pages={1}]{back_cover.pdf}
