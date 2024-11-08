@@ -258,7 +258,7 @@ plot_table_epiweek_tosferina <- function(data_epiweek, distribution_epiweek) {
                  col.names = c("SE", "% Positivos"),
                  align = "c",
                  caption = "Positividad de tosferina por semana epidemiológica,
-                 Bogotá 2022") %>%
+                 Bogotá 2024") %>%
     kableExtra::row_spec(0, bold = TRUE,
                          color = "white", background = "#145765") %>%
     kableExtra::row_spec(seq(2, nrow(distribution_epiweek), by = 2),
