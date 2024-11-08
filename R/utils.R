@@ -10,7 +10,7 @@ row_to_header <- function(data, row_num = 1) {
 #' @title Generar las categorias de edad
 #' @export
 generate_age_categories <- function(dataset) {
-  if (any(names(dataset) == "grupo_edad")) {
+  if (!any(names(dataset) == "grupo_edad")) {
     data_ages <- cbind(dataset, grupo_edad = NA)
     data_ages[, ncol(data_ages)] <- sapply(data_ages$edad,
                                            define_age_category)
