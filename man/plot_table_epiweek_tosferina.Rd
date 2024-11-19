@@ -5,7 +5,12 @@
 \title{Graficar la tabla con la distribución de casos de Tosferna por semana
 epidemiológica}
 \usage{
-plot_table_epiweek_tosferina(data_epiweek, distribution_epiweek)
+plot_table_epiweek_tosferina(
+  data_epiweek,
+  distribution_epiweek,
+  col_epiweek = "SE",
+  epiweek
+)
 }
 \description{
 Graficar la tabla con la distribución de casos de Tosferna por semana

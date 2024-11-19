@@ -6,28 +6,11 @@ plot_age_group_distribution <- function(report_data,
                                         var_fill = "etiqueta",
                                         stacked_percentage = TRUE,
                                         include_sars = FALSE) {
-  colors <- c("Adenovirus" = "#AC6DAD",
-              "Rinovirus" = "#FCB814",
-              "Bocavirus" = "#D49392",
-              "Parainfluenza" = "#64439B",
-              "Influenza b" = "#B94846",
-              "Metapneumovirus" = "#87C762",
-              "VSR" = "#2274BB",
-              "H1N1" = "#F4802D",
-              "H1N1 2009" = "#9DB2D0",
-              "H3N2" = "#145765",
-              "A no subtipificado" = "#EEEA3D",
-              "Otros Virus" = "#19AFE5")
+  colors <- get_colors_age_groups(include_sars = include_sars)
   config_path <- system.file("extdata", "config.yml", package = "labrep")
   category_labels <-
     config::get(file = config_path,
                 "age_categories")$age_categories
-  if (include_sars) {
-    colors <- c(colors, "SARS CoV 2" = "#145765",
-                "H3N1" = "#4F81BD")
-  } else {
-    colors <- c(colors, "H3N1" = "#145765")
-  }
   plot <- ggplot2::ggplot(report_data,
                           ggplot2::aes_string(x =
                                                 factor(report_data[[var_x]],
@@ -45,11 +28,11 @@ plot_age_group_distribution <- function(report_data,
     ggplot2::theme_classic() +
     ggplot2::xlab("Grupo de edad") +
     ggplot2::ylab("Porcentaje de casos") +
-    ggplot2::theme(legend.position = "bottom",
+    ggplot2::theme(legend.position = "none",
                    text = ggplot2::element_text(family = "Montserrat",
-                                                size = 14),
+                                                size = 11),
                    axis.title = ggplot2::element_text(face = "bold"),
-                   legend.title = ggplot2::element_text(face = "bold")) +
+                   axis.title.x = ggplot2::element_blank()) +
     ggplot2::scale_fill_manual(values = colors,
                                name = "Virus respiratorios")
   return(plot)
@@ -137,7 +120,8 @@ plot_distribution_epiweek <- function(report_data,
                                                         ),
                                                       breaks = seq(0,
                                                                    1,
-                                                                   0.1))) +
+                                                                   0.1)),
+                                  limits = c(0, 100)) +
       ggplot2::theme(text = ggplot2::element_text(size = 14,
                                                   family = "Montserrat"))
   }
@@ -148,8 +132,7 @@ plot_distribution_epiweek <- function(report_data,
 #' @export
 plot_cumulative_proportion <- function(data_proportion) {
   cases <- data_proportion$casos
-  labels <- paste(data_proportion$etiqueta,
-                  paste0(data_proportion$porcentaje, "%"))
+  labels <- paste0(data_proportion$porcentaje, "%")
   colors <- c("Adenovirus" = "#AC6DAD",
               "Rinovirus" = "#FCB814",
               "Bocavirus" = "#D49392",
@@ -167,14 +150,21 @@ plot_cumulative_proportion <- function(data_proportion) {
   }
   par(family = "Montserrat")
   plotrix::pie3D(cases,
-                 mar = rep(1.75, 4),
+                 mar = rep(1, 4),
                  col = colors,
                  labels = labels,
-                 explode = 0.1,
+                 explode = 0.2,
                  border = "white",
-                 labelcex = 1.4,
+                 labelcex = 1.6,
                  radius = 0.6,
-                 start = 0.9)
+                 start = 0.8)
+  legend("bottom",
+         legend = data_proportion$etiqueta,
+
+         fill = colors, 
+
+         xpd = TRUE,
+         ncol = 3)
 }
 
 #' @title Graficar la distribución de casos de Tosferina
@@ -186,14 +176,68 @@ plot_results_tosferina <- function(report_data,
                                    show_values = FALSE) {
   colors <- c("Positivo para Bordetella" = "#F4802D",
               "Negativo para Bordetella" = "#145765")
-  plot <- ggplot2::ggplot(report_data) +
-    ggplot2::geom_bar(ggplot2::aes_string(x = column,
-                                          y = "casos",
-                                          fill =
-                                            "interpretacion_del_resultado"),
-                      alpha = 0.9,
-                      width = 0.5,
-                      stat = "identity") +
+  plot <- ggplot2::ggplot()
+  if (column == "grupo_edad") {
+    config_path <- system.file("extdata", "config.yml", package = "labrep")
+    category_labels <-
+      config::get(file = config_path,
+                  "tosferina_data")$age_groups$labels
+    plot <- plot +
+      ggplot2::geom_bar(data = report_data,
+                        ggplot2::aes(x = factor(grupo_edad,
+                                                levels =
+                                                  category_labels),
+                                     y = casos,
+                                     fill = interpretacion_del_resultado),
+                        alpha = 0.9,
+                        stat = "identity",
+                        width = 0.5,
+                        position = ggplot2::position_dodge())
+  } else {
+    plot <- plot +
+      ggplot2::geom_bar(data = report_data,
+                        ggplot2::aes_string(x = column,
+                                            y = "casos",
+                                            fill =
+                                              "interpretacion_del_resultado"),
+                        alpha = 0.9,
+                        stat = "identity",
+                        width = 0.5,
+                        position = ggplot2::position_dodge())
+  }
+  max_val_pos <- max(positives[["porcentaje"]])
+  max_val_report <- max(report_data[["casos"]])
+  if (!is.null(positives)) {
+    if (column == "grupo_edad") {
+      plot <- plot +
+        ggplot2::geom_line(data = positives,
+                           ggplot2::aes(x = factor(grupo_edad,
+                                                   levels = category_labels),
+                                        y = (porcentaje * max_val_report)
+                                            / max_val_pos),
+                           stat = "identity",
+                           color = "#F99D00",
+                           size = 0.8,
+                           group = 1)
+    } else {
+      plot <- plot +
+        ggplot2::geom_line(data = positives,
+                           ggplot2::aes_string(x = column,
+                                               y = "(porcentaje * max_val_pos)
+                                               / max_val_report"),
+                           stat = "identity",
+                           color = "#F99D00",
+                           size = 0.8,
+                           group = 1)
+    }
+    plot <- plot +
+      ggplot2::scale_y_continuous(name = "Numero de muestras analizadas\n",
+                                  sec.axis =
+                                    ggplot2::sec_axis(trans = ~ . * max_val_report /
+                                                        max_val_pos,
+                                                      name = "Porcentaje"))
+  }
+  plot <- plot +
     ggplot2::theme_classic() +
     ggplot2::xlab(label_x) +
     ggplot2::ylab("Numero de muestras analizadas\n") +
@@ -204,35 +248,19 @@ plot_results_tosferina <- function(report_data,
                    legend.title = ggplot2::element_text(face = "bold")) +
     ggplot2::scale_fill_manual(values = colors,
                                name = "Interpretación del resultado")
-  if (!is.null(positives)) {
-    positives[[column]]  <- toupper(positives[[column]])
-    plot <- plot +
-      ggplot2::geom_line(data = positives,
-                         ggplot2::aes_string(x = column,
-                                             y = "porcentaje"),
-                         stat = "identity",
-                         color = "#F99D00",
-                         size = 0.8,
-                         group = 1) +
-      ggplot2::scale_y_continuous(sec.axis =
-                                    ggplot2::sec_axis(~. * 0.0055,
-                                                      labels =
-                                                      scales::percent_format(
-                                                        ),
-                                                      breaks = seq(0, 1,
-                                                                   0.1))) +
-      ggplot2::theme(text = ggplot2::element_text(size = 14,
-                                                  family = "Montserrat"))
-  }
   return(plot)
 }
 
 #' @title Graficar la tabla con la distribución de casos por semana
 #' epidemiológica
 #' @export
-plot_table_vrs_epiweek <- function(data_epiweek) {
+plot_table_vrs_epiweek <- function(data_epiweek,
+                                   col_epiweek = "Semana",
+                                   epiweek) {
+  data_table <- data_epiweek %>%
+    dplyr::filter(!!dplyr::sym(col_epiweek) <= epiweek)
   table_epiweek <-
-    knitr::kable(data_epiweek,
+    knitr::kable(data_table,
                  col.names = c("Semana Epidemiologica", "% Positivos"),
                  align = "c",
                  longtable = TRUE,
@@ -240,7 +268,7 @@ plot_table_vrs_epiweek <- function(data_epiweek) {
                  epidemiológica, Bogotá 2024 \n ") %>%
     kableExtra::row_spec(0, bold = TRUE,
                          color = "white", background = "#145765") %>%
-    kableExtra::row_spec(seq(2, nrow(data_epiweek), by = 2),
+    kableExtra::row_spec(seq(2, nrow(data_table), by = 2),
                          background = "#D4EFFB") %>%
     kableExtra::column_spec(1, border_left = TRUE) %>%
     kableExtra::column_spec(2, border_right = TRUE) %>%
@@ -251,9 +279,14 @@ plot_table_vrs_epiweek <- function(data_epiweek) {
 #' @title Graficar la tabla con la distribución de casos de Tosferna por semana
 #' epidemiológica
 #' @export
-plot_table_epiweek_tosferina <- function(data_epiweek, distribution_epiweek) {
+plot_table_epiweek_tosferina <- function(data_epiweek,
+                                         distribution_epiweek,
+                                         col_epiweek = "SE",
+                                         epiweek) {
+  data_table <- data_epiweek %>%
+    dplyr::filter(!!dplyr::sym(col_epiweek) <= epiweek)
   table_epiweek <-
-    knitr::kable(data_epiweek,
+    knitr::kable(data_table,
                  longtable = TRUE,
                  col.names = c("SE", "% Positivos"),
                  align = "c",
@@ -261,7 +294,7 @@ plot_table_epiweek_tosferina <- function(data_epiweek, distribution_epiweek) {
                  Bogotá 2024") %>%
     kableExtra::row_spec(0, bold = TRUE,
                          color = "white", background = "#145765") %>%
-    kableExtra::row_spec(seq(2, nrow(distribution_epiweek), by = 2),
+    kableExtra::row_spec(seq(2, nrow(data_table), by = 2),
                          background = "#D4EFFB") %>%
     kableExtra::column_spec(1, border_left = TRUE) %>%
     kableExtra::column_spec(2, border_right = TRUE) %>%
@@ -351,5 +384,38 @@ plot_historic_epi_time <- function(stacked_data, tabla,
     ggplot2::annotate("segment", x = 21, xend = 22.2, y = -150, yend = -150,
                       color = "#E97132", linewidth = 0.7) +
     ggplot2::annotate("text", x = 22.5, y = -150, label = "% DE POSITIVIDAD",
-                      hjust = 0, color = "black", size= 2) 
+                      hjust = 0, color = "black", size = 2)
 }
+
+#' @title Graficar la tabla de la leyenda
+#' @export
+plot_table_legend <- function(report_data,
+                              include_sars = FALSE) {
+  report_data$cs <- ""
+  report_data <- report_data %>%
+    dplyr::arrange(.data$etiqueta) %>%
+    dplyr::relocate(.data$cs, .after = .data$etiqueta)
+  colors <- get_colors_age_groups(order = TRUE,
+                                  hex_cods = TRUE,
+                                  include_sars = include_sars)
+  col_names <- names(report_data)
+  table <- knitr::kable(report_data,
+                        col.names = NULL,
+                        align = "c",
+                        longtable = TRUE) %>%
+    kableExtra::kable_styling(
+      full_width = FALSE,
+      position = "left",
+      latex_options = c("bordered", "hold_position"),
+      font_size = 9
+    )  %>%
+    kableExtra::column_spec(2, background = colors) %>%
+    kableExtra::column_spec(1, border_left = TRUE) %>%
+    kableExtra::column_spec(length(col_names), border_right = TRUE) %>%
+    kableExtra::column_spec(column = seq(3, length(col_names)),
+                            width = "1.6cm") %>%
+    kableExtra::column_spec(length(col_names), border_right = TRUE,
+                            width = "1.7cm")
+  return(table)
+}
+

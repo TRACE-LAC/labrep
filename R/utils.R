@@ -297,3 +297,45 @@ get_table_epiweek_tosferina <- function(report_data, epiweek) {
     dplyr::arrange(.data$SE)
   return(table_data)
 }
+
+#' @title Añadir las semanas epidemiológicas faltantes
+#' @export
+add_missing_weeks <- function(dataset, col_epiweek) {
+  max_epiweek <-
+    max(as.numeric(dataset[[col_epiweek]]))
+  if (max_epiweek < 53) {
+    diff_epiweek <- 53 - max_epiweek
+    dataset_aux <- data.frame()
+    dataset_aux <- rbind(dataset_aux,
+                         data.frame(semana =
+                                  seq(max_epiweek + 1, 53),
+                                casos = rep(0, diff_epiweek),
+                                total_casos = rep(0, diff_epiweek),
+                                porcentaje = rep(0, diff_epiweek)))
+    names(dataset_aux)[names(dataset_aux)
+                       == "semana"] <- col_epiweek
+    dataset <- rbind(dataset, dataset_aux)
+  }
+  return(dataset)
+}
+
+#' @title Convertir grupos de edad a columnas
+#' @export
+convert_age_groups_as_cols <- function(dataset) {
+  config_path <- system.file("extdata", "config.yml", package = "labrep")
+  category_labels <-
+    config::get(file = config_path,
+                "age_categories")$age_categories
+  category_labels <- c("etiqueta", category_labels)
+  data_groups <- dataset %>%
+    dplyr::select(.data$etiqueta, .data$grupo_edad, .data$casos) %>% # Seleccionar columnas relevantes
+    tidyr::pivot_wider(
+      names_from = .data$grupo_edad, # Columna que se convierte en encabezados
+      values_from = .data$casos      # Valores que llenan la tabla
+    )
+  cols_order <- factor(colnames(data_groups),
+                       levels = category_labels)
+  data_groups <- data_groups %>%
+    dplyr::select(dplyr::all_of(levels(cols_order)))
+  return(data_groups)
+}

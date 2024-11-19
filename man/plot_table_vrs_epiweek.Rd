@@ -5,7 +5,7 @@
 \title{Graficar la tabla con la distribución de casos por semana
 epidemiológica}
 \usage{
-plot_table_vrs_epiweek(data_epiweek)
+plot_table_vrs_epiweek(data_epiweek, col_epiweek = "Semana", epiweek)
 }
 \description{
 Graficar la tabla con la distribución de casos por semana
