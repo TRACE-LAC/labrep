@@ -797,6 +797,8 @@ get_cases_influenza <- function(filmarray_data,
     get_cases_epiweeks(report_data = data_epiweeks,
                        data_grouped = cases_influenza,
                        col_epiweek = col_epiweek)
+  cases_epiweeks <- add_missing_weeks(dataset = cases_epiweeks,
+                                       col_epiweek = col_epiweek)
   distribution_epiweeks <- list(cases_epiweeks = cases_epiweeks,
                                 influenza_epiweeks = cases_influenza)
   return(distribution_epiweeks)
