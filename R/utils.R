@@ -319,3 +319,23 @@ add_missing_weeks <- function(dataset, col_epiweek) {
   return(dataset)
 }
 
+#' @title Convertir grupos de edad a columnas
+#' @export
+convert_age_groups_as_cols <- function(dataset) {
+  config_path <- system.file("extdata", "config.yml", package = "labrep")
+  category_labels <-
+    config::get(file = config_path,
+                "age_categories")$age_categories
+  category_labels <- c("etiqueta", category_labels)
+  data_groups <- dataset %>%
+    dplyr::select(.data$etiqueta, .data$grupo_edad, .data$casos) %>% # Seleccionar columnas relevantes
+    tidyr::pivot_wider(
+      names_from = .data$grupo_edad, # Columna que se convierte en encabezados
+      values_from = .data$casos      # Valores que llenan la tabla
+    )
+  cols_order <- factor(colnames(data_groups),
+                       levels = category_labels)
+  data_groups <- data_groups %>%
+    dplyr::select(dplyr::all_of(levels(cols_order)))
+  return(data_groups)
+}
