@@ -192,7 +192,6 @@ filmarray_data <- import_data_viral_circulation(report_data = params$fci_data,
 filmarray_data_cleaned <- clean_filmarray_data(filmarray_data = filmarray_data)
 filmarray_data_cleaned <-
   generate_age_categories(dataset = filmarray_data_cleaned)
-#report_data_week <- filter(filmarray_data_cleaned, se == "23")
 filmarray_age_groups <-
   get_cases_filmarray(report_data = filmarray_data_cleaned,
                       age_groups = TRUE)
