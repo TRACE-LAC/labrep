@@ -599,10 +599,6 @@ get_distribution_test <- function(report_data,
   
   report_data_test <- rbind(report_data_test, report_data_irag_grave)
   report_data_test <- rbind(report_data_test, report_data_irag)
-  if (epiweek > 0) {
-    report_data_test <- report_data_test[
-      report_data_test$semanaepidemiologicavegeneral == epiweek, ]
-  }
   config_path <- system.file("extdata", "config.yml", package = "labrep")
   if (is.null(col_epiweek)) {
     col_epiweek <- config::get(file = config_path,
@@ -614,11 +610,19 @@ get_distribution_test <- function(report_data,
            " a la semana epidemiologica")
     }
   }
+  if (epiweek > 0) {
+    report_data_test <- report_data_test[
+      report_data_test[[col_epiweek]] == epiweek, ]
+  }
   cases_epiweeks <-
     get_cases_epiweeks(report_data = report_data,
                        data_grouped = report_data_test,
                        col_epiweek = col_epiweek,
                        table = FALSE)
+  
+  cases_epiweeks <- 
+    add_missing_weeks(dataset = cases_epiweeks,
+                      col_epiweek = col_epiweek)
   viruses_epiweeks <- get_cases_other_viruses(report_data = report_data_test,
                                               epiweek = "all")
   if (include_sars) {
