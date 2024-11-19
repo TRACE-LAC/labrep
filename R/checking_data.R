@@ -877,19 +877,11 @@ get_results_tosferina <- function(report_data, results = "positivo",
                                   col_results =
                                     "interpretacion_del_resultado") {
   columns <- c(columns, col_results)
-  report_data[[col_results]][grep("positivo",
-                                  report_data[[col_results]],
-                                  fixed = TRUE)] <-
-    "Positivo para Bordetella"
-  report_data[[col_results]][grep("negativo",
-                                  report_data[[col_results]],
-                                  fixed = TRUE)] <-
-    "Negativo para Bordetella"
-  cases <- report_data[grepl("Positivo|Negativo", report_data[[col_results]],
-                             fixed = TRUE), ]
-  na_values <- which(is.na(report_data[[col_results]]))
+  cases <- report_data[grepl(paste(c("positivo", "negativo"), collapse = "|"),
+                             report_data[[col_results]]), ]
+  na_values <- which(is.na(cases[[col_results]]))
   if (length(na_values) > 0) {
-    cases <- report_data[-na_values, ]
+    cases <- cases[-na_values, ]
   }
   muestra_values <- grep("muestra", cases[[col_results]], fixed = TRUE)
   if (length(muestra_values) > 0) {
@@ -911,6 +903,14 @@ get_results_tosferina <- function(report_data, results = "positivo",
   data_grouped <- data_grouped %>%
     dplyr::mutate(porcentaje = round((data_grouped$casos / total_cases) *
                                        100, 1))
+  data_grouped[[col_results]][grep("positivo",
+                                   data_grouped[[col_results]],
+                                  fixed = TRUE)] <-
+    "Positivo para Bordetella"
+  data_grouped[[col_results]][grep("negativo",
+                                   data_grouped[[col_results]],
+                            fixed = TRUE)] <-
+    "Negativo para Bordetella"
   col_gender <-
     config::get(file = config_path,
                 "tosferina_data")$gender$col_valid
@@ -929,6 +929,9 @@ get_results_tosferina <- function(report_data, results = "positivo",
                               "Positivo para Bordetella")
       data_grouped <- rbind(data_grouped, new_row)
     }
+  }
+  if (any(columns == "grupo_edad")) {
+    data_grouped[["grupo_edad"]] <- tolower(data_grouped[["grupo_edad"]])
   }
   data_grouped <- data_grouped %>% dplyr::mutate(evento = "tosferina",
                                                  etiqueta = "tosferina")
