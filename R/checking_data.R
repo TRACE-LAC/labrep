@@ -842,9 +842,10 @@ get_cases_tosferina <- function(report_data, result = "positivo",
   }
   if (column == "grupo_edad") {
     config_path <- system.file("extdata", "config.yml", package = "labrep")
-    categorie_labels <- config::get(file = config_path,
-                                    "age_categorie_labels_tosferina")
-    for (label in categorie_labels) {
+    category_labels <-
+      config::get(file = config_path,
+                  "tosferina_data")$age_groups$labels
+    for (label in category_labels) {
       if (!any(data_grouped == label) || is.na(any(data_grouped == label))) {
         new_row <- data.frame(grupo_edad = label, casos = 0, porcentaje  = 0,
                               total_casos = 0)
