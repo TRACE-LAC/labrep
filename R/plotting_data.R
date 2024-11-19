@@ -120,7 +120,8 @@ plot_distribution_epiweek <- function(report_data,
                                                         ),
                                                       breaks = seq(0,
                                                                    1,
-                                                                   0.1))) +
+                                                                   0.1)),
+                                  limits = c(0, 100)) +
       ggplot2::theme(text = ggplot2::element_text(size = 14,
                                                   family = "Montserrat"))
   }
@@ -131,8 +132,7 @@ plot_distribution_epiweek <- function(report_data,
 #' @export
 plot_cumulative_proportion <- function(data_proportion) {
   cases <- data_proportion$casos
-  labels <- paste(data_proportion$etiqueta,
-                  paste0(data_proportion$porcentaje, "%"))
+  labels <- paste0(data_proportion$porcentaje, "%")
   colors <- c("Adenovirus" = "#AC6DAD",
               "Rinovirus" = "#FCB814",
               "Bocavirus" = "#D49392",
@@ -150,14 +150,21 @@ plot_cumulative_proportion <- function(data_proportion) {
   }
   par(family = "Montserrat")
   plotrix::pie3D(cases,
-                 mar = rep(1.75, 4),
+                 mar = rep(1, 4),
                  col = colors,
                  labels = labels,
-                 explode = 0.1,
+                 explode = 0.2,
                  border = "white",
-                 labelcex = 1.4,
+                 labelcex = 1.6,
                  radius = 0.6,
-                 start = 0.9)
+                 start = 0.8)
+  legend("bottom",
+         legend = data_proportion$etiqueta,
+
+         fill = colors, 
+
+         xpd = TRUE,
+         ncol = 3)
 }
 
 #' @title Graficar la distribución de casos de Tosferina
