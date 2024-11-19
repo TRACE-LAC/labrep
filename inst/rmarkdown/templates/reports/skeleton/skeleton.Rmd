@@ -476,7 +476,6 @@ plot_distribution_epiweek(distribution_influenza$influenza_epiweeks,
                           positives = distribution_influenza$cases_epiweeks)
 ```
 
-\newpage
 
 ```{=tex}
 \begin{flushleft}
