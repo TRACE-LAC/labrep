@@ -81,12 +81,12 @@ print(params$fci_data)
 
 ```{=tex}
 \begin{center}
-{\color{colortitles} Alcaldesa Mayor de Bogotá\\}
-Claudia Nayibe López Hernández\\~\\
+{\color{colortitles} Alcalde Mayor de Bogotá\\}
+Carlos Fernando Galán Pachón\\~\\
 
 
 {\color{colortitles} Secretario Distrital de Salud\\}
-Alejandro Gómez López\\~\\
+Gerson Orlando Bermont Galavis\\~\\
 
 
 {\color{colortitles} Subsecretario de Salud Pública\\}
@@ -198,7 +198,6 @@ filmarray_age_groups <-
                       age_groups = TRUE)
 ```
 
-
 ```{r other-viruses-data}
 other_viruses_data <-
   import_data_viral_circulation(report_data =
@@ -242,9 +241,16 @@ Para esta semana, por grupo de edad, el `r perc_vrs_age_group`% de pacientes pos
 la población de menores de 5 años (figura 2) y si se incluye al
 SARS-CoV-2 los menores corresponden al `r perc_sars_age_group` % (figura 3).
 
-```{r plot-viruses-age-groups, include=TRUE, fig.height=5, fig.width=10,fig.cap="Distribución porcentual de virus respiratorios por grupo de edad, Laboratorio de Salud Pública Bogotá."}
+```{r plot-viruses-age-groups, include=TRUE, fig.height=4, fig.width=5.7,fig.cap="Distribución porcentual de virus respiratorios por grupo de edad, Laboratorio de Salud Pública Bogotá.", fig.align='right'}
 plot_age_group_distribution(viruses_age_groups)
 ```
+
+```{r table-viruses-age-groups, fig.align='right'}
+trans_viruses_age_groups <-
+  convert_age_groups_as_cols(dataset = viruses_age_groups)
+plot_table_legend(report_data = trans_viruses_age_groups)
+```
+
 
 ```{r paragraph-viruses-age-groups}
 text_cons_viruses <-
@@ -255,12 +261,19 @@ text_cons_viruses <-
 
 En la figura 3 se presenta el consolidado de los virus respiratorios por los diferentes grupos de edad, en los niños menores de 2 años las mayores frecuencias son de casos de `r text_cons_viruses`.
 
-```{r plot-distribution-sars, include=TRUE, fig.height=5, fig.width=10, fig.cap="Distribución porcentual de virus respiratorios y SARS-CoV-2 por grupo de edad, Laboratorio de Salud Pública Bogotá."}
+\newpage
+
+```{r plot-distribution-sars, include=TRUE, fig.height=4, fig.width=5.7, fig.align='right', fig.cap="Distribución porcentual de virus respiratorios y SARS-CoV-2 por grupo de edad, Laboratorio de Salud Pública Bogotá."}
 plot_age_group_distribution(sars_viruses_age_groups, var_y = "casos",
                             include_sars = TRUE)
 ```
 
-\newpage
+```{r table-distribution-sars, fig.align='right'}
+trans_sars_age_groups <-
+  convert_age_groups_as_cols(dataset = sars_viruses_age_groups)
+plot_table_legend(report_data = trans_sars_age_groups,
+                  include_sars = TRUE)
+```
 
 ```{r paragraph-sars-age-groups}
 text_cons_vrs_sars <-
@@ -281,14 +294,23 @@ según grupo de edad (figura 4). También se ha incluido al SARS-CoV-2.
 esi_age_groups <-
   get_distribution_surveillance(report_data = other_viruses_cleaned_data,
                                 include_sars = TRUE,
-                                surveillance_type = "esi")
+                                surveillance_type = "esi",
+                                epiweek = params$epiweek)
 ```
 
-
-```{r plot-distribution-esi-age-groups, include=TRUE, fig.height=5, fig.width=10, warning=FALSE, include=TRUE, message=FALSE, fig.cap="Circulación de virus respiratorios por tipo de vigilancia y según grupo de edad, Laboratorio de Salud Pública. \\linebreak \\linebreak Distribución de virus respiratorios en casos de ESI, según grupos de edad."}
+```{r plot-distribution-esi-age-groups, include=TRUE, fig.height=4, fig.width=5.7, fig.align='right', warning=FALSE, include=TRUE, message=FALSE, fig.cap="Circulación de virus respiratorios por tipo de vigilancia y según grupo de edad, Laboratorio de Salud Pública. \\linebreak \\linebreak Distribución de virus respiratorios en casos de ESI, según grupos de edad."}
 plot_age_group_distribution(esi_age_groups,
                             include_sars = TRUE)
 ```
+
+```{r table-distribution-esi-age-groups, fig.align='right'}
+trans_esi_age_groups <-
+  convert_age_groups_as_cols(dataset = esi_age_groups)
+plot_table_legend(report_data = trans_esi_age_groups,
+                  include_sars = TRUE)
+```
+
+\newpage
 
 **Distribución de virus respiratorios en casos de IRA Grave, según
 grupos de edad**
@@ -297,11 +319,19 @@ grupos de edad**
 irag_grave_age_groups <-
   get_distribution_surveillance(other_viruses_cleaned_data,
                                 include_sars = TRUE,
-                                surveillance_type = "irag_grave")
+                                surveillance_type = "irag_grave",
+                                epiweek = params$epiweek)
 ```
 
-```{r plot-distribution-irag-grave-age-groups, include=TRUE, fig.height=5, fig.width=10}
+```{r plot-distribution-irag-grave-age-groups, include=TRUE, fig.height=4, fig.width=5.7, fig.align='right'}
 plot_age_group_distribution(irag_grave_age_groups, include_sars = TRUE)
+```
+
+```{r table-distribution-irag-grave-age-groups, fig.align='right'}
+trans_irag_grave_age_groups <-
+  convert_age_groups_as_cols(dataset = irag_grave_age_groups)
+plot_table_legend(report_data = trans_irag_grave_age_groups,
+                  include_sars = TRUE)
 ```
 
 \newpage
@@ -313,13 +343,21 @@ grupos de edad.**
 irag_inusitado_age_groups <-
   get_distribution_surveillance(other_viruses_cleaned_data,
                                 include_sars = TRUE,
-                                surveillance_type = "irag_inusitado")
+                                surveillance_type = "irag_inusitado",
+                                epiweek = params$epiweek)
 irag_inusitado_age_groups <- irag_inusitado_age_groups %>% arrange(grupo_edad)
 ```
 
-```{r plot-distribution-irag-inusitado-age-groups, include=TRUE, fig.height=5, fig.width=10}
+```{r plot-distribution-irag-inusitado-age-groups, include=TRUE, fig.height=4, fig.width=5.7, fig.align='right'}
 plot_age_group_distribution(irag_inusitado_age_groups,
                             include_sars = TRUE)
+```
+
+```{r table-distribution-irag-inusitado-age-groups, fig.align='right'}
+trans_irag_grave_age_groups <-
+  convert_age_groups_as_cols(dataset = irag_inusitado_age_groups)
+plot_table_legend(report_data = trans_irag_grave_age_groups,
+                  include_sars = TRUE)
 ```
 
 En la figura 5 se puede observar el comportamiento de los virus
@@ -355,7 +393,8 @@ cualquier virus respiratorio, diferentes al SARS-CoV-2, en la siguiente
 tabla.
 
 ```{r plot-distribution-epiweek, include=TRUE, fig.height=5, fig.width=10, fig.align='center'}
-plot_table_vrs_epiweek(distribution_epiweek)
+plot_table_vrs_epiweek(distribution_epiweek,
+                       epiweek = params$epiweek)
 ```
 
 
@@ -398,8 +437,8 @@ sars_prop_text <-
   get_prop_text(dataset = sars_prop_epiweeks$cases_epiweek)
 ```
 
-```{r plot-cumulative-proportion-sars, fig.height=8, fig.width=14, include=TRUE, fig.cap="Proporción acumulada de los virus respiratorios, Laboratorio de Salud Pública"}
-plot_cumulative_proportion(sars_prop_epiweeks$cases_epiweek)
+```{r plot-cumulative-proportion-sars, fig.height=8, fig.width=15, include=TRUE, fig.cap="Proporción acumulada de los virus respiratorios, Laboratorio de Salud Pública"}
+ plot_cumulative_proportion(sars_prop_epiweeks$cases_epiweek)
 ```
 
 En la semana `r params$epiweek` la circulación viral estuvo con predominio de `r viruses_prop_text`; en las `r viruses_prop_epiweek$total_samples` muestras analizadas para esta semana.
@@ -428,7 +467,7 @@ text_influenza <- get_text_viruses(dataset = total_dist_influenza,
 
 En cuanto al comportamiento de los virus de Influenza acumulado a SE `r params$epiweek` como de costumbre en las primeras semanas del año ha circulado el virus de `r text_influenza` en `r total_cases_influenza` muestras positivas. (Figura 8)
 
-```{r distribution_influeza, include=TRUE, fig.height=4, fig.width=10, fig.cap="Distribución de tipos y subtipos de Influenza, Laboratorio de Salud Pública"}
+```{r distribution_influeza, include=TRUE, fig.height=5, fig.width=10, fig.cap="Distribución de tipos y subtipos de Influenza, Laboratorio de Salud Pública"}
 plot_distribution_epiweek(distribution_influenza$influenza_epiweeks,
                           var_x = "semanaepidemiologicavegeneral",
                           var_y = "casos",
@@ -468,7 +507,8 @@ Se ha observado la siguiente positividad en `r total_cases_tosferina` muestras a
 
 ```{r table-tosferina-epiweek, include=TRUE, fig.height=5, fig.width=10}
 plot_table_epiweek_tosferina(data_epiweek = table_epiweek,
-                             distribution_epiweek = cases_epiweeks_tosferina)
+                             distribution_epiweek = cases_epiweeks_tosferina,
+                             epiweek = params$epiweek)
 ```
 
 
@@ -483,10 +523,10 @@ results_ages_tosferina <-
 
 ```{r paragraph-tosferina}
 tosferina_group_0 <- results_ages_tosferina %>%
-  dplyr::filter(grupo_edad == "< O = 1 MES")
+  dplyr::filter(grupo_edad == "< O = 1 mes")
 per_tosferina_group_0 <- sum(tosferina_group_0$porcentaje)
 tosferina_group_2 <- results_ages_tosferina %>%
-  dplyr::filter(grupo_edad == "2 A 3 MESES")
+  dplyr::filter(grupo_edad == "2 a 3 meses")
 per_tosferina_group_2 <- sum(tosferina_group_0$porcentaje)
 ```
 
@@ -499,11 +539,9 @@ El comportamiento de la tosferina por grupo de edad indica que el `r per_tosferi
 ```{r plotdistribution_tosferina_ages, echo=FALSE, error=FALSE, fig.height=4, fig.width=10, warning=FALSE, include=TRUE, message=FALSE, fig.cap="Distribución porcentual de casos de tosferina confirmados en el Laboratorio de Salud Pública por grupo de edad"}
 plot_results_tosferina(report_data = results_ages_tosferina, 
                        column = "grupo_edad",
-                       positives = group_ages_tosferina$tosferina_cases,
+                       positives = group_ages_tosferina$cases_age_group,
                        label_x = "Grupo de edad")
 ```
-
-\newpage
 
 ```{r distribution-tosferina-sex}
 results_sex_tosferina <- get_results_tosferina(tosferina_cleaned_data,
@@ -521,7 +559,7 @@ tosferina_text_sex <- get_tosferina_text_sex(total_dist_tosferina, figure = 11)
 
 `r tosferina_text_sex$text`
 
-```{r distribution_tosferina_sex, include=TRUE, fig.height=5, fig.width=10, fig.cap="Distribución porcentual de casos de tosferina confirmados en el Laboratorio de Salud Pública, según género"}
+```{r distribution_tosferina_sex, include=TRUE, fig.height=4.5, fig.width=10, fig.cap="Distribución porcentual de casos de tosferina confirmados en el Laboratorio de Salud Pública, según género"}
 plot_results_tosferina(results_sex_tosferina,
                        column = "genero",
                        label_x = "Genero",
