@@ -5,6 +5,7 @@
 <url><loc>/authors.html</loc></url>
 <url><loc>/index.html</loc></url>
 <url><loc>/reference/add_character.html</loc></url>
+<url><loc>/reference/add_missing_weeks.html</loc></url>
 <url><loc>/reference/clean_colnames_spaces.html</loc></url>
 <url><loc>/reference/clean_colnames_suffixes.html</loc></url>
 <url><loc>/reference/clean_data_other_viruses.html</loc></url>
@@ -14,6 +15,7 @@
 <url><loc>/reference/clean_sars_data.html</loc></url>
 <url><loc>/reference/clean_tosferina_data.html</loc></url>
 <url><loc>/reference/complete_age_categories.html</loc></url>
+<url><loc>/reference/convert_age_groups_as_cols.html</loc></url>
 <url><loc>/reference/define_age_category.html</loc></url>
 <url><loc>/reference/fill_down_year.html</loc></url>
 <url><loc>/reference/generate_age_categories.html</loc></url>
@@ -26,6 +28,7 @@
 <url><loc>/reference/get_cases_prop_epiweek.html</loc></url>
 <url><loc>/reference/get_cases_sars.html</loc></url>
 <url><loc>/reference/get_cases_tosferina.html</loc></url>
+<url><loc>/reference/get_colors_age_groups.html</loc></url>
 <url><loc>/reference/get_cons_viruses_age_text.html</loc></url>
 <url><loc>/reference/get_dist_fci_other_vrs.html</loc></url>
 <url><loc>/reference/get_distribution_age_vr_sars.html</loc></url>
@@ -57,6 +60,7 @@
 <url><loc>/reference/plot_historic_epi_time.html</loc></url>
 <url><loc>/reference/plot_results_tosferina.html</loc></url>
 <url><loc>/reference/plot_table_epiweek_tosferina.html</loc></url>
+<url><loc>/reference/plot_table_legend.html</loc></url>
 <url><loc>/reference/plot_table_vrs_epiweek.html</loc></url>
 <url><loc>/reference/row_to_header.html</loc></url>
 </urlset>
