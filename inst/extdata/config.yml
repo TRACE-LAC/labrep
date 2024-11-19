@@ -6,14 +6,14 @@ default:
     labels: ["menor de 2 años", "entre 2 y 4 años", "entre 5 y 14 años", "entre 15 y 39 años", "entre 40 y 59 años", "entre 60 y más años"]
   age_categorie_labels_tosferina: [ "< o = 1 mes", "2 a 3 meses", "4 a 5 meses", "6 a 11 meses", "1 a 4 años", "5 a 14 años", "15 a 44 años", "45 y mas años"]
   respiratory_virus_column_names: [ "influenza_a_h1_2009", "influenza_a_h1", "influenza_a_h3", "influenza_b", "metapneumovirus_humano", "rinovirus_enterovirus_humano", "virus_sincitial_respiratorio", "adenovirus"]
-  respiratory_virus_names: [ "H1N1 2009", "H1N1", "H3N1", "Influenza B", "Metapneumovirus", "Rinovirus", "VSR", "Adenovirus"]
+  respiratory_virus_names: [ "H1N1 2009", "H1N1", "H3N2", "Influenza B", "Metapneumovirus", "Rinovirus", "VSR", "Adenovirus"]
   dates_column_names: ["fecha_nto", "fec_not", "ini_sin", "fec_hos", "fec_def", "fec_con"]
   depto_column_names: ["cod_dpto_o"]
-  respiratory_virus_detected_names: ["Adenovirus", "Rinovirus", "Bocavirus", "Parainfluenza", "Influenza b", "H3N1", "Metapneumovirus", "VSR", "H1N1"]
+  respiratory_virus_detected_names: ["Adenovirus", "Rinovirus", "Bocavirus", "Parainfluenza", "Influenza B", "H3N2", "Metapneumovirus", "VSR", "H1N1"]
   respiratory_virus_detected: [ "adenovirus", "rinovirus", "bocavirus", "parainfluenza", "influenza_b", "h3", "metapneumovirus", "virus_sincitial_respiratorio", "h1"]
   influeza_types: [ "influenza_b", "h3", "h1"]
   influeza_events: [ "influenza_a", "h1n1", "h1n1_pdm09", "h3n2", "influenza_b"]
-  influeza_columns_names: [ "Influenza B", "H3N1", "H1N1 2009"]
+  influeza_columns_names: [ "Influenza B", "H3N2", "H1N1 2009"]
   respiratory_virus_test_exceptions: [ "muestra_insuficiente_no_se_procesa", "no_se_procesa_ifi_tiempo_de_toma_de_muestra_superior_a_7_dias_nota_2", "no_se_observan_virus_respiratorios", "muestra_escasa_de_celulas"]
   other_viruses:
     epiweek: 
@@ -38,6 +38,7 @@ default:
     age_groups:
       col_valid: "grupo_edad"
       cols_clean: ["grupo_de_edad"]
+      labels: ["< 0 = 1 mes", "2 a 3 meses", "4 a 5 meses", "6 a 11 meses", "1 a 4 años", "5 a 14 años", "15 a 44 años", "45 y más años"]
     result_interpretation:
       col_valid: "interpretacion_del_resultado"
       cols_clean: ["interpretacion_de_resultados"]
