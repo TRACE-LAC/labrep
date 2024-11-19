@@ -6,28 +6,11 @@ plot_age_group_distribution <- function(report_data,
                                         var_fill = "etiqueta",
                                         stacked_percentage = TRUE,
                                         include_sars = FALSE) {
-  colors <- c("Adenovirus" = "#AC6DAD",
-              "Rinovirus" = "#FCB814",
-              "Bocavirus" = "#D49392",
-              "Parainfluenza" = "#64439B",
-              "Influenza b" = "#B94846",
-              "Metapneumovirus" = "#87C762",
-              "VSR" = "#2274BB",
-              "H1N1" = "#F4802D",
-              "H1N1 2009" = "#9DB2D0",
-              "H3N2" = "#145765",
-              "A no subtipificado" = "#EEEA3D",
-              "Otros Virus" = "#19AFE5")
+  colors <- get_colors_age_groups(include_sars = include_sars)
   config_path <- system.file("extdata", "config.yml", package = "labrep")
   category_labels <-
     config::get(file = config_path,
                 "age_categories")$age_categories
-  if (include_sars) {
-    colors <- c(colors, "SARS CoV 2" = "#145765",
-                "H3N1" = "#4F81BD")
-  } else {
-    colors <- c(colors, "H3N1" = "#145765")
-  }
   plot <- ggplot2::ggplot(report_data,
                           ggplot2::aes_string(x =
                                                 factor(report_data[[var_x]],
