@@ -254,9 +254,13 @@ plot_results_tosferina <- function(report_data,
 #' @title Graficar la tabla con la distribución de casos por semana
 #' epidemiológica
 #' @export
-plot_table_vrs_epiweek <- function(data_epiweek) {
+plot_table_vrs_epiweek <- function(data_epiweek,
+                                   col_epiweek = "Semana",
+                                   epiweek) {
+  data_table <- data_epiweek %>%
+    dplyr::filter(!!dplyr::sym(col_epiweek) <= epiweek)
   table_epiweek <-
-    knitr::kable(data_epiweek,
+    knitr::kable(data_table,
                  col.names = c("Semana Epidemiologica", "% Positivos"),
                  align = "c",
                  longtable = TRUE,
@@ -264,7 +268,7 @@ plot_table_vrs_epiweek <- function(data_epiweek) {
                  epidemiológica, Bogotá 2024 \n ") %>%
     kableExtra::row_spec(0, bold = TRUE,
                          color = "white", background = "#145765") %>%
-    kableExtra::row_spec(seq(2, nrow(data_epiweek), by = 2),
+    kableExtra::row_spec(seq(2, nrow(data_table), by = 2),
                          background = "#D4EFFB") %>%
     kableExtra::column_spec(1, border_left = TRUE) %>%
     kableExtra::column_spec(2, border_right = TRUE) %>%
@@ -275,9 +279,14 @@ plot_table_vrs_epiweek <- function(data_epiweek) {
 #' @title Graficar la tabla con la distribución de casos de Tosferna por semana
 #' epidemiológica
 #' @export
-plot_table_epiweek_tosferina <- function(data_epiweek, distribution_epiweek) {
+plot_table_epiweek_tosferina <- function(data_epiweek,
+                                         distribution_epiweek,
+                                         col_epiweek = "SE",
+                                         epiweek) {
+  data_table <- data_epiweek %>%
+    dplyr::filter(!!dplyr::sym(col_epiweek) <= epiweek)
   table_epiweek <-
-    knitr::kable(data_epiweek,
+    knitr::kable(data_table,
                  longtable = TRUE,
                  col.names = c("SE", "% Positivos"),
                  align = "c",
@@ -285,7 +294,7 @@ plot_table_epiweek_tosferina <- function(data_epiweek, distribution_epiweek) {
                  Bogotá 2024") %>%
     kableExtra::row_spec(0, bold = TRUE,
                          color = "white", background = "#145765") %>%
-    kableExtra::row_spec(seq(2, nrow(distribution_epiweek), by = 2),
+    kableExtra::row_spec(seq(2, nrow(data_table), by = 2),
                          background = "#D4EFFB") %>%
     kableExtra::column_spec(1, border_left = TRUE) %>%
     kableExtra::column_spec(2, border_right = TRUE) %>%
@@ -375,7 +384,7 @@ plot_historic_epi_time <- function(stacked_data, tabla,
     ggplot2::annotate("segment", x = 21, xend = 22.2, y = -150, yend = -150,
                       color = "#E97132", linewidth = 0.7) +
     ggplot2::annotate("text", x = 22.5, y = -150, label = "% DE POSITIVIDAD",
-                      hjust = 0, color = "black", size= 2) 
+                      hjust = 0, color = "black", size = 2)
 }
 
 #' @title Graficar la tabla de la leyenda
