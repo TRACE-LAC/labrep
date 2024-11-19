@@ -353,3 +353,143 @@ plot_historic_epi_time <- function(stacked_data, tabla,
     ggplot2::annotate("text", x = 22.5, y = -150, label = "% DE POSITIVIDAD",
                       hjust = 0, color = "black", size= 2) 
 }
+
+
+
+
+
+#### CODIGO AGREGADO POR WILLIAM
+
+#' @title Graficar el tiempo epidemiológico historico
+#' @export
+plot_historic_epi_time_temp <- function(df, periodo_epi ) {
+  
+  df <- df %>%
+    filter((df$ano == 2024 & periodo_epidemiologico <= periodo_epi) | df$ano != 2024)
+  
+  
+  
+  # AJUSTAMOS LA MAGNITUD DESEADA DE LOS EJES 'Y' DE LA GRÁFICA
+  #--
+  Y_AXIS1_VALOR_MAX <- 700
+  Y__AXIS2_VALOR_MAX <- 70
+  scaling_factor <- Y_AXIS1_VALOR_MAX / Y__AXIS2_VALOR_MAX
+  
+  Y_AXIS1_NAME <- "NÚMERO DE CASOS POSITIVOS"
+  X_AXIS_NAME <- "PERÍODO EPIDEMIOLÓGICO"
+  ANNOTATION_TEXT <- c("AÑO 2022", "AÑO 2023", "AÑO 2024")
+
+  #--
+  ANCHO_BARRAS <- 0.4
+  
+  ANCHO_LINEA <- 0.7
+  COLOR_LINEA <- "#E97132"
+  
+  COLOR_AXIS_TITLES <- "#595959"
+  COLOR_VERTICAL_LINES <- "black"
+  
+  #--
+  
+  COLOR_a_h1n1_pdm09 <- "#8064A2"
+  COLOR_a_no_subtipificado <- "#4BACC6"
+  COLOR_a_h3 <- "#F79646"
+  COLOR_influenza_b <- "#2C4D75"
+  COLOR_parainfluenza <- "#772C2A"
+  COLOR_vsr <- "#5F7530"
+  COLOR_adenovirus <- "#4D3B62"
+  COLOR_metapneumovirus <- "#2C4D75"
+  COLOR_rinovirus <- "#B65708"
+  COLOR_bocavirus <- "#729ACA"
+  COLOR_otros_virus <- "#4F81BD"
+  
+  
+  # Ensure the epidemiological period is within valid range
+  periodo_epi <- pmax(1, pmin(periodo_epi, 13))
+  
+
+  # Prepare data for stacked bar and line charts
+  
+  historic_epi_times <- get_historic_epi_times(tabla = df)
+  
+  stacked_data <- historic_epi_times$stacked_data
+  line_data <- historic_epi_times$line_data
+  
+  
+  # Calculate annotation position dynamically
+  ANNOTATE_X <- 0.6727 * periodo_epi + 17.8273
+  
+  # Generate the plot
+  ggplot2::ggplot() +
+    # Stacked bar chart
+    ggplot2::geom_bar(
+      data = stacked_data,
+      ggplot2::aes(x = YearWeek, y = Cases, fill = Virus_Type),
+      stat = "identity",
+      width = ANCHO_BARRAS
+    ) +
+    # Line chart for positivity rate
+    ggplot2::geom_line(
+      data = line_data,
+      ggplot2::aes(
+        x = YearWeek,
+        y = Percent_Positivity * scaling_factor,
+        group = 1
+      ),
+      color = COLOR_LINEA,
+      linewidth = ANCHO_LINEA
+    ) +
+    # Y-axis and secondary axis
+    ggplot2::scale_y_continuous(
+      name = Y_AXIS1_NAME,
+      limits = c(-500, 700),
+      breaks = seq(0, 700, by = 100),
+      sec.axis = ggplot2::sec_axis(~ . / scaling_factor,
+                                   breaks = seq(0, 70, by = 10),
+                                   labels = scales::number_format(accuracy = 0.1))
+    ) +
+    # X-axis
+    ggplot2::scale_x_discrete(labels = df$periodo_epidemiologico) +
+    # Custom fill colors
+    ggplot2::scale_fill_manual(values = c(
+      "a_h1n1_pdm09" = COLOR_a_h1n1_pdm09,
+      "a_no_subtipificado" = COLOR_a_no_subtipificado,
+      "a_h3" = COLOR_a_h3,
+      "influenza_b" = COLOR_influenza_b,
+      "parainfluenza" = COLOR_parainfluenza,
+      "vsr" = COLOR_vsr,
+      "adenovirus" = COLOR_adenovirus,
+      "metapneumovirus" = COLOR_metapneumovirus,
+      "rinovirus" = COLOR_rinovirus,
+      "bocavirus" = COLOR_bocavirus,
+      "otros_virus" = COLOR_otros_virus
+    )) +
+    ggplot2::labs(x = X_AXIS_NAME, fill = NULL, color = NULL) +
+    # Themes and styling
+    ggplot2::theme_minimal() +
+    ggplot2::theme(
+      axis.text.x = ggplot2::element_text(size = 7, margin = ggplot2::margin(t = -255, b = -5)),
+      axis.title.x = ggplot2::element_text(margin = ggplot2::margin(t = 20, b = -10), size = 8, face = "bold", color = COLOR_AXIS_TITLES),
+      axis.title.y = ggplot2::element_text(size = 8, face = "bold", color = COLOR_AXIS_TITLES),
+      panel.grid.major.x = ggplot2::element_blank(),
+      panel.grid.minor.x = ggplot2::element_blank(),
+      panel.grid.minor.y = ggplot2::element_blank(),
+      legend.position = "bottom",
+      legend.key.size = ggplot2::unit(1.2, "lines"),
+      legend.key.height = ggplot2::unit(0.02, "lines"),
+      legend.text = ggplot2::element_text(size = 7)
+    ) +
+    ggplot2::guides(
+      fill = ggplot2::guide_legend(
+        nrow = 3,
+        byrow = TRUE
+      ),
+      color = "none"
+    )+
+    # Vertical lines and annotations
+    ggplot2::geom_segment(ggplot2::aes(x = 13.5, xend = 13.5, y = -25, yend = 700), color = COLOR_VERTICAL_LINES, linewidth = 0.65) +
+    ggplot2::geom_segment(ggplot2::aes(x = 26.5, xend = 26.5, y = -25, yend = 700), color = COLOR_VERTICAL_LINES, linewidth = 0.65) +
+    ggplot2::annotate("text", x = c(7, 20, 26.5 + floor(periodo_epi / 2)), y = -35, label = ANNOTATION_TEXT, size = 2.4, fontface = "bold") +
+    ggplot2::annotate("segment", x = ANNOTATE_X, xend = ANNOTATE_X + 1.2, y = -145, yend = -145, color = COLOR_LINEA, linewidth = 0.7) +
+    ggplot2::annotate("text", x = ANNOTATE_X + 1.6, y = -145, label = "% de positividad", hjust = 0, color = "black", size = 2.5)
+}
+

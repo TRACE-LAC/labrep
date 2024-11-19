@@ -183,11 +183,45 @@ fill_down_year <- function(df, column_name) {
 
 #' @title Función que limpia la información historica
 #' @export
-clean_historic_data <- function(tabla) {
-  tabla <- tabla %>%
+clean_historic_data <- function(df) {
+  df <- df %>%
     clean_colnames_suffixes() %>%
     clean_colnames_spaces() %>%
     fill_down_year("ano") %>% 
     slice(1:32)
-  return(tabla)
+  return(df)
 }
+
+
+
+
+#### FUNCIONES AGREGADAS POR WILLIAM 
+
+#' @title Remove rows with NA values
+#' @description This function removes rows that contain any `NA` values from a data frame.
+#' @param df A data frame to clean.
+#' @return A data frame with rows containing `NA` values removed.
+#' @export
+remove_na_rows <- function(df) {
+  df <- df %>%
+    dplyr::filter(!rowSums(is.na(.)))
+  
+  # Return the cleaned data frame
+  return(df)
+}
+
+#' @title Función temporal que limpia la información historica
+#' @export
+clean_historic_data_temp <- function(df) {
+  df <- df %>%
+    clean_colnames_suffixes() %>%
+    janitor::clean_names() %>%
+    fill_down_year("ano") %>% 
+    remove_na_rows() %>%
+    dplyr::mutate(across(-percent_de_positividad, as.integer))
+  return(df)
+}
+
+
+
+

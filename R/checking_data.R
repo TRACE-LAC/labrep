@@ -946,7 +946,7 @@ get_historic_epi_times <- function(tabla) {
                                                .data$periodo_epidemiologico),
                             sep = "-")) %>%
     dplyr::select(.data$YearWeek, Percent_Positivity =
-             .data$de_positividad) %>%
+             .data$percent_de_positividad) %>%
     tidyr::drop_na(.data$Percent_Positivity) # Remove any NA values in Percent_Positivity
   
   historic_data <- list(stacked_data = stacked_data,
