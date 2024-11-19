@@ -176,14 +176,68 @@ plot_results_tosferina <- function(report_data,
                                    show_values = FALSE) {
   colors <- c("Positivo para Bordetella" = "#F4802D",
               "Negativo para Bordetella" = "#145765")
-  plot <- ggplot2::ggplot(report_data) +
-    ggplot2::geom_bar(ggplot2::aes_string(x = column,
-                                          y = "casos",
-                                          fill =
-                                            "interpretacion_del_resultado"),
-                      alpha = 0.9,
-                      width = 0.5,
-                      stat = "identity") +
+  plot <- ggplot2::ggplot()
+  if (column == "grupo_edad") {
+    config_path <- system.file("extdata", "config.yml", package = "labrep")
+    category_labels <-
+      config::get(file = config_path,
+                  "tosferina_data")$age_groups$labels
+    plot <- plot +
+      ggplot2::geom_bar(data = report_data,
+                        ggplot2::aes(x = factor(grupo_edad,
+                                                levels =
+                                                  category_labels),
+                                     y = casos,
+                                     fill = interpretacion_del_resultado),
+                        alpha = 0.9,
+                        stat = "identity",
+                        width = 0.5,
+                        position = ggplot2::position_dodge())
+  } else {
+    plot <- plot +
+      ggplot2::geom_bar(data = report_data,
+                        ggplot2::aes_string(x = column,
+                                            y = "casos",
+                                            fill =
+                                              "interpretacion_del_resultado"),
+                        alpha = 0.9,
+                        stat = "identity",
+                        width = 0.5,
+                        position = ggplot2::position_dodge())
+  }
+  max_val_pos <- max(positives[["porcentaje"]])
+  max_val_report <- max(report_data[["casos"]])
+  if (!is.null(positives)) {
+    if (column == "grupo_edad") {
+      plot <- plot +
+        ggplot2::geom_line(data = positives,
+                           ggplot2::aes(x = factor(grupo_edad,
+                                                   levels = category_labels),
+                                        y = (porcentaje * max_val_report)
+                                            / max_val_pos),
+                           stat = "identity",
+                           color = "#F99D00",
+                           size = 0.8,
+                           group = 1)
+    } else {
+      plot <- plot +
+        ggplot2::geom_line(data = positives,
+                           ggplot2::aes_string(x = column,
+                                               y = "(porcentaje * max_val_pos)
+                                               / max_val_report"),
+                           stat = "identity",
+                           color = "#F99D00",
+                           size = 0.8,
+                           group = 1)
+    }
+    plot <- plot +
+      ggplot2::scale_y_continuous(name = "Numero de muestras analizadas\n",
+                                  sec.axis =
+                                    ggplot2::sec_axis(trans = ~ . * max_val_report /
+                                                        max_val_pos,
+                                                      name = "Porcentaje"))
+  }
+  plot <- plot +
     ggplot2::theme_classic() +
     ggplot2::xlab(label_x) +
     ggplot2::ylab("Numero de muestras analizadas\n") +
@@ -194,26 +248,6 @@ plot_results_tosferina <- function(report_data,
                    legend.title = ggplot2::element_text(face = "bold")) +
     ggplot2::scale_fill_manual(values = colors,
                                name = "Interpretación del resultado")
-  if (!is.null(positives)) {
-    positives[[column]]  <- toupper(positives[[column]])
-    plot <- plot +
-      ggplot2::geom_line(data = positives,
-                         ggplot2::aes_string(x = column,
-                                             y = "porcentaje"),
-                         stat = "identity",
-                         color = "#F99D00",
-                         size = 0.8,
-                         group = 1) +
-      ggplot2::scale_y_continuous(sec.axis =
-                                    ggplot2::sec_axis(~. * 0.0055,
-                                                      labels =
-                                                      scales::percent_format(
-                                                        ),
-                                                      breaks = seq(0, 1,
-                                                                   0.1))) +
-      ggplot2::theme(text = ggplot2::element_text(size = 14,
-                                                  family = "Montserrat"))
-  }
   return(plot)
 }
 
