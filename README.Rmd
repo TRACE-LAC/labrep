@@ -47,3 +47,5 @@ Este paquete actualmente está en la fase de *concepto*, como lo define
 ### Contribuciones
 
 La contribuciones son bienvenidas vía [pull requests](https://github.com/TRACE-LAC/labrep/pulls).
+
+
