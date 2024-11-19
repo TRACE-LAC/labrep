@@ -353,3 +353,36 @@ plot_historic_epi_time <- function(stacked_data, tabla,
     ggplot2::annotate("text", x = 22.5, y = -150, label = "% DE POSITIVIDAD",
                       hjust = 0, color = "black", size= 2) 
 }
+
+#' @title Graficar la tabla de la leyenda
+#' @export
+plot_table_legend <- function(report_data,
+                              include_sars = FALSE) {
+  report_data$cs <- ""
+  report_data <- report_data %>%
+    dplyr::arrange(.data$etiqueta) %>%
+    dplyr::relocate(.data$cs, .after = .data$etiqueta)
+  colors <- get_colors_age_groups(order = TRUE,
+                                  hex_cods = TRUE,
+                                  include_sars = include_sars)
+  col_names <- names(report_data)
+  table <- knitr::kable(report_data,
+                        col.names = NULL,
+                        align = "c",
+                        longtable = TRUE) %>%
+    kableExtra::kable_styling(
+      full_width = FALSE,
+      position = "left",
+      latex_options = c("bordered", "hold_position"),
+      font_size = 9
+    )  %>%
+    kableExtra::column_spec(2, background = colors) %>%
+    kableExtra::column_spec(1, border_left = TRUE) %>%
+    kableExtra::column_spec(length(col_names), border_right = TRUE) %>%
+    kableExtra::column_spec(column = seq(3, length(col_names)),
+                            width = "1.6cm") %>%
+    kableExtra::column_spec(length(col_names), border_right = TRUE,
+                            width = "1.7cm")
+  return(table)
+}
+
