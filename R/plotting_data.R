@@ -28,11 +28,11 @@ plot_age_group_distribution <- function(report_data,
     ggplot2::theme_classic() +
     ggplot2::xlab("Grupo de edad") +
     ggplot2::ylab("Porcentaje de casos") +
-    ggplot2::theme(legend.position = "bottom",
+    ggplot2::theme(legend.position = "none",
                    text = ggplot2::element_text(family = "Montserrat",
-                                                size = 14),
+                                                size = 11),
                    axis.title = ggplot2::element_text(face = "bold"),
-                   legend.title = ggplot2::element_text(face = "bold")) +
+                   axis.title.x = ggplot2::element_blank()) +
     ggplot2::scale_fill_manual(values = colors,
                                name = "Virus respiratorios")
   return(plot)
