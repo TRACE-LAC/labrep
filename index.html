@@ -75,6 +75,40 @@
 <span><span class="fu">pak</span><span class="fu">::</span><span class="fu"><a href="https://pak.r-lib.org/reference/pak.html" class="external-link">pak</a></span><span class="op">(</span><span class="st">"TRACE-LAC/labrep"</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
+<h2 id="reporte-automatizado">Reporte automatizado<a class="anchor" aria-label="anchor" href="#reporte-automatizado"></a>
+</h2>
+<p>Actualmente, <code>labrep</code> provee una plantilla de reporte llamada <code>Informe de circulación viral {labrep}</code>, la cual recibe los siguientes parámetros de entrada: la base de datos de la Fundación Cardio Infantil, la base de datos de Otros Virus, la base de datos de Tosferina, la base de datos historica de los períodos epidemiológicos y la semana epidemiológica.</p>
+<p>Para hacer uso de la plantilla del reporte puedes seguir los siguientes pasos:</p>
+<blockquote>
+<p>🎥 <a href="https://youtu.be/pqzRw5YhP_g" class="external-link">¿Cómo generar un reporte con labrep?</a></p>
+</blockquote>
+<p>Para generar el reporte en formato PDF debes instalar LateX. Puedes instalarlo siguiendo las instrucciones que se encuentran en <a href="https://bookdown.org/yihui/rmarkdown-cookbook/install-latex.html" class="external-link">R Markdown Cookbook</a>.</p>
+<p>Si estas realizando la instalación en computador oficial o de alguna institución, te recomendamos seguir los siguientes pasos para evitar inconvenientes con el suso e instalación de LateX:</p>
+<ol style="list-style-type: decimal">
+<li>Solicitar permisos con la mesa de soporte de la institución para instalar LateX y los siguientes paquetes:</li>
+</ol>
+<ul>
+<li>fontenc</li>
+<li>inputenc</li>
+<li>babel-spanish</li>
+<li>floatrow</li>
+<li>fancyhdr</li>
+<li>graphicx</li>
+<li>hyperref</li>
+<li>pdfpages</li>
+<li>xcolor</li>
+<li>colortbl</li>
+<li>caption</li>
+<li>montserrat</li>
+<li>array</li>
+</ul>
+</div>
+<div class="section level2">
+<h2 id="errores-comunes">Errores comunes<a class="anchor" aria-label="anchor" href="#errores-comunes"></a>
+</h2>
+<p>Si tienes problemas generando el reporte o en la etapa de rendirización del reporte se queda cargando infinitamente, ejecuta los siguientes pasos: 1. En RStudio dirigite al tab de Terminal y ejecuta los siguientes comandos: <code>tlmgr option repository https://mirror.ctan.org/systems/texlive/tlnet   tlmgr update --self   tlmgr install fontenc inputenc babel-spanish floatrow fancyhdr graphicx hyperref pdfpages montserrat xcolor colortbl caption array</code></p>
+</div>
+<div class="section level2">
 <h2 id="desarrollo">Desarrollo<a class="anchor" aria-label="anchor" href="#desarrollo"></a>
 </h2>
 <div class="section level3">
