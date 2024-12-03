@@ -148,3 +148,5 @@ default:
       values: ["positivo"]
       valid_result: TRUE
     label: "Adenovirus"
+  legends:
+  - epitime: ["PERÍODO EPIDEMIOLOGICO"]
