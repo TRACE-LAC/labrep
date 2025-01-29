@@ -173,21 +173,23 @@ clean_colnames_suffixes <- function(df) {
 
 #' @title Función que rellena los años
 #' @export
-fill_down_year <- function(df, column_name) {
-  df <- df %>%
+fill_down_column <- function(dataset, column_name) {
+  dataset <- dataset %>%
     tidyr::fill({{ column_name }}, .direction = "down")
   
   # Devolver el data frame limpio
-  return(df)
+  return(dataset)
 }
 
 #' @title Función que limpia la información historica
 #' @export
-clean_historic_data <- function(tabla) {
-  tabla <- tabla %>%
+clean_historic_data <- function(dataset) {
+  dataset <- dataset %>%
     clean_colnames_suffixes() %>%
-    clean_colnames_spaces() %>%
-    fill_down_year("ano") %>% 
-    slice(1:32)
-  return(tabla)
+    janitor::clean_names() %>%  
+    fill_down_column("anos") %>%
+    fill_down_column("periodo_epidemiologico")
+  
+  return(dataset)
+  
 }
