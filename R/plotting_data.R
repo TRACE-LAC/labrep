@@ -374,6 +374,19 @@ plot_historic_epi_time <- function(df, bars_df, lines_df, periodo_epi ) {
       "rinovirus" = colores$COLOR_rinovirus,
       "bocavirus" = colores$COLOR_bocavirus,
       "otros_virus" = colores$COLOR_otros_virus
+    ),
+    labels = c(
+      "a_h1n1_pdm09" = "H1N1 2009",
+      "a_no_subtipificado" = "A no subtipificado",
+      "a_h3" = "H3N2",
+      "influenza_b" = "Influenza B",
+      "parainfluenza" = "Parainfluenza",
+      "vsr" = "VSR",
+      "adenovirus" = "Adenovirus",
+      "metapneumovirus" = "Metapneumovirus",
+      "rinovirus" = "Rinovirus",
+      "bocavirus" = "Bocavirus",
+      "otros_virus" = "Otros Virus"
     )) +
     ggplot2::labs(x = X_AXIS_NAME, fill = NULL, color = NULL) +
     # Themes and styling
@@ -402,8 +415,8 @@ plot_historic_epi_time <- function(df, bars_df, lines_df, periodo_epi ) {
     ggplot2::geom_segment(ggplot2::aes(x = 13.5, xend = 13.5, y = -25, yend = 700), color = colores$COLOR_VERTICAL_LINES, linewidth = 0.65) +
     ggplot2::geom_segment(ggplot2::aes(x = 26.5, xend = 26.5, y = -25, yend = 700), color = colores$COLOR_VERTICAL_LINES, linewidth = 0.65) +
     ggplot2::annotate("text", x = c(7, 20, 26.5 + floor(periodo_epi / 2)), y = -35, label = ANNOTATION_TEXT, size = 2.4, fontface = "bold") +
-    ggplot2::annotate("segment", x = ANNOTATE_X, xend = ANNOTATE_X + 1.2, y = -145, yend = -145, color = colores$COLOR_LINEA, linewidth = 0.7) +
-    ggplot2::annotate("text", x = ANNOTATE_X + 1.6, y = -145, label = "% de positividad", hjust = 0, color = "black", size = 2.5)
+    ggplot2::annotate("segment", x = ANNOTATE_X-0.3, xend = ANNOTATE_X + 0.9, y = -145, yend = -145, color = colores$COLOR_LINEA, linewidth = 0.7) +
+    ggplot2::annotate("text", x = ANNOTATE_X + 1.3, y = -145, label = "% de positividad", hjust = 0, color = "black", size = 2.5)
   
 }
 
