@@ -49,10 +49,15 @@ params:
     label: "Semana epidemiológica"
     input: text
     value: 23
+  periodo_epi:
+    label: "Periodo epidemiológica"
+    input: numeric
+    value: 5
 editor_options: 
   markdown: 
     wrap: 72
 ---
+
 
 ```{r setup, echo=FALSE, include=FALSE}
 knitr::opts_chunk$set(
@@ -168,38 +173,44 @@ cadena de la polimerasa con transcriptasa inversa (RT-PCR) para el
 diagnóstico de los principales agentes a los que se les atribuye el
 IRAG.
 
-```{r historic-data}
-
-SHEET_NAME <- "POR PERIODO"
-INDICADOR <- 1
-tables <- get_all_tables(params$historic_data, SHEET_NAME)
-tabla_total <- get_selected_table(tables, INDICADOR)
-
-tabla_total <- clean_historic_data(dataset = tabla_total)
-tabla_epiTime_period <- getTable_hitoric_epi_times_period(dataset = tabla_total)
 
 
-#Perido epidemiologico que va a mostrar el "ULTIMO año"
-periodo_epi <- 8
-#Filtra los años :OJO (revisar logica)
-tabla_epiTime_period <- tabla_epiTime_period %>%
-filter((tabla_epiTime_period$anos == 2024 & periodo_epidemiologico <= periodo_epi) | tabla_epiTime_period$anos != 2024)
+```{r dataset_respiratory_viruses_2022_20224}
+#IMPORTING DATASET: "VIRUS RESPIRATORIO 2022 A 2024.xlsx"
 
 
-# Prepare data for stacked bar and line charts
-historic_epi_times <- get_historic_epi_times(tabla = tabla_epiTime_period)
-stacked_data <- historic_epi_times$stacked_data
-line_data <- historic_epi_times$line_data
+dataset_sheet_name <- "POR PERIODO"
+all_tables_from_sheet <- get_all_tables(file_name=params$historic_data, sheet_name=dataset_sheet_name)
+dataset_number <- 2
+
+cl_dataset_respiratory_viruses_last_3_years <- get_selected_table(list_of_tables=all_tables_from_sheet, indicator=dataset_number)
+```
+
+```{r cl_dataset_respiratory_viruses_last_3_years}
+# CLEANING
+
+cl_dataset_respiratory_viruses_last_3_years <- clean_historic_data(dataset = cl_dataset_respiratory_viruses_last_3_years)
+ 
 
 ```
 
+```{r filtered_dataset_respiratory_viruses_years}
+# PROCESSING
+
+
+#  TODO ::ULTIMO_AÑO_DATASET(2024) O CURRENT_YEAR(2025) (?)
+pr_dataset_respiratory_viruses_last_3_years <- cl_dataset_respiratory_viruses_last_3_years %>%
+    filter((cl_dataset_respiratory_viruses_last_3_years$ano == 2024 & periodo_epidemiologico <= params$periodo_epi) | cl_dataset_respiratory_viruses_last_3_years$ano != 2024)
+
+```
 
 
 En el análisis del comportamiento de los virus respiratorios por periodo epidemiológico desde el 2022 se observa que se ha mantenido la circulación de virus como Rinovirus, Adenovirus y VSR. Para los tres años entre los periodos 3 al 6 coincide con el pico respiratorio que se presenta en todos los años (Figura 1).
 
 ```{r plot-historic-data, include=TRUE, fig.height=6, fig.width=8,fig.cap="Circulación de virus respiratorios por período epidemiológico Año 2022 - 2024, Laboratorio de Salud Pública Bogotá."}
-plot_historic_epi_time(df=tabla_epiTime_period, bars_df=stacked_data, lines_df=line_data, periodo_epi = 8 )
+#PLOTTING
 
+plot_historic_epi_time(dataset = pr_dataset_respiratory_viruses_last_3_years ,periodo_epi= params$periodo_epi)
 ```
 
 
@@ -581,6 +592,5 @@ plot_results_tosferina(results_sex_tosferina,
                        label_x = "Genero",
                        show_values = FALSE)
 ```
-
 
 \includepdf[pages={1}]{back_cover.pdf}

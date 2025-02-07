@@ -938,52 +938,48 @@ get_results_tosferina <- function(report_data, results = "positivo",
   return(data_grouped)
 }
 
-#' @title Obtener los tiempos epidemiologicos de los datos historicos
+
+
+
+
+
+#' @title Obtener tiempos epidemiológicos de datos históricos
+#'
+#' @description 
+#' Transforma la tabla de la base de datos 'VIRUS RESPIRATORIOS 2022 A 2024' 
+#' para generar 2 tablas que facilitan las operaciones para las funciones de visualización. 
+#' Se crea una tabla con los datos adecuados para un gráfico de línea. 
+#' Se crea una tabla con las columnas adecuadas para un gráfico de barras apiladas.
+#'
+#' @param dataset_epi_times Data frame con datos históricos que incluyen las columnas 
+#'        `ano`, `periodo_epidemiologico`, `de_positividad` y las de distintos tipos de virus.
+#' 
+#' @return Una lista con dos data frames:
+#' - `stacked_data`: Datos en formato largo con tipo de virus y número de casos por semana.
+#' - `line_data`: Serie de tiempo con la positividad semanal.
+#'
 #' @export
-get_historic_epi_times <- function(tabla) {
-  data <- tabla 
+get_historic_epi_times <- function(dataset_epi_times) {
+  data <- dataset_epi_times 
   stacked_data <- data %>%
     tidyr::pivot_longer(cols = .data$a_h1n1_pdm09:.data$otros_virus, 
                         names_to = "Virus_Type", 
                         values_to = "Cases") %>%
-    dplyr::mutate(YearWeek = paste(.data$anos,
+    dplyr::mutate(YearWeek = paste(.data$ano,
                                    sprintf("%02d",
                                            .data$periodo_epidemiologico),
                                    sep = "-"))
   # Prepare line data for the line chart, ensuring YearWeek is created consistently
   line_data <- data %>%
-    dplyr::mutate(YearWeek = paste(.data$anos, sprintf("%02d",
-                                                       .data$periodo_epidemiologico),
+    dplyr::mutate(YearWeek = paste(.data$ano, sprintf("%02d",
+                                                      .data$periodo_epidemiologico),
                                    sep = "-")) %>%
     dplyr::select(.data$YearWeek, Percent_Positivity =
-                    .data$porcentaje_de_positividad) %>%
+                    .data$percent_de_positividad) %>%
     tidyr::drop_na(.data$Percent_Positivity) # Remove any NA values in Percent_Positivity
   
   historic_data <- list(stacked_data = stacked_data,
                         line_data = line_data)
   return(historic_data)
 }
-
-
-
-
-#' @title 
-#' @export
-getTable_hitoric_epi_times_period <- function(dataset, year = NULL){
-  dataset <- dataset %>%
-    select(-semanas_epidemiologicas) %>%
-    group_by(anos, periodo_epidemiologico) %>%
-    summarise(across(where(is.numeric), sum, na.rm = TRUE), .groups = "drop")
-  
-  if (!is.null(year)) {
-    dataset <- dataset %>%
-      filter(anos == year)
-  }
-  dataset <- dataset %>%
-    mutate(porcentaje_de_positividad = (muestras_positivas / muestras_analizadas) * 100)
-  return(dataset)
-}
-
-
-
 

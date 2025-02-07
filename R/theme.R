@@ -29,44 +29,74 @@ get_colors_age_groups <- function(order = FALSE,
 
 
 
-# PLOT 1 PERIODOS EPIDEMIOLOGICO 2022-2024
-
-# Función para obtener los colores
-get_color_periodo_epidemiologico<- function() {
+#' @title Obtener configuración de colores para el periodo epidemiológico
+#'
+#' @description
+#' Devuelve una lista con los colores asignados a diferentes elementos del gráfico, 
+#' incluyendo líneas, títulos de ejes, líneas verticales y tipos de virus.
+#'
+#' @return Lista con los colores definidos
+#' @export
+get_color_periodo_epidemiologico <- function() {
   return(list(
-    COLOR_LINEA = "#E97132",
-    COLOR_AXIS_TITLES = "#595959",
-    COLOR_VERTICAL_LINES = "black",
-    COLOR_a_h1n1_pdm09 = "#8064A2",
-    COLOR_a_no_subtipificado = "#4BACC6",
-    COLOR_a_h3 = "#F79646",
-    COLOR_influenza_b = "#2C4D75",
-    COLOR_parainfluenza = "#772C2A",
-    COLOR_vsr = "#5F7530",
-    COLOR_adenovirus = "#4D3B62",
-    COLOR_metapneumovirus = "#2C4D75",
-    COLOR_rinovirus = "#B65708",
-    COLOR_bocavirus = "#729ACA",
-    COLOR_otros_virus = "#4F81BD"
+    color_linea = "#E97132",
+    color_axis_titles = "#595959",
+    color_vertical_lines = "black",
+    color_a_h1n1_pdm09 = "#8064A2",
+    color_a_no_subtipificado = "#4BACC6",
+    color_a_h3 = "#F79646",
+    color_influenza_b = "#2C4D75",
+    color_parainfluenza = "#772C2A",
+    color_vsr = "#5F7530",
+    color_adenovirus = "#4D3B62",
+    color_metapneumovirus = "#2C4D75",
+    color_rinovirus = "#B65708",
+    color_bocavirus = "#729ACA",
+    color_otros_virus = "#4F81BD"
   ))
 }
 
-# Función para obtener configuración de los ejes
-get_axis_config_periodo_epidemiologico <- function(periodo_epi) {
+
+#' @title Obtener configuración de los ejes para el periodo epidemiológico
+#'
+#' @description
+#' Devuelve una lista con los valores máximos de los ejes Y, el factor de escala 
+#' y los parámetros de ancho de barra y línea.
+#'
+#' @return Lista con la configuración de los ejes:
+#' - `y_axis1_max_value`: Valor máximo del primer eje Y.
+#' - `y_axis2_max_value`: Valor máximo del segundo eje Y.
+#' - `scaling_factor`: Factor de escala entre los dos ejes.
+#' - `bar_width`: Ancho de las barras.
+#' - `line_width`: Ancho de la línea.
+#' @export
+get_axis_config_periodo_epidemiologico <- function() {
   return(list(
-    Y_AXIS1_VALOR_MAX = 700,
-    Y_AXIS2_VALOR_MAX = 70,
+    y_axis1_max_value = 700,
+    y_axis2_max_value = 70,
     scaling_factor = 700 / 70,
-    ANCHO_BARRAS = 0.4,
-    ANCHO_LINEA = 0.7
+    bar_width = 0.4,
+    line_width = 0.7
   ))
 }
 
-get_text_labels_periodo_epidemiologico <- function() {
-  return(list(
-    Y_AXIS1_NAME = "NÚMERO DE CASOS POSITIVOS",
-    X_AXIS_NAME = "PERÍODO EPIDEMIOLÓGICO",
-    ANNOTATION_TEXT = c("AÑO 2022", "AÑO 2023", "AÑO 2024")
-  ))
+
+
+#' @title Generar etiquetas de texto para los periodos epidemiológicos
+#'
+#' @description
+#' Extrae los años únicos del dataset y genera etiquetas en formato "AÑO <año>".
+#'
+#' @param dataset_epiTime Dataset con una columna `ano` que contiene los años.
+#' @return Vector de texto con etiquetas para cada año.
+#' @export
+get_text_labels_periodo_epidemiologico <- function(dataset_epiTime) {
+  # Extract unique years from the dataset
+  unique_years <- sort(unique(dataset_epiTime$ano))
+  
+  # Generate the annotation text dynamically
+  annotation_text <- paste("AÑO", unique_years)
+  
+  return(annotation_text)
 }
 

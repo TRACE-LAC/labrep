@@ -44,6 +44,10 @@ default:
       cols_clean: ["interpretacion_de_resultados"]
     gender:
       col_valid: "genero"
+  respiratory_viruses_historic_data:
+    legends:
+      x_axis_name: "PERÍODO EPIDEMIOLÓGICO"
+      y_1_axis_name: "NÚMERO DE CASOS POSITIVOS"
   viruses:
   - name: "influenza_a"
     filmarray:

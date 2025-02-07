@@ -302,34 +302,43 @@ plot_table_epiweek_tosferina <- function(data_epiweek,
   return(table_epiweek)
 }
 
-#' @title Graficar el tiempo epidemiológico historico
+
+
+#' @title Generar gráfico de evolución epidemiológica histórica
+#'
+#' @description
+#' Crea un gráfico combinado con barras apiladas y una línea de tendencia, 
+#' representando la evolución de virus respiratorios y la positividad epidemiológica 
+#' en función del tiempo.
+#'
+#' @param dataset_epiTime Dataset con datos epidemiológicos, que debe incluir las columnas 
+#' `ano`, `periodo_epidemiologico`, y los distintos tipos de virus.
+#' @param periodo_epi Período epidemiológico a destacar en el gráfico (valor entre 1 y 13).
+#'
+#' @return Un objeto `ggplot2` con el gráfico de evolución epidemiológica.
 #' @export
-plot_historic_epi_time <- function(df, bars_df, lines_df, periodo_epi ) {
+plot_historic_epi_time <- function(dataset_epiTime, periodo_epi ) {
   
   # Ensure the epidemiological period is within valid range
   periodo_epi <- pmax(1, pmin(periodo_epi, 13))
   
+  #get stacked bars and line datasets
+  historic_epi_times <- get_historic_epi_times(dataset_epi_times = dataset_epiTime)
+  stacked_data <- historic_epi_times$stacked_data
+  line_data <- historic_epi_times$line_data
+  
+  #get texts of the axis from config.yml
+  config_path <- system.file("extdata", "config.yml", package = "labrep")
+  text_axis_labels <-  config::get(file = config_path,"respiratory_viruses_historic_data")$legends
+  y_axis1_name <- text_axis_labels$y_1_axis_name
+  x_axis_name <- text_axis_labels$x_axis_name
+  
+  #get plot theme parameters
   colores <- get_color_periodo_epidemiologico()
   plot_parameters <- get_axis_config_periodo_epidemiologico()
-  plot_text_labels <- get_text_labels_periodo_epidemiologico()
-  
-  # AJUSTAMOS LA MAGNITUD DESEADA DE LOS EJES 'Y' DE LA GRÁFICA
-  #--
-  Y_AXIS1_VALOR_MAX <- plot_parameters$Y_AXIS1_VALOR_MAX
-  Y__AXIS2_VALOR_MAX <- plot_parameters$Y__AXIS2_VALOR_MAX
-  scaling_factor <- plot_parameters$scaling_factor
-  ANCHO_BARRAS <- plot_parameters$ANCHO_BARRAS
-  ANCHO_LINEA <- plot_parameters$ANCHO_LINEA
-  ANNOTATE_X <- 0.6727 * periodo_epi + 17.8273
-  
-  Y_AXIS1_NAME <- plot_text_labels$Y_AXIS1_NAME
-  X_AXIS_NAME <- plot_text_labels$X_AXIS_NAME
-  ANNOTATION_TEXT <- plot_text_labels$ANNOTATION_TEXT
-  
-  #--
+  plot_text_years_labels <- get_text_labels_periodo_epidemiologico(dataset_epiTime=dataset_epiTime)
+  annotate_x_pos <- 0.6727 * periodo_epi + 17.8273
 
-  
-  
   # Generate the plot
   ggplot2::ggplot() +
     # Stacked bar chart
@@ -337,43 +346,43 @@ plot_historic_epi_time <- function(df, bars_df, lines_df, periodo_epi ) {
       data = stacked_data,
       ggplot2::aes(x = YearWeek, y = Cases, fill = Virus_Type),
       stat = "identity",
-      width = ANCHO_BARRAS
+      width = plot_parameters$bar_width
     ) +
     # Line chart for positivity rate
     ggplot2::geom_line(
       data = line_data,
       ggplot2::aes(
         x = YearWeek,
-        y = Percent_Positivity * scaling_factor,
+        y = Percent_Positivity * plot_parameters$scaling_factor,
         group = 1
       ),
-      color = colores$COLOR_LINEA,
-      linewidth = ANCHO_LINEA
+      color = colores$color_linea,
+      linewidth = plot_parameters$line_width
     ) +
     # Y-axis and secondary axis
     ggplot2::scale_y_continuous(
-      name = Y_AXIS1_NAME,
-      limits = c(-500, 700),
-      breaks = seq(0, 700, by = 100),
-      sec.axis = ggplot2::sec_axis(~ . / scaling_factor,
-                                   breaks = seq(0, 70, by = 10),
+      name = y_axis1_name,
+      limits = c(-500, plot_parameters$y_axis1_max_value),
+      breaks = seq(0, plot_parameters$y_axis1_max_value, by = 100),
+      sec.axis = ggplot2::sec_axis(~ . / plot_parameters$scaling_factor,
+                                   breaks = seq(0, plot_parameters$y_axis2_max_value, by = 10),
                                    labels = scales::number_format(accuracy = 0.1))
     ) +
     # X-axis
-    ggplot2::scale_x_discrete(labels = df$periodo_epidemiologico) +
+    ggplot2::scale_x_discrete(labels = dataset_epiTime$periodo_epidemiologico) +
     # Custom fill colors
     ggplot2::scale_fill_manual(values = c(
-      "a_h1n1_pdm09" = colores$COLOR_a_h1n1_pdm09,
-      "a_no_subtipificado" = colores$COLOR_a_no_subtipificado,
-      "a_h3" = colores$COLOR_a_h3,
-      "influenza_b" = colores$COLOR_influenza_b,
-      "parainfluenza" = colores$COLOR_parainfluenza,
-      "vsr" = colores$COLOR_vsr,
-      "adenovirus" = colores$COLOR_adenovirus,
-      "metapneumovirus" = colores$COLOR_metapneumovirus,
-      "rinovirus" = colores$COLOR_rinovirus,
-      "bocavirus" = colores$COLOR_bocavirus,
-      "otros_virus" = colores$COLOR_otros_virus
+      "a_h1n1_pdm09" = colores$color_a_h1n1_pdm09,
+      "a_no_subtipificado" = colores$color_a_no_subtipificado,
+      "a_h3" = colores$color_a_h3,
+      "influenza_b" = colores$color_influenza_b,
+      "parainfluenza" = colores$color_parainfluenza,
+      "vsr" = colores$color_vsr,
+      "adenovirus" = colores$color_adenovirus,
+      "metapneumovirus" = colores$color_metapneumovirus,
+      "rinovirus" = colores$color_rinovirus,
+      "bocavirus" = colores$color_bocavirus,
+      "otros_virus" = colores$color_otros_virus
     ),
     labels = c(
       "a_h1n1_pdm09" = "H1N1 2009",
@@ -388,14 +397,14 @@ plot_historic_epi_time <- function(df, bars_df, lines_df, periodo_epi ) {
       "bocavirus" = "Bocavirus",
       "otros_virus" = "Otros Virus"
     )) +
-    ggplot2::labs(x = X_AXIS_NAME, fill = NULL, color = NULL) +
+    ggplot2::labs(x = x_axis_name, fill = NULL, color = NULL) +
     # Themes and styling
     ggplot2::theme_minimal() +
     ggplot2::theme(
       axis.text.x = ggplot2::element_text(size = 7, margin = ggplot2::margin(t = -255, b = -5)),
-      axis.title.x = ggplot2::element_text(margin = ggplot2::margin(t = 20, b = -10), size = 8, face = "bold", color = colores$COLOR_AXIS_TITLES),
+      axis.title.x = ggplot2::element_text(margin = ggplot2::margin(t = 20, b = -10), size = 8, face = "bold", color = colores$color_axis_titles),
       axis.title.y = ggplot2::element_text(hjust = 0.7,margin = ggplot2::margin(r = 10), 
-                                           size = 8, face = "bold", color = colores$COLOR_AXIS_TITLES),
+                                           size = 8, face = "bold", color = colores$color_axis_titles),
       panel.grid.major.x = ggplot2::element_blank(),
       panel.grid.minor.x = ggplot2::element_blank(),
       panel.grid.minor.y = ggplot2::element_blank(),
@@ -412,12 +421,10 @@ plot_historic_epi_time <- function(df, bars_df, lines_df, periodo_epi ) {
       color = "none"
     )+
     # Vertical lines and annotations
-    ggplot2::geom_segment(ggplot2::aes(x = 13.5, xend = 13.5, y = -25, yend = 700), color = colores$COLOR_VERTICAL_LINES, linewidth = 0.65) +
-    ggplot2::geom_segment(ggplot2::aes(x = 26.5, xend = 26.5, y = -25, yend = 700), color = colores$COLOR_VERTICAL_LINES, linewidth = 0.65) +
-    ggplot2::annotate("text", x = c(7, 20, 26.5 + floor(periodo_epi / 2)), y = -35, label = ANNOTATION_TEXT, size = 2.4, fontface = "bold") +
-    ggplot2::annotate("segment", x = ANNOTATE_X-0.3, xend = ANNOTATE_X + 0.9, y = -145, yend = -145, color = colores$COLOR_LINEA, linewidth = 0.7) +
-    ggplot2::annotate("text", x = ANNOTATE_X + 1.3, y = -145, label = "% de positividad", hjust = 0, color = "black", size = 2.5)
+    ggplot2::geom_segment(ggplot2::aes(x = 13.5, xend = 13.5, y = -25, yend = 700), color = colores$color_vertical_lines, linewidth = 0.65) +
+    ggplot2::geom_segment(ggplot2::aes(x = 26.5, xend = 26.5, y = -25, yend = 700), color = colores$color_vertical_lines, linewidth = 0.65) +
+    ggplot2::annotate("text", x = c(7, 20, 26.5 + floor(periodo_epi / 2)), y = -35, label = plot_text_years_labels, size = 2.4, fontface = "bold") +
+    ggplot2::annotate("segment", x = annotate_x_pos-0.3, xend = annotate_x_pos + 0.9, y = -145, yend = -145, color = colores$color_linea, linewidth = 0.7) +
+    ggplot2::annotate("text", x = annotate_x_pos + 1.3, y = -145, label = "% de positividad", hjust = 0, color = "black", size = 2.5)
   
 }
-
-
