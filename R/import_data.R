@@ -96,19 +96,19 @@ get_all_tables <- function(file_name, sheet_name) {
 #'
 #' @return Un dataframe correspondiente a la tabla seleccionada.
 #' @export
-get_selected_table <- function(list_of_tables, indicator) {
+get_selected_table <- function(list_tables, indicator) {
   # Verificar que 'tables' es una lista
-  if (!is.list(list_of_tables)) {
+  if (!is.list(list_tables)) {
     stop("El argumento 'tables' debe ser una lista de tablas.")
   }
   
   # Verificar que el INDICADOR es válido
-  if (indicator < 1 || indicator > length(list_of_tables)) {
+  if (indicator < 1 || indicator > length(list_tables)) {
     stop("El INDICADOR está fuera del rango de las tablas disponibles.")
   }
   
   # Extraer la tabla especificada
-  selected_table <- list_of_tables[[indicator]]
+  selected_table <- list_tables[[indicator]]
   
   # Asegurarse de que la tabla es un data.frame o convertirla en uno si es necesario
   if (!is.data.frame(selected_table)) {

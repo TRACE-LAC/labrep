@@ -90,9 +90,10 @@ get_axis_config_periodo_epidemiologico <- function() {
 #' @param dataset_epiTime Dataset con una columna `ano` que contiene los años.
 #' @return Vector de texto con etiquetas para cada año.
 #' @export
-get_text_labels_periodo_epidemiologico <- function(dataset_epiTime) {
+get_text_labels_periodo_epidemiologico <- function(dataset_epi_time) {
+  
   # Extract unique years from the dataset
-  unique_years <- sort(unique(dataset_epiTime$ano))
+  unique_years <- sort(unique(dataset_epi_time$ano))
   
   # Generate the annotation text dynamically
   annotation_text <- paste("AÑO", unique_years)

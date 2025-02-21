@@ -317,18 +317,20 @@ plot_table_epiweek_tosferina <- function(data_epiweek,
 #'
 #' @return Un objeto `ggplot2` con el gráfico de evolución epidemiológica.
 #' @export
-plot_historic_epi_time <- function(dataset_epiTime, periodo_epi ) {
+plot_historic_epi_time <- function(dataset_epi_time, periodo_epi ) {
   
   # Ensure the epidemiological period is within valid range
   periodo_epi <- pmax(1, pmin(periodo_epi, 13))
   
   #get stacked bars and line datasets
-  historic_epi_times <- get_historic_epi_times(dataset_epi_times = dataset_epiTime)
+  historic_epi_times <- get_historic_epi_times(dataset_epi_times = dataset_epi_time)
   stacked_data <- historic_epi_times$stacked_data
   line_data <- historic_epi_times$line_data
   
   #get texts of the axis from config.yml
   config_path <- system.file("extdata", "config.yml", package = "labrep")
+  config_path <- "C:/Users/willi/GITHUB/labrep/inst/extdata/config.yml"
+  
   text_axis_labels <-  config::get(file = config_path,"respiratory_viruses_historic_data")$legends
   y_axis1_name <- text_axis_labels$y_1_axis_name
   x_axis_name <- text_axis_labels$x_axis_name
@@ -336,7 +338,7 @@ plot_historic_epi_time <- function(dataset_epiTime, periodo_epi ) {
   #get plot theme parameters
   colores <- get_color_periodo_epidemiologico()
   plot_parameters <- get_axis_config_periodo_epidemiologico()
-  plot_text_years_labels <- get_text_labels_periodo_epidemiologico(dataset_epiTime=dataset_epiTime)
+  plot_text_years_labels <- get_text_labels_periodo_epidemiologico(dataset_epi_time=dataset_epi_time)
   annotate_x_pos <- 0.6727 * periodo_epi + 17.8273
 
   # Generate the plot
@@ -369,7 +371,7 @@ plot_historic_epi_time <- function(dataset_epiTime, periodo_epi ) {
                                    labels = scales::number_format(accuracy = 0.1))
     ) +
     # X-axis
-    ggplot2::scale_x_discrete(labels = dataset_epiTime$periodo_epidemiologico) +
+    ggplot2::scale_x_discrete(labels = dataset_epi_time$periodo_epidemiologico) +
     # Custom fill colors
     ggplot2::scale_fill_manual(values = c(
       "a_h1n1_pdm09" = colores$color_a_h1n1_pdm09,

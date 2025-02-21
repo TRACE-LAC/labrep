@@ -48,6 +48,10 @@ default:
     legends:
       x_axis_name: "PERÍODO EPIDEMIOLÓGICO"
       y_1_axis_name: "NÚMERO DE CASOS POSITIVOS"
+    year:
+      col_name: "ano"
+    periodo_epidemiologico:
+      col_name: "periodo_epidemiologico"
   viruses:
   - name: "influenza_a"
     filmarray:

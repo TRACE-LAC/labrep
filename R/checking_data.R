@@ -960,8 +960,8 @@ get_results_tosferina <- function(report_data, results = "positivo",
 #'
 #' @export
 get_historic_epi_times <- function(dataset_epi_times) {
-  data <- dataset_epi_times 
-  stacked_data <- data %>%
+  dataset <- dataset_epi_times 
+  stacked_dataset <- dataset %>%
     tidyr::pivot_longer(cols = .data$a_h1n1_pdm09:.data$otros_virus, 
                         names_to = "Virus_Type", 
                         values_to = "Cases") %>%
@@ -969,8 +969,8 @@ get_historic_epi_times <- function(dataset_epi_times) {
                                    sprintf("%02d",
                                            .data$periodo_epidemiologico),
                                    sep = "-"))
-  # Prepare line data for the line chart, ensuring YearWeek is created consistently
-  line_data <- data %>%
+  # Prepare line dataset for the line chart, ensuring YearWeek is created consistently
+  line_dataset <- dataset %>%
     dplyr::mutate(YearWeek = paste(.data$ano, sprintf("%02d",
                                                       .data$periodo_epidemiologico),
                                    sep = "-")) %>%
@@ -978,8 +978,9 @@ get_historic_epi_times <- function(dataset_epi_times) {
                     .data$percent_de_positividad) %>%
     tidyr::drop_na(.data$Percent_Positivity) # Remove any NA values in Percent_Positivity
   
-  historic_data <- list(stacked_data = stacked_data,
-                        line_data = line_data)
-  return(historic_data)
+  historic_dataset <- list(stacked_dataset = stacked_dataset,
+                           line_dataset = line_dataset)
+  return(historic_dataset)
 }
+
 
