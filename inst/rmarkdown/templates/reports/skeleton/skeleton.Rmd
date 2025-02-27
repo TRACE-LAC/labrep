@@ -49,6 +49,18 @@ params:
     label: "Semana epidemiológica"
     input: text
     value: 23
+  correo:
+    label: "correo"
+    input: text
+    value: ""
+  periodo:
+    label: "Periodo epidemiológico"
+    input: text
+    value: ""
+  save_data:
+    label: "Guardar datos en Github"
+    input: checkbox
+    value: FALSE
 editor_options: 
   markdown: 
     wrap: 72
@@ -141,6 +153,7 @@ www.saludcapital.gov.co\\}
 \pagenumbering{gobble}
 \pagenumbering{arabic}
 ```
+
 \newpage
 
 ```{=tex}
@@ -149,9 +162,130 @@ www.saludcapital.gov.co\\}
 \end{flushleft}
 ```
 
-```{r current-year, include=FALSE}
+
+```{r current-year correo periodo subir_datos_github, include=FALSE}
 current_year <- format(Sys.Date(), "%Y")
+subir_datos_github <- params$save_data  
+correo <- params$correo    
+periodo <- params$periodo_epi 
+
+correo_valido <- validar_dominio(correo = correo)
+# Si el correo no es válido, detener la ejecución y mostrar un mensaje de alerta
+if (!correo_valido) {
+  stop("ERROR: El correo ingresado no es válido. Debe ser del dominio @saludcapital.gov.co. 
+       Por favor, ingrese un correo válido antes de compilar el documento.")
+}
+
 ```
+
+```{r local_library_path}
+#crea un path local de la libreria (carpeta) de archivos '.rds'
+local_library_path <- generar_ruta_datos_historicos() 
+
+```
+
+```{r nombre_archivo}
+# crea el nombre del archivo '.rds' usando la fecha, usuario, periodo.
+usuario <- obtener_usuario(correo)
+fecha <- obtener_fecha_hora(hora=FALSE)
+fecha_hora <- obtener_fecha_hora()
+
+nombre_archivo <- construir_nombre_archivo(fecha=fecha, usuario=usuario, anio_actual=current_year, periodo=periodo)
+```
+
+```{r local_rds_path}
+# crea el path del archivo '.rds' que se guarda en local
+local_rds_path <- crear_path_local(local_library_path, nombre_archivo)
+```
+
+
+
+```{r token}
+token <- Sys.getenv("GITHUB_PAT")
+resultado_auth <- autenticar_github(token)
+# Mostrar mensaje de éxito o advertencia
+if (resultado_auth) {
+  message("El token de autenticación de Github fue detectado: ", local_rds_path)
+} else {
+  warning("No se encontró un token de autenticación para Github")
+}
+```
+
+```{r config_github}
+config_github <- obtener_configuracion_github()
+repo <- config_github$repo # Nombre del repositorio en GitHub
+branch <- config_github$branch # Rama a consultar
+remote_path <- config_github$remote_path # Carpeta remota en GitHub
+
+```
+
+```{r descargar_archivos_faltantes}
+
+# Crear directorio en local si no existe
+crear_directorio(local_library_path = local_library_path)
+
+# Obtener lista de archivos en la carpeta remota
+archivos_remoto <- obtener_archivos_remotos(repo=repo, remote_path =remote_path, branch=branch, token=token )
+print(archivos_remoto$nombres)  # Imprime los nombres de los archivos
+
+# Obtener lista de archivos en la carpeta local
+archivos_local <- obtener_archivos_locales(local_library_path)
+
+# Comparar listas y mostrar diferencias
+archivos_diferencia <- comparar_y_mostrar_diferencias(local_files = archivos_local , remote_file_names = archivos_remoto$nombres)
+archivos_faltantes_en_local <- archivos_diferencia$faltan_en_local
+
+descargar_archivos_faltantes(missing_in_local = archivos_faltantes_en_local, archivos_remoto = archivos_remoto, local_library_path =local_library_path) 
+```
+
+
+
+```{r dataframe_de_prueba}
+
+dataframe_de_prueba <- data.frame(
+  Columna1 = c("A", "B", "C"),
+  Columna2 = c(1, 2, 3),
+  Columna3 = c(TRUE, FALSE, TRUE),
+  stringsAsFactors = FALSE
+)
+```
+
+```{r guardar_datos_local}
+ # Llamar a la función y almacenar el resultado
+resultado_guardado <- guardar_datos_local(dataframe_de_prueba, local_rds_path)
+
+# Mostrar mensaje de éxito o advertencia
+if (resultado_guardado) {
+  message("El archivo RDS se guardó correctamente en: ", local_rds_path)
+} else {
+  warning("Hubo un problema al guardar el archivo RDS.")
+}
+
+```
+
+
+```{r subir_o_actualizar_archivo}
+# Leer el archivo .RDS y codificarlo en base64
+
+if(subir_datos_github){
+  
+encoded_content<- codificar_rds_base64 (local_rds_path = local_rds_path)
+
+remote_file_path <- generar_ruta_remota(nombre_archivo)
+
+file_sha<- obtener_sha_archivo(repo = repo, remote_file_path = remote_file_path, branch = branch, token = token )
+
+subir_o_actualizar_archivo(repo=repo,
+                           remote_file_path = remote_file_path,
+                           encoded_content = encoded_content,
+                           branch = branch,
+                           token = token,
+                           file_sha =file_sha )
+}
+
+```
+
+
 
 
 Durante `r current_year`, el Laboratorio de Salud Pública (LSP) continúa
@@ -167,6 +301,8 @@ después continúan su análisis con: panel respiratorio  Allplex y reacción en
 cadena de la polimerasa con transcriptasa inversa (RT-PCR) para el
 diagnóstico de los principales agentes a los que se les atribuye el
 IRAG.
+
+
 
 ```{r historic-data}
 SHEET_NAME <- "POR PERIODO"
