@@ -174,6 +174,15 @@ current_year <- format(Sys.Date(), "%Y")
 ```
 
 
+```{r, include=FALSE}
+source("C:/Users/willi/GITHUB/labrep/R/checking_data.R", local = knitr::knit_global())
+source("C:/Users/willi/GITHUB/labrep/R/import_data.R", local = knitr::knit_global())
+source("C:/Users/willi/GITHUB/labrep/R/plotting_data.R", local = knitr::knit_global())
+source("C:/Users/willi/GITHUB/labrep/R/cleaning_data.R", local = knitr::knit_global())
+source("C:/Users/willi/GITHUB/labrep/R/theme.R", local = knitr::knit_global())
+source("C:/Users/willi/GITHUB/labrep/R/utils.R", local = knitr::knit_global())
+```
+
 Durante `r current_year`, el Laboratorio de Salud Pública (LSP) continúa
 apoyando la vigilancia de la infección respiratoria aguda en Bogotá, mediante el
 procesamiento de muestras remitidas por instituciones centinela de los
@@ -198,24 +207,27 @@ dataset_sheet_name <- "POR PERIODO"
 all_tables_from_sheet <- get_all_tables(file_name=params$historic_data, sheet_name=dataset_sheet_name)
 dataset_number <- 2
 
-cl_dataset_respiratory_viruses_last_3_years <- get_selected_table(list_tables=all_tables_from_sheet, indicator=dataset_number)
+dataset_periodo_epi <- get_selected_table(list_tables=all_tables_from_sheet, indicator=dataset_number)
 ```
 
 ```{r cl_dataset_respiratory_viruses_last_3_years}
 # CLEANING
-
-cl_dataset_respiratory_viruses_last_3_years <- clean_historic_data(dataset = cl_dataset_respiratory_viruses_last_3_years)
+# cl = clean
+cl_dataset_periodo_epi <- clean_historic_data(dataset = dataset_periodo_epi)
  
 
 ```
 
 ```{r filtered_dataset_respiratory_viruses_years}
 # PROCESSING
-
+# pr = processed
 
 #  TODO ::ULTIMO_AÑO_DATASET(2024) O CURRENT_YEAR(2025) (?)
-pr_dataset_respiratory_viruses_last_3_years <- cl_dataset_respiratory_viruses_last_3_years %>%
-    filter((cl_dataset_respiratory_viruses_last_3_years$ano == 2024 & periodo_epidemiologico <= params$periodo_epi) | cl_dataset_respiratory_viruses_last_3_years$ano != 2024)
+#se debe crear una funcion para obtener el ultimo año del dataset.
+# la figura solo debe tomar los ultimos 3 años, teneindo encuenta current_year
+
+pr_dataset_respiratory_viruses_last_3_years <- cl_dataset_periodo_epi %>%
+    filter((cl_dataset_periodo_epi$ano == 2024 & periodo_epidemiologico <= params$periodo_epi) | cl_dataset_periodo_epi$ano != 2024)
 
 ```
 
@@ -228,155 +240,5 @@ En el análisis del comportamiento de los virus respiratorios por periodo epidem
 plot_historic_epi_time(dataset = pr_dataset_respiratory_viruses_last_3_years ,periodo_epi= params$periodo_epi)
 ```
 
-
-```{r filmarray-data}
-filmarray_data <- import_data_viral_circulation(report_data = params$fci_data,
-                                                sheet = 1,
-                                                skip = 3)
-filmarray_data_cleaned <- clean_filmarray_data(filmarray_data = filmarray_data)
-filmarray_data_cleaned <-
-  generate_age_categories(dataset = filmarray_data_cleaned)
-filmarray_age_groups <-
-  get_cases_filmarray(report_data = filmarray_data_cleaned,
-                      age_groups = TRUE)
-```
-
-```{r other-viruses-data}
-other_viruses_data <-
-  import_data_viral_circulation(report_data =
-                                  params$other_viruses,
-                                skip = 0,
-                                sheet = 1)
-other_viruses_cleaned_data  <- clean_data_other_viruses(other_viruses_data)
-other_viruses_age_groups <-
-  get_cases_other_viruses(report_data = other_viruses_cleaned_data,
-                          age_groups = TRUE)
-```
-
-```{r distribution-age-groups}
-viruses_age_groups <-
-  get_dist_fci_other_vrs(fci_data = filmarray_age_groups,
-                         vrs_data = other_viruses_age_groups)
-```
-
-
-```{r sars-data}
-sars_age_groups <- get_cases_sars(other_viruses_cleaned_data,
-                                  age_groups = TRUE)
-sars_viruses_age_groups <- get_distribution_age_vr_sars(viruses_age_groups,
-                                                        sars_age_groups)
-top_sars_age_groups <-
-  group_columns_total(disease_data = sars_viruses_age_groups,
-                      sum_cases = TRUE, col_names = "grupo_edad",
-                      wt_percentage = TRUE, col_order = "porcentaje",
-                      etiqueta = FALSE)
-```
-
-
-```{r paragraph-viruses}
-perc_vrs_age_group <-
-  get_perc_viruses_age(dataset = viruses_age_groups)
-perc_sars_age_group <-
-  get_perc_viruses_age(dataset = sars_viruses_age_groups)
-```
-
-Para esta semana, por grupo de edad, el `r perc_vrs_age_group`% de pacientes positivos para virus respiratorios diferentes al SARS-CoV-2 en `r current_year` corresponden a
-la población de menores de 5 años (figura 2) y si se incluye al
-SARS-CoV-2 los menores corresponden al `r perc_sars_age_group` % (figura 3).
-
-```{r plot-viruses-age-groups, include=TRUE, fig.height=4, fig.width=5.7,fig.cap="Distribución porcentual de virus respiratorios por grupo de edad, Laboratorio de Salud Pública Bogotá.", fig.align='right'}
-plot_age_group_distribution(viruses_age_groups)
-```
-
-```{r table-viruses-age-groups, fig.align='right'}
-trans_viruses_age_groups <-
-  convert_age_groups_as_cols(dataset = viruses_age_groups)
-plot_table_legend(report_data = trans_viruses_age_groups)
-```
-
-
-```{r paragraph-viruses-age-groups}
-text_cons_viruses <-
-  get_cons_viruses_age_text(dataset = viruses_age_groups,
-                            text_group = ", para los niños entre 2 y 4 años 
-                            se presentan casos de ")
-```
-
-En la figura 3 se presenta el consolidado de los virus respiratorios por los diferentes grupos de edad, en los niños menores de 2 años las mayores frecuencias son de casos de `r text_cons_viruses`.
-
-\newpage
-
-```{r plot-distribution-sars, include=TRUE, fig.height=4, fig.width=5.7, fig.align='right', fig.cap="Distribución porcentual de virus respiratorios y SARS-CoV-2 por grupo de edad, Laboratorio de Salud Pública Bogotá."}
-plot_age_group_distribution(sars_viruses_age_groups, var_y = "casos",
-                            include_sars = TRUE)
-```
-
-```{r table-distribution-sars, fig.align='right'}
-trans_sars_age_groups <-
-  convert_age_groups_as_cols(dataset = sars_viruses_age_groups)
-plot_table_legend(report_data = trans_sars_age_groups,
-                  include_sars = TRUE)
-```
-
-```{r paragraph-sars-age-groups}
-text_cons_vrs_sars <-
-  get_cons_viruses_age_text(dataset = sars_viruses_age_groups,
-                            text_group = ", en el grupo de 2 a 4
-años, ")
-```
-
-Al incluir el virus de SARS-CoV-2 en la cuenta de los virus
-respiratorios, se observa que, en los menores de 2 años años las
-frecuencias son para `r text_cons_vrs_sars`. A continuación, se presenta la circulación acumulada de 
-los virus respiratorios de forma desagregada por tipo de vigilancia, 
-según grupo de edad (figura 4). También se ha incluido al SARS-CoV-2.
-
-\newpage
-
-```{r distribution-esi-age-groups}
-esi_age_groups <-
-  get_distribution_surveillance(report_data = other_viruses_cleaned_data,
-                                include_sars = TRUE,
-                                surveillance_type = "esi",
-                                epiweek = params$epiweek)
-```
-
-```{r plot-distribution-esi-age-groups, include=TRUE, fig.height=4, fig.width=5.7, fig.align='right', warning=FALSE, include=TRUE, message=FALSE, fig.cap="Circulación de virus respiratorios por tipo de vigilancia y según grupo de edad, Laboratorio de Salud Pública. \\linebreak \\linebreak Distribución de virus respiratorios en casos de ESI, según grupos de edad."}
-plot_age_group_distribution(esi_age_groups,
-                            include_sars = TRUE)
-```
-
-```{r table-distribution-esi-age-groups, fig.align='right'}
-trans_esi_age_groups <-
-  convert_age_groups_as_cols(dataset = esi_age_groups)
-plot_table_legend(report_data = trans_esi_age_groups,
-                  include_sars = TRUE)
-```
-
-\newpage
-
-**Distribución de virus respiratorios en casos de IRA Grave, según
-grupos de edad**
-
-```{r, distribution-irag-grave-age-groups}
-irag_grave_age_groups <-
-  get_distribution_surveillance(other_viruses_cleaned_data,
-                                include_sars = TRUE,
-                                surveillance_type = "irag_grave",
-                                epiweek = params$epiweek)
-```
-
-```{r plot-distribution-irag-grave-age-groups, include=TRUE, fig.height=4, fig.width=5.7, fig.align='right'}
-plot_age_group_distribution(irag_grave_age_groups, include_sars = TRUE)
-```
-
-```{r table-distribution-irag-grave-age-groups, fig.align='right'}
-trans_irag_grave_age_groups <-
-  convert_age_groups_as_cols(dataset = irag_grave_age_groups)
-plot_table_legend(report_data = trans_irag_grave_age_groups,
-                  include_sars = TRUE)
-```
-
-\newpage
 
 \includepdf[pages={1}]{back_cover.pdf}
