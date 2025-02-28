@@ -156,38 +156,99 @@ clean_tosferina_data <- function(report_data) {
   return(report_data)
 }
 
-#' @title Función para reemplazar espacios en los nombres de las columnas con
-#' guiones bajos
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#' @title Limpiar espacios en los nombres de las columnas
+#'
+#' @description
+#' Reemplaza los espacios y caracteres especiales en los nombres de las columnas 
+#' por guiones bajos, asegurando una nomenclatura estandarizada.
+#'
+#' @param dataset Un dataset con nombres de columna a limpiar.
+#' @return Un dataset con nombres de columna estandarizados.
 #' @export
-clean_colnames_spaces <- function(df) {
-  colnames(df) <- epitrix::clean_labels(colnames(df))
-  return(df)
+clean_colnames_spaces <- function(dataset) {
+  colnames(dataset) <- epitrix::clean_labels(colnames(dataset))
+  return(dataset)
 }
 
-#' @title Función que remueve los sufijos
+#' @title Eliminar sufijos numéricos en los nombres de las columnas
+#'
+#' @description
+#' Remueve los sufijos numéricos en los nombres de las columnas que siguen el 
+#' formato `...1`, `...2`, `...3`, común en datos importados desde archivos CSV o Excel.
+#'
+#' @param dataset Un dataset con nombres de columna que pueden contener sufijos numéricos.
+#' @return Un dataset con nombres de columna sin sufijos numéricos.
 #' @export
-clean_colnames_suffixes <- function(df) {
-  colnames(df) <- gsub("\\.\\.\\.[0-9]+$", "", colnames(df))
-  return(df)
+clean_colnames_suffixes <- function(dataset) {
+  colnames(dataset) <- gsub("\\.\\.\\.[0-9]+$", "", colnames(dataset))
+  return(dataset)
 }
 
-#' @title Función que rellena los años
+
+#' @title Rellenar valores faltantes en una columna
+#'
+#' @description
+#' Usa `tidyr::fill()` para rellenar los valores faltantes en la columna especificada,
+#' propagando los valores hacia abajo.
+#'
+#' @param dataset Un dataset que contiene la columna a rellenar.
+#' @param column_name Nombre de la columna a rellenar (como variable sin comillas).
+#' @return Un dataset con los valores de la columna completados.
 #' @export
-fill_down_year <- function(df, column_name) {
-  df <- df %>%
+fill_down_column <- function(dataset, column_name) {
+  dataset <- dataset %>%
     tidyr::fill({{ column_name }}, .direction = "down")
   
   # Devolver el data frame limpio
-  return(df)
+  return(dataset)
 }
 
-#' @title Función que limpia la información historica
+#' @title Limpiar datos históricos epidemiológicos
+#'
+#' @description
+#' Aplica varias transformaciones al dataset de datos históricos:
+#' - Remueve sufijos en nombres de columnas (`clean_colnames_suffixes`).
+#' - Estandariza los nombres de las columnas (`janitor::clean_names`).
+#' - Rellena valores faltantes en las columnas `ano` y `periodo_epidemiologico` (`fill_down_column`).
+#'
+#' @param dataset Un dataset con datos históricos sin procesar.
+#' @return Un dataset limpio y listo para análisis.
 #' @export
-clean_historic_data <- function(tabla) {
-  tabla <- tabla %>%
+clean_historic_data <- function(dataset) {
+  
+  #get texts of the axis from config.yml
+  config_path <- system.file("extdata", "config.yml", package = "labrep")
+  config_path <- "C:/Users/willi/GITHUB/labrep/inst/extdata/config.yml"
+
+  year_column <-  config::get(file = config_path,"respiratory_viruses_historic_data")$year
+  col_year <- year_column$col_name
+  periodo_epidemiologico <- config::get(file = config_path,"respiratory_viruses_historic_data")$periodo_epidemiologico
+  col_periodo <- periodo_epidemiologico$col_name
+  
+  dataset <- dataset %>%
     clean_colnames_suffixes() %>%
-    clean_colnames_spaces() %>%
-    fill_down_year("ano") %>% 
-    slice(1:32)
-  return(tabla)
+    janitor::clean_names() %>%  
+    fill_down_column(col_year) %>%
+    fill_down_column(col_periodo)
+  
+  return(dataset)
+  
 }

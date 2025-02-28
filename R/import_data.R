@@ -29,9 +29,23 @@ import_data_viral_circulation <- function(report_data = NULL,
   return(viral_circulation_data)
 }
 
-#' @title Obtener todas las tables de las bases historicas
+#' @title Extraer todas las tablas de una hoja de Excel 
+#'
+#' @description
+#' Detecta y extrae múltiples tablas dentro de una hoja de Excel, identificando 
+#' separaciones mediante filas y columnas en blanco.
+#'
+#' @param file_name Ruta del archivo de Excel.
+#'
+#' @return Lista de dataframes, donde cada elemento representa una tabla identificada dentro de la hoja.
 #' @export
-get_all_tables <- function(file_name, sheet_name) {
+get_all_tables <- function(file_name) {
+  
+  config_path <- system.file("extdata", "config.yml", package = "labrep")
+  sheet_name <-  config::get(file = config_path,"respiratory_viruses_historic_data")$excel_sheet_name
+  sheet_name <- sheet_name$value
+
+  
   # Leer los datos de la hoja especificada en el archivo
   data <-  readxl::read_excel(file_name, sheet = sheet_name)
   
@@ -76,21 +90,34 @@ get_all_tables <- function(file_name, sheet_name) {
   return(tables)
 }
 
-#' @title Extraer una tabla específica de la lista y devolverla como data.frame
+#' @title Obtener una tabla específica de una lista de tablas
+#'
+#' @description
+#' Extrae una tabla de una lista de tablas generada a partir de `get_all_tables`, 
+#' seleccionándola por su índice en la lista.
+#'
+#' @param list_of_tables Lista de tablas, donde cada elemento es un dataframe.
+#'
+#' @return Un dataframe correspondiente a la tabla seleccionada.
 #' @export
-get_selected_table <- function(tables, INDICADOR) {
+get_selected_table <- function(list_tables) {
+  
+  config_path <- system.file("extdata", "config.yml", package = "labrep")
+  indicator <-  config::get(file = config_path,"respiratory_viruses_historic_data")$table_number
+  indicator <- indicator$value
+  
   # Verificar que 'tables' es una lista
-  if (!is.list(tables)) {
+  if (!is.list(list_tables)) {
     stop("El argumento 'tables' debe ser una lista de tablas.")
   }
   
   # Verificar que el INDICADOR es válido
-  if (INDICADOR < 1 || INDICADOR > length(tables)) {
+  if (indicator < 1 || indicator > length(list_tables)) {
     stop("El INDICADOR está fuera del rango de las tablas disponibles.")
   }
   
   # Extraer la tabla especificada
-  selected_table <- tables[[INDICADOR]]
+  selected_table <- list_tables[[indicator]]
   
   # Asegurarse de que la tabla es un data.frame o convertirla en uno si es necesario
   if (!is.data.frame(selected_table)) {

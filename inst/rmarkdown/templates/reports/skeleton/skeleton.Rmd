@@ -49,10 +49,15 @@ params:
     label: "Semana epidemiológica"
     input: text
     value: 23
+  periodo_epi:
+    label: "Periodo epidemiológica"
+    input: numeric
+    value: 5
 editor_options: 
   markdown: 
     wrap: 72
 ---
+
 
 ```{r setup, echo=FALSE, include=FALSE}
 knitr::opts_chunk$set(
@@ -78,6 +83,8 @@ print(params$fci_data)
 ```
 
 \includepdf[pages={1}]{cover.pdf}
+
+
 
 ```{=tex}
 \begin{center}
@@ -153,7 +160,6 @@ www.saludcapital.gov.co\\}
 current_year <- format(Sys.Date(), "%Y")
 ```
 
-
 Durante `r current_year`, el Laboratorio de Salud Pública (LSP) continúa
 apoyando la vigilancia de la infección respiratoria aguda en Bogotá, mediante el
 procesamiento de muestras remitidas por instituciones centinela de los
@@ -168,22 +174,42 @@ cadena de la polimerasa con transcriptasa inversa (RT-PCR) para el
 diagnóstico de los principales agentes a los que se les atribuye el
 IRAG.
 
-```{r historic-data}
-SHEET_NAME <- "POR PERIODO"
-INDICADOR <- 2
-tables <- get_all_tables(params$historic_data, SHEET_NAME)
-tabla <- get_selected_table(tables, INDICADOR)
-tabla <- clean_historic_data(tabla = tabla)
-historic_epi_times <- get_historic_epi_times(tabla = tabla)
+
+
+```{r dataset_respiratory_viruses_2022_20224}
+#IMPORTING DATASET: "VIRUS RESPIRATORIO 2022 A 2024.xlsx"
+
+all_tables_from_sheet <- get_all_tables(file_name=params$historic_data)
+
+dataset_periodo_epi <- get_selected_table(list_tables=all_tables_from_sheet)
 ```
+
+```{r cl_dataset_respiratory_viruses_last_3_years}
+# CLEANING
+# cl = clean
+cl_dataset_periodo_epi <- clean_historic_data(dataset = dataset_periodo_epi)
+ 
+
+```
+
+```{r filtered_dataset_respiratory_viruses_years}
+# PROCESSING
+# pr = processed
+
+pr_dataset_respiratory_viruses_last_3_years <- cl_dataset_periodo_epi %>%
+    filter((cl_dataset_periodo_epi$ano == 2024 & periodo_epidemiologico <= params$periodo_epi) | cl_dataset_periodo_epi$ano != 2024)
+
+```
+
 
 En el análisis del comportamiento de los virus respiratorios por periodo epidemiológico desde el 2022 se observa que se ha mantenido la circulación de virus como Rinovirus, Adenovirus y VSR. Para los tres años entre los periodos 3 al 6 coincide con el pico respiratorio que se presenta en todos los años (Figura 1).
 
 ```{r plot-historic-data, include=TRUE, fig.height=6, fig.width=8,fig.cap="Circulación de virus respiratorios por período epidemiológico Año 2022 - 2024, Laboratorio de Salud Pública Bogotá."}
-plot_historic_epi_time(stacked_data = historic_epi_times$stacked_data,
-                       line_data = historic_epi_times$line_data,
-                       tabla = tabla)
+#PLOTTING Figura 1
+
+plot_historic_epi_time(dataset = pr_dataset_respiratory_viruses_last_3_years ,periodo_epi= params$periodo_epi)
 ```
+
 
 ```{r filmarray-data}
 filmarray_data <- import_data_viral_circulation(report_data = params$fci_data,
