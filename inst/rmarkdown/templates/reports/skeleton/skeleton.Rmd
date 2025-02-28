@@ -86,19 +86,6 @@ print(params$fci_data)
 
 
 
-```{r, include=FALSE}
-source("C:/Users/willi/GITHUB/labrep/R/checking_data.R", local = knitr::knit_global())
-source("C:/Users/willi/GITHUB/labrep/R/import_data.R", local = knitr::knit_global())
-source("C:/Users/willi/GITHUB/labrep/R/plotting_data.R", local = knitr::knit_global())
-source("C:/Users/willi/GITHUB/labrep/R/cleaning_data.R", local = knitr::knit_global())
-source("C:/Users/willi/GITHUB/labrep/R/theme.R", local = knitr::knit_global())
-source("C:/Users/willi/GITHUB/labrep/R/utils.R", local = knitr::knit_global())
-```
-
-
-
-
-
 ```{=tex}
 \begin{center}
 {\color{colortitles} Alcalde Mayor de Bogotá\\}
