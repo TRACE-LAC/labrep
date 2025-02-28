@@ -29,18 +29,23 @@ import_data_viral_circulation <- function(report_data = NULL,
   return(viral_circulation_data)
 }
 
-#' @title Extraer todas las tablas de una hoja de Excel
+#' @title Extraer todas las tablas de una hoja de Excel 
 #'
 #' @description
 #' Detecta y extrae múltiples tablas dentro de una hoja de Excel, identificando 
 #' separaciones mediante filas y columnas en blanco.
 #'
 #' @param file_name Ruta del archivo de Excel.
-#' @param sheet_name Nombre de la hoja de donde extraer las tablas.
 #'
 #' @return Lista de dataframes, donde cada elemento representa una tabla identificada dentro de la hoja.
 #' @export
-get_all_tables <- function(file_name, sheet_name) {
+get_all_tables <- function(file_name) {
+  
+  config_path <- system.file("extdata", "config.yml", package = "labrep")
+  sheet_name <-  config::get(file = config_path,"respiratory_viruses_historic_data")$excel_sheet_name
+  sheet_name <- sheet_name$value
+
+  
   # Leer los datos de la hoja especificada en el archivo
   data <-  readxl::read_excel(file_name, sheet = sheet_name)
   
@@ -92,11 +97,15 @@ get_all_tables <- function(file_name, sheet_name) {
 #' seleccionándola por su índice en la lista.
 #'
 #' @param list_of_tables Lista de tablas, donde cada elemento es un dataframe.
-#' @param indicator Índice numérico de la tabla que se desea extraer (debe estar dentro del rango de la lista).
 #'
 #' @return Un dataframe correspondiente a la tabla seleccionada.
 #' @export
-get_selected_table <- function(list_tables, indicator) {
+get_selected_table <- function(list_tables) {
+  
+  config_path <- system.file("extdata", "config.yml", package = "labrep")
+  indicator <-  config::get(file = config_path,"respiratory_viruses_historic_data")$table_number
+  indicator <- indicator$value
+  
   # Verificar que 'tables' es una lista
   if (!is.list(list_tables)) {
     stop("El argumento 'tables' debe ser una lista de tablas.")

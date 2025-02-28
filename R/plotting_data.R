@@ -329,7 +329,6 @@ plot_historic_epi_time <- function(dataset_epi_time, periodo_epi ) {
   
   #get texts of the axis from config.yml
   config_path <- system.file("extdata", "config.yml", package = "labrep")
-  config_path <- "C:/Users/willi/GITHUB/labrep/inst/extdata/config.yml"
   
   text_axis_labels <-  config::get(file = config_path,"respiratory_viruses_historic_data")$legends
   y_axis1_name <- text_axis_labels$y_1_axis_name

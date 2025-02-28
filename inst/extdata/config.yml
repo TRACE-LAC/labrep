@@ -52,6 +52,11 @@ default:
       col_name: "ano"
     periodo_epidemiologico:
       col_name: "periodo_epidemiologico"
+    excel_sheet_name:
+      value: "POR PERIODO"
+    table_number:
+      value: 2
+    
   viruses:
   - name: "influenza_a"
     filmarray:
