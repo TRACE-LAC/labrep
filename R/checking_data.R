@@ -93,7 +93,7 @@ get_cases_filmarray <- function(report_data,
       get_influenza_viruses(viruses = cols_viruses,
                             events = vrs_influenza)
   }
-  if (!is.null(epiweek)  && epiweek != "all") {
+  if (!is.null(epiweek) && epiweek != "all") {
     col_epiweek <- config::get(file = config_path,
                                "filmarray_data")$epiweek$col_valid
     report_data <-
@@ -106,36 +106,43 @@ get_cases_filmarray <- function(report_data,
       if (all(filmarray_vrs$col_name %in% names(report_data)) &&
           !("" %in% filmarray_vrs$values)) {
         for (col_name in filmarray_vrs$col_name) {
-          positive_cases <-
-            report_data[report_data[[col_name]]
-                        == filmarray_vrs$values, ]
-          if (!is.null(epiweek)) {
-              positive_cases <- group_columns_total(disease_data = positive_cases,
-                                                    event_name = virus$name,
-                                                    col_names = col_epiweek,
-                                                    event_label = virus$label) 
+          positive_cases <- data.frame()
+          for (value in filmarray_vrs$values) {
+            aux_positive_cases <-
+              report_data[report_data[[col_name]]
+                          == value, ]
+            if (nrow(aux_positive_cases) > 0) {
+              positive_cases <- rbind(positive_cases, aux_positive_cases)
+            }
           }
-          if (age_groups) {
-            positive_cases_age_group <-
-              group_columns_total(positive_cases,
-                                  col_age_groups,
-                                  event_name = virus$name,
-                                  wt_percentage = TRUE,
-                                  total_cases = nrow(positive_cases),
-                                  event_label = virus$label)
-            positive_cases_age_group <-
-              complete_age_categories(data_grouped = positive_cases_age_group,
-                                      event_name = virus$name,
-                                      event_label = virus$label)
-            positive_cases_age_group$total_casos <-
-              nrow(positive_cases)
-            viruses_age_group <-
-              rbind(viruses_age_group, positive_cases_age_group)
-          } else {
-            positive_cases$total_casos <-
-              nrow(positive_cases)
-            viruses_age_group <-
-              rbind(viruses_age_group, positive_cases)
+          if (nrow(positive_cases) > 0) {
+            if (!is.null(epiweek)) {
+              positive_cases <-
+                group_columns_total(disease_data = positive_cases,
+                                    event_name = virus$name,
+                                    col_names = col_epiweek,
+                                    event_label = virus$label) 
+            }
+            if (age_groups) {
+              positive_cases_age_group <-
+                group_columns_total(positive_cases,
+                                    col_age_groups,
+                                    event_name = virus$name,
+                                    wt_percentage = TRUE,
+                                    total_cases = nrow(positive_cases),
+                                    event_label = virus$label)
+              positive_cases_age_group <-
+                complete_age_categories(data_grouped = positive_cases_age_group,
+                                        event_name = virus$name,
+                                        event_label = virus$label)
+              positive_cases_age_group$total_casos <-
+                nrow(positive_cases)
+              viruses_age_group <-
+                rbind(viruses_age_group, positive_cases_age_group)
+            } else {
+              viruses_age_group <-
+                rbind(viruses_age_group, positive_cases)
+            } 
           }
         }
       }
