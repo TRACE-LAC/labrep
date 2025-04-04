@@ -216,13 +216,16 @@ plot_results_tosferina <- function(report_data,
   max_val_pos <- max(positives[["porcentaje"]])
   max_val_report <- max(report_data[["casos"]])
   if (!is.null(positives)) {
+    max_positives <- max(positives[["porcentaje"]], na.rm = TRUE)
+    scaling_factor <- round(max(report_data[["casos"]], na.rm = TRUE) /
+                              max_positives, 
+                            digits = 2)
     if (column == "grupo_edad") {
       plot <- plot +
         ggplot2::geom_line(data = positives,
                            ggplot2::aes(x = factor(grupo_edad,
                                                    levels = category_labels),
-                                        y = (porcentaje * max_val_report)
-                                            / max_val_pos),
+                                        y = porcentaje * scaling_factor),
                            stat = "identity",
                            color = "#F99D00",
                            size = 0.8,
@@ -241,8 +244,11 @@ plot_results_tosferina <- function(report_data,
     plot <- plot +
       ggplot2::scale_y_continuous(name = "Numero de muestras analizadas\n",
                                   sec.axis =
-                                    ggplot2::sec_axis(trans = ~ . * max_val_report /
-                                                        max_val_pos,
+                                    ggplot2::sec_axis(~ . / scaling_factor,
+                                                      breaks = seq(0,
+                                                                   max_positives, by = 2), 
+                                                      labels =
+                                                        function(x) sprintf("%.f", x),
                                                       name = "Porcentaje"))
   }
   plot <- plot +
