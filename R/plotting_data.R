@@ -277,6 +277,7 @@ plot_table_vrs_epiweek <- function(data_epiweek,
     knitr::kable(data_table,
                  col.names = c("Semana Epidemiologica", "% Positivos"),
                  align = "c",
+                 "latex",
                  longtable = TRUE,
                  caption = "Positividad de virus respiratorios por semana 
                  epidemiológica, Bogotá 2024 \n ") %>%
@@ -305,7 +306,8 @@ plot_table_epiweek_tosferina <- function(data_epiweek,
                  col.names = c("SE", "% Positivos"),
                  align = "c",
                  caption = "Positividad de tosferina por semana epidemiológica,
-                 Bogotá 2024") %>%
+                 Bogotá 2024",
+                 "latex") %>%
     kableExtra::row_spec(0, bold = TRUE,
                          color = "white", background = "#145765") %>%
     kableExtra::row_spec(seq(2, nrow(data_table), by = 2),
