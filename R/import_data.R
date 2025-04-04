@@ -2,30 +2,60 @@
 #' @export
 import_data_viral_circulation <- function(report_data = NULL,
                                           header = FALSE,
-                                          skip = 3,
+                                          skip = NULL,
                                           col_names = FALSE,
-                                          sheet) {
+                                          sheet = NULL,
+                                          dataset_name = NULL) {
   viral_circulation_data <- data.frame()
+  config_path <- system.file("extdata", "config.yml", package = "labrep")
+  filmarray_sheets <-
+    config::get(file = config_path, "filmarray_data")$file$sheets
+  fci_datasets <- list()
   for (data_path in report_data) {
     file_extension <- tools::file_ext(data_path)
     if (!is.null(file_extension)) {
-      temp_data <- switch(
-        file_extension,
-        "xlsx" = readxl::read_excel(data_path,
-                                    col_names = col_names,
-                                    skip = skip,
-                                    sheet = sheet),
-        "csv" = utils::read.csv(data_path, header = header,
-                                skip = if (header) 0 else 3)
-      )
-      if (!header) {
-        temp_data <- row_to_header(data = temp_data)
-        viral_circulation_data <- rbind(viral_circulation_data, temp_data)
-      } else {
-        viral_circulation_data <- temp_data
+      if (file_extension == "xlsx") {
+        if (is.null(sheet)) {
+          i <- 1
+          sheets <- readxl::excel_sheets(data_path)
+          for (sheet in sheets) {
+            temp_data <-
+              readxl::read_excel(data_path,
+                                 skip = filmarray_sheets$skip[i],
+                                 sheet = sheet,
+                                 col_types = "text")
+            if (stringr::str_detect(sheet, filmarray_sheets$names[1])) {
+              fci_datasets$filmarray <- temp_data
+            }
+            if (stringr::str_detect(sheet, filmarray_sheets$names[2])) {
+              fci_datasets$panel <- temp_data
+            }
+            i <- i + 1
+          }
+        } else if (!is.null(skip)) {
+          temp_data <-
+            readxl::read_excel(data_path, skip = skip, sheet = sheet,
+                               col_names = col_names)
+        }
+      }
+      if (file_extension == "csv") {
+        utils::read.csv(data_path, header = header,
+                        skip = if (header) 0 else 3)
       }
     }
   }
+  
+  if (!is.null(dataset_name) && dataset_name == "fci") {
+    return(fci_datasets)
+  }
+  
+  if (!header) {
+    temp_data <- row_to_header(data = temp_data)
+    viral_circulation_data <- rbind(viral_circulation_data, temp_data)
+  } else {
+    viral_circulation_data <- temp_data
+  }
+  
   return(viral_circulation_data)
 }
 
