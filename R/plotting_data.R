@@ -69,6 +69,8 @@ plot_distribution_epiweek <- function(report_data,
                                       var_x = "semanaepidemiologicavegeneral",
                                       var_y = "casos",
                                       var_fill = "etiqueta",
+                                      var_total = "total_casos",
+                                      var_positives = "porcentaje",
                                       influenza = FALSE,
                                       positives = NULL) {
   if (!influenza) {
@@ -89,6 +91,7 @@ plot_distribution_epiweek <- function(report_data,
                 "H1N1" = "#19AFE5",
                 "Influenza B" = "#B94846")
   }
+  report_data[[var_x]] <- factor(report_data[[var_x]])
   plot_epiweek <- ggplot2::ggplot(report_data) +
     ggplot2::geom_col(ggplot2::aes_string(x = var_x,
                                           y = var_y,
@@ -101,29 +104,34 @@ plot_distribution_epiweek <- function(report_data,
                                                 size = 14),
                    axis.title = ggplot2::element_text(face = "bold"),
                    legend.title = ggplot2::element_text(face = "bold")) +
-    ggplot2::scale_x_continuous(breaks = seq(1, 52, 2)) +
+    ggplot2::scale_x_discrete(breaks = seq(1, 52, 2)) +
     ggplot2::scale_fill_manual(values = colors, name = "Virus respiratorios")
   if (!is.null(positives)) {
+    max_positives <- max(positives[[var_positives]])
+    scaling_factor <- round(max(report_data[[var_total]], na.rm = TRUE) /
+                              max(positives[[var_positives]], na.rm = TRUE), 
+                            digits = 2)
+    positives[[var_x]] <- factor(
+      positives[[var_x]], 
+      levels = levels(report_data[[var_x]])
+    )
     plot_epiweek <- plot_epiweek +
       ggplot2::geom_line(data = positives,
-                         ggplot2::aes_string(x = var_x,
-                                             y = "porcentaje"),
-                         stat = "identity",
-                         linetype = "dashed",
+                         ggplot2::aes(x = !!sym(var_x),
+                                      y = !!sym(var_positives) * scaling_factor),
                          color = "black",
-                         size = 0.8,
+                         linetype = "dashed",
+                         linewidth = 0.8,
                          group = 1) +
       ggplot2::scale_y_continuous(sec.axis =
-                                    ggplot2::sec_axis(~. * 0.0055,
-                                                      labels =
-                                                    scales::percent_format(
-                                                        ),
+                                    ggplot2::sec_axis(~ . / scaling_factor,
+                                                      name = "Positividad (%)\n",
                                                       breaks = seq(0,
-                                                                   1,
-                                                                   0.1)),
-                                  limits = c(0, 100)) +
+                                                                   max_positives, by = 5), 
+                                                      labels =
+                                                        function(x) sprintf("%.f", x))) +
       ggplot2::theme(text = ggplot2::element_text(size = 14,
-                                                  family = "Montserrat"))
+                                                  family = "Montserrat")) 
   }
   return(plot_epiweek)
 }
