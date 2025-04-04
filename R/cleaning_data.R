@@ -11,6 +11,7 @@ clean_filmarray_data <- function(filmarray_data) {
   index_col <- which(names(data_clean) %in% col_epiweek)
   if (length(index_col) > 0) {
     data_clean[[col_epiweek]] <- as.numeric(data_clean[[col_epiweek]])
+    data_clean <- subset(data_clean, !is.na(data_clean[[col_epiweek]]))
   }
   return(data_clean)
 }
@@ -102,6 +103,7 @@ clean_data_other_viruses <- function(report_data) {
     col_clean <- cols_clean_epiweek[index_col]
     names(report_data)[names(report_data) == col_clean] <- col_epiweek
     report_data[[col_epiweek]] <- as.numeric(report_data[[col_epiweek]])
+    report_data <- subset(report_data, !is.na(report_data[[col_epiweek]]))
   }
   report_data$influenzaaporrtpcrvegeneral <- epitrix::clean_labels(
     report_data$influenzaaporrtpcrvegeneral)
