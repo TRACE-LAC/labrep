@@ -392,23 +392,39 @@ get_cases_other_viruses <- function(report_data,
 #' @title Obtener la distribución de casos de las base de datos Filmarray
 #' de la Fundación Cardio Infantil y Otros Virus
 #' @export
-get_dist_fci_other_vrs <- function(fci_data, vrs_data) {
+get_dist_fci_other_vrs <- function(fci_data, vrs_data,
+                                   col_name = "grupo_edad",
+                                   porcentaje = TRUE,
+                                   transpose = FALSE) {
+  if (col_name == "se") {
+    names(vrs_data)[names(vrs_data)
+                    == "semanaepidemiologicavegeneral"] <- col_name
+  }
   dist_fci_other_vrs <- rbind(fci_data, vrs_data)
   dist_fci_other_vrs <- dist_fci_other_vrs %>%
     dplyr::group_by(dplyr::across(dplyr::all_of(
-      c("evento", "grupo_edad","etiqueta")))) %>%
+      c("evento", col_name,"etiqueta")))) %>%
     dplyr::summarise(casos = sum(casos),
                      total_casos = sum(total_casos),
                      .groups = "drop")
   dist_fci_other_vrs <- dist_fci_other_vrs %>%
-    dplyr::mutate(porcentaje =
-                    round((.data$casos * 100)/.data$total_casos))
-  dist_fci_other_vrs <- dist_fci_other_vrs %>%
-    dplyr::select(.data$grupo_edad,
+    dplyr::select(.data[[col_name]],
                   .data$casos,
-                  .data$porcentaje,
                   .data$evento,
-                  .data$etiqueta)
+                  .data$etiqueta,
+                  .data$total_casos)
+  if (porcentaje) {
+    dist_fci_other_vrs <- dist_fci_other_vrs %>%
+      dplyr::mutate(porcentaje =
+                      round((.data$casos * 100)/.data$total_casos))
+  }
+  if (transpose) {
+    dist_fci_other_vrs <- dist_fci_other_vrs %>% dplyr::select(-"evento", 
+                                                        -"total_casos")
+    dist_fci_other_vrs <- dist_fci_other_vrs %>%
+      tidyr::pivot_wider(names_from = etiqueta,
+                         values_from = casos, values_fn = sum)
+  }
   return(dist_fci_other_vrs)
 }
 
@@ -548,6 +564,7 @@ get_distribution_surveillance <- function(report_data,
   if (epiweek > 0) {
     report_data_esi <- report_data_esi[
       report_data_esi$semanaepidemiologicavegeneral == epiweek, ]
+      !is.na(report_data_esi$semanaepidemiologicavegeneral), ]
   }
   report_data_esi <- report_data_esi[which(
     !is.na(
