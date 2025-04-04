@@ -24,6 +24,7 @@ header-includes: |
   \usepackage[font=bf]{caption}
   \definecolor{colortitles}{HTML}{145765}
   \definecolor{colorborder}{HTML}{337E8C}
+  \definecolor{colorbdtableplot}{HTML}{A2A5A8}
   \usepackage{colortbl}
   \arrayrulecolor{colorborder}
   \usepackage{caption}
@@ -288,6 +289,7 @@ SARS-CoV-2 los menores corresponden al `r perc_sars_age_group` % (figura 3).
 # ESTA BIEN
 plot_age_group_distribution(viruses_age_groups)
 ```
+\arrayrulecolor{colorbdtableplot}
 
 ```{r table-viruses-age-groups, fig.align='right'}
 trans_viruses_age_groups <-
@@ -436,6 +438,8 @@ distribution_epiweek <-
 En las semanas transcurridas de `r current_year` se aprecia la positividad para
 cualquier virus respiratorio, diferentes al SARS-CoV-2, en la siguiente
 tabla.
+
+\arrayrulecolor{colorborder}
 
 ```{r plot-distribution-epiweek, include=TRUE, fig.height=5, fig.width=10, fig.align='center'}
 plot_table_vrs_epiweek(distribution_epiweek,
