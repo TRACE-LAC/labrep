@@ -445,6 +445,9 @@ get_cases_sars <- function(report_data,
     report_data$virusdetectadosvegeneral, "covid_19")), ]
   positive_cases_sars <- rbind(positive_cases_sars,
                                positive_cases_virusvgeneral)
+  positive_cases_sars <-
+    positive_cases_sars[
+      !is.na(positive_cases_sars$resultadonuevocoronavirussarscov2vegeneral), ]
   if (!is.null(epiweek)) {
     sars_epiweeks <-
       group_columns_total(positive_cases_sars,
@@ -464,12 +467,18 @@ get_cases_sars <- function(report_data,
     return(sars_epiweeks)
   }
   if (age_groups) {
+    # Validar NaN con las personas de la SDS
+    # Que se considera como un registro valido
+    positive_cases_sars <-
+      positive_cases_sars[
+        !is.na(positive_cases_sars$rangodeedadvegeneral), ]
     sars_age_groups <-
       generate_age_groups_viruses(positive_cases_sars,
                                   event_name = "sars",
                                   wt_percentage = TRUE,
                                   total_cases = nrow(positive_cases_sars),
                                   event_label = "SARS CoV 2")
+    sars_age_groups$total_casos <- sum(sars_age_groups$casos)
     return(sars_age_groups)
   }
   return(positive_cases_sars)
