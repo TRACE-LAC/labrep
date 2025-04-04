@@ -548,6 +548,7 @@ get_distribution_surveillance <- function(report_data,
                                           include_sars = FALSE,
                                           surveillance_type = "esi",
                                           test = NULL) {
+  # Se debe unir con la informacion suministrada por la cardio infantil?
   viruses_age_group <- data.frame()
   report_data_esi <- report_data
   report_data_sars <- report_data
@@ -555,6 +556,7 @@ get_distribution_surveillance <- function(report_data,
   report_data_irag <- report_data
   if (!is.null(surveillance_type)) {
     if (surveillance_type == "esi") {
+      # Se debe incluir esi_irag_centinela_345_mortalidad?
       report_data_esi <- report_data_esi[
         report_data_esi$eventovegeneral == "esi_irag_centinela_345", ]
       report_data_esi <- report_data_esi[
@@ -565,7 +567,9 @@ get_distribution_surveillance <- function(report_data,
       report_data_esi <- report_data_esi[
         which(stringr::str_detect(
           report_data_esi$clasificacionvegeneral, "hospitalizado")), ]
+      # Se debe incluir condicion_final_2_muerto?
     } else if (surveillance_type == "irag_inusitado") {
+      # Se debe incluir irag_inusitado_348_mortalidad?
       report_data_esi <- report_data_esi[
         report_data_esi$eventovegeneral == "irag_inusitado_348", ]
     }
@@ -573,6 +577,7 @@ get_distribution_surveillance <- function(report_data,
   if (epiweek > 0) {
     report_data_esi <- report_data_esi[
       report_data_esi$semanaepidemiologicavegeneral == epiweek, ]
+    report_data_esi <- report_data_esi[
       !is.na(report_data_esi$semanaepidemiologicavegeneral), ]
   }
   report_data_esi <- report_data_esi[which(
@@ -676,8 +681,9 @@ get_distribution_test <- function(report_data,
   cases_epiweeks <- 
     add_missing_weeks(dataset = cases_epiweeks,
                       col_epiweek = col_epiweek)
-  viruses_epiweeks <- get_cases_other_viruses(report_data = report_data_test,
-                                              epiweek = "all")
+  viruses_epiweeks <- 
+    get_cases_other_viruses(report_data = report_data_test,
+                            epiweek = "all")
   if (include_sars) {
     sars_epiweeks <- get_cases_sars(report_data = report_data_test,
                                     epiweek = "all")
