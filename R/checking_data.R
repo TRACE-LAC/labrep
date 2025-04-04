@@ -704,7 +704,7 @@ get_distribution_test <- function(report_data,
 get_cases_epiweeks <- function(report_data,
                                data_grouped,
                                col_epiweek,
-                               diseases_epiweek, table = FALSE) {
+                               table = FALSE) {
   if (table) {
     table_epiweeks <- data.frame(Semana = data_grouped[[col_epiweek]],
                                  Positivos = data_grouped$porcentaje)
@@ -808,7 +808,8 @@ get_cases_prop_epiweek <- function(filmarray_data,
 #' @title Obtener la distribución de casos de Influenza y sus subtipos
 #' @export
 get_cases_influenza <- function(filmarray_data,
-                                other_virs_data) {
+                                other_virs_data,
+                                epiweek = "all")  {
   cases_filmarray <- data.frame()
   cases_other_virs <- data.frame()
   config_path <- system.file("extdata", "config.yml", package = "labrep")
@@ -830,34 +831,56 @@ get_cases_influenza <- function(filmarray_data,
       dplyr::rename(filmarray_data,
                     "semanaepidemiologicavegeneral" =
                    !!dplyr::sym(col_epiweek_filmarray))
+    
+    total_test_epiweeks_filmarray <- filmarray_data %>%
+      dplyr::group_by(dplyr::across(dplyr::all_of(col_epiweek))) %>%
+      dplyr::summarise(pruebas = n())
   }
   if (nrow(other_virs_data) > 0) {
     cases_other_virs <- get_cases_other_viruses(report_data = other_virs_data,
                                                 epiweek = "all",
                                                 vrs_influenza = events,
                                                 age_groups = FALSE)
+    total_test_epiweeks_other_virs <- other_virs_data %>%
+      dplyr::group_by(dplyr::across(dplyr::all_of(col_epiweek))) %>%
+      dplyr::summarise(pruebas = n())
   }
+  
   cases_influenza <- rbind(cases_filmarray, cases_other_virs)
   cases_influenza <-
     group_columns_total(cases_influenza,
                         event_name = "",
                         col_names = c(col_epiweek,
                                       "etiqueta"),
-                        wt_percentage = TRUE,
-                        total_cases = sum(cases_influenza$casos),
                         event_label = "",
                         sum_cases = TRUE)
-  filmarray_epiweeks <- filmarray_data %>%
-    dplyr::select(!!dplyr::sym(col_epiweek))
-  other_virs_epiweeks <- other_virs_data %>%
-    dplyr::select(!!dplyr::sym(col_epiweek))
-  data_epiweeks <- rbind(filmarray_epiweeks, other_virs_epiweeks)
-  cases_epiweeks <-
-    get_cases_epiweeks(report_data = data_epiweeks,
-                       data_grouped = cases_influenza,
-                       col_epiweek = col_epiweek)
+  
+  total_cases_epiweeks <- cases_influenza %>%
+    dplyr::group_by(!!dplyr::sym(col_epiweek)) %>%
+    dplyr::summarise(total_casos = sum(.data$casos))
+  cases_influenza <- cases_influenza %>%
+    dplyr::left_join(total_cases_epiweeks, by = col_epiweek)
+  
+  total_test_epiweeks <- rbind(total_test_epiweeks_filmarray,
+                               total_test_epiweeks_other_virs)
+  total_test_epiweeks <- total_test_epiweeks %>%
+    dplyr::group_by(!!dplyr::sym(col_epiweek)) %>%
+    dplyr::summarise(total_pruebas = sum(.data$pruebas))
+  
+  
+  cases_epiweeks <- total_cases_epiweeks %>%
+    dplyr::left_join(total_test_epiweeks, by = col_epiweek) %>%
+    dplyr::mutate(positividad =
+                    round((.data$total_casos / .data$total_pruebas) * 100,
+                          digits = 2))
+  
   cases_epiweeks <- add_missing_weeks(dataset = cases_epiweeks,
-                                       col_epiweek = col_epiweek)
+                                      col_epiweek = col_epiweek,
+                                      col_casos = "total_casos",
+                                      col_total = "total_pruebas",
+                                      col_porcentaje = "positividad")
+  cases_epiweeks <- na.omit(cases_epiweeks)
+  cases_influenza <- na.omit(cases_influenza)
   distribution_epiweeks <- list(cases_epiweeks = cases_epiweeks,
                                 influenza_epiweeks = cases_influenza)
   return(distribution_epiweeks)
