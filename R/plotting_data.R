@@ -318,79 +318,118 @@ plot_table_epiweek_tosferina <- function(data_epiweek,
   return(table_epiweek)
 }
 
-#' @title Graficar el tiempo epidemiológico historico
+
+
+#' @title Generar gráfico de evolución epidemiológica histórica
+#'
+#' @description
+#' Crea un gráfico combinado con barras apiladas y una línea de tendencia, 
+#' representando la evolución de virus respiratorios y la positividad epidemiológica 
+#' en función del tiempo.
+#'
+#' @param dataset_epiTime Dataset con datos epidemiológicos, que debe incluir las columnas 
+#' `ano`, `periodo_epidemiologico`, y los distintos tipos de virus.
+#' @param periodo_epi Período epidemiológico a destacar en el gráfico (valor entre 1 y 13).
+#'
+#' @return Un objeto `ggplot2` con el gráfico de evolución epidemiológica.
 #' @export
-plot_historic_epi_time <- function(stacked_data, tabla,
-                                   line_data) {
-  scaling_factor <- 700 / 70
-  # Plot the figure
+plot_historic_epi_time <- function(dataset_epi_time, periodo_epi ) {
+  
+  # Ensure the epidemiological period is within valid range
+  periodo_epi <- pmax(1, pmin(periodo_epi, 13))
+  
+  #get stacked bars and line datasets
+  historic_epi_times <- get_historic_epi_times(dataset_epi_times = dataset_epi_time)
+  stacked_data <- historic_epi_times$stacked_data
+  line_data <- historic_epi_times$line_data
+  
+  #get texts of the axis from config.yml
+  config_path <- system.file("extdata", "config.yml", package = "labrep")
+  
+  text_axis_labels <-  config::get(file = config_path,"respiratory_viruses_historic_data")$legends
+  y_axis1_name <- text_axis_labels$y_1_axis_name
+  x_axis_name <- text_axis_labels$x_axis_name
+  
+  #get plot theme parameters
+  colores <- get_color_periodo_epidemiologico()
+  plot_parameters <- get_axis_config_periodo_epidemiologico()
+  plot_text_years_labels <- get_text_labels_periodo_epidemiologico(dataset_epi_time=dataset_epi_time)
+  annotate_x_pos <- 0.6727 * periodo_epi + 17.8273
+
+  # Generate the plot
   ggplot2::ggplot() +
     # Stacked bar chart
-    ggplot2::geom_bar(data = stacked_data, 
-             ggplot2::aes(x = YearWeek, y = Cases, fill = Virus_Type), 
-             stat = "identity",
-             width = 0.4) +
-    
-    # Line chart for % positivity with scaling applied
-    ggplot2::geom_line(data = line_data, 
-                       ggplot2::aes(x = YearWeek, 
-                  y = Percent_Positivity * scaling_factor, 
-                  color = "Positivity Rate", 
-                  group = 1),
-              color = "#E97132",
-              linewidth = 0.7) +
-    
-    # Scale and labels with specified y-axis breaks
-    ggplot2::scale_y_continuous(name = "NÚMERO DE CASOS POSITIVOS",
-                       limits = c(-500, 700), breaks = seq(0, 700, by = 100),
-                       sec.axis = ggplot2::sec_axis(~ . / scaling_factor, 
-                                           breaks = seq(0, 70, by = 10), 
-                                           labels = function(x) sprintf("%.1f", x))
+    ggplot2::geom_bar(
+      data = stacked_data,
+      ggplot2::aes(x = YearWeek, y = Cases, fill = Virus_Type),
+      stat = "identity",
+      width = plot_parameters$bar_width
     ) +
-    ggplot2::scale_x_discrete(labels = tabla$periodo_epidemiologico)+
+    # Line chart for positivity rate
+    ggplot2::geom_line(
+      data = line_data,
+      ggplot2::aes(
+        x = YearWeek,
+        y = Percent_Positivity * plot_parameters$scaling_factor,
+        group = 1
+      ),
+      color = colores$color_linea,
+      linewidth = plot_parameters$line_width
+    ) +
+    # Y-axis and secondary axis
+    ggplot2::scale_y_continuous(
+      name = y_axis1_name,
+      limits = c(-500, plot_parameters$y_axis1_max_value),
+      breaks = seq(0, plot_parameters$y_axis1_max_value, by = 100),
+      sec.axis = ggplot2::sec_axis(~ . / plot_parameters$scaling_factor,
+                                   breaks = seq(0, plot_parameters$y_axis2_max_value, by = 10),
+                                   labels = scales::number_format(accuracy = 0.1))
+    ) +
+    # X-axis
+    ggplot2::scale_x_discrete(labels = dataset_epi_time$periodo_epidemiologico) +
+    # Custom fill colors
     ggplot2::scale_fill_manual(values = c(
-      "a_h1n1_pdm09" = "#8064A2",       # Light blue for A(H1N1)pdm09
-      "a_no_subtipificado" = "#4BACC6", # Purple for A no subtipificado
-      "a_h3" = "#F79646",              # Green for A(H3)
-      "influenza_B" = "#2C4D75",       # Dark gray for Influenza B
-      "adenovirus" = "#4D3B62",         # Dark teal for Adenovirus
-      "metapneumovirus" = "#2C4D75",    # Dark purple for Metapneumovirus
-      "rinovirus" = "#B65708",          # Dark green for Rinovirus
-      "bocavirus" = "#729ACA",          # Blue for Bocavirus
-      "otros_virus" = "#4F81BD",        # Blue for Otros Virus
-      "parainfluenza" = "#772C2A",      # Brown for Parainfluenza
-      "vsr" = "#5F7530",                # Dark green for VSR
-      "nueva_columna" = "black"         # Black for nueva_columna (appears as line in legend)
+      "a_h1n1_pdm09" = colores$color_a_h1n1_pdm09,
+      "a_no_subtipificado" = colores$color_a_no_subtipificado,
+      "a_h3" = colores$color_a_h3,
+      "influenza_b" = colores$color_influenza_b,
+      "parainfluenza" = colores$color_parainfluenza,
+      "vsr" = colores$color_vsr,
+      "adenovirus" = colores$color_adenovirus,
+      "metapneumovirus" = colores$color_metapneumovirus,
+      "rinovirus" = colores$color_rinovirus,
+      "bocavirus" = colores$color_bocavirus,
+      "otros_virus" = colores$color_otros_virus
+    ),
+    labels = c(
+      "a_h1n1_pdm09" = "H1N1 2009",
+      "a_no_subtipificado" = "A no subtipificado",
+      "a_h3" = "H3N2",
+      "influenza_b" = "Influenza B",
+      "parainfluenza" = "Parainfluenza",
+      "vsr" = "VSR",
+      "adenovirus" = "Adenovirus",
+      "metapneumovirus" = "Metapneumovirus",
+      "rinovirus" = "Rinovirus",
+      "bocavirus" = "Bocavirus",
+      "otros_virus" = "Otros Virus"
     )) +
-    ggplot2::labs(x = "PERÍODO EPIDEMIOLOGICO", fill = NULL, color = NULL) +
-    
-    # Customize the grid lines
+    ggplot2::labs(x = x_axis_name, fill = NULL, color = NULL) +
+    # Themes and styling
     ggplot2::theme_minimal() +
     ggplot2::theme(
-      axis.text.x = ggplot2::element_text(angle = 0, size = 7,
-                                          margin = ggplot2::margin(t = -255, b=-5)),
-      axis.title.x = ggplot2::element_text(margin = ggplot2::margin(t = 20, b=-10),
-                                           size = 8, face = "bold",
-                                           color = "#595959"),
-      axis.title.y = ggplot2::element_text(hjust = 0.75, size = 8,
-                                           face = "bold", color = "#595959"),
-      panel.grid.major.x = ggplot2::element_blank(),         # Remove vertical major grid lines
-      panel.grid.minor.x = ggplot2::element_blank(),         # Remove vertical minor grid lines
+      axis.text.x = ggplot2::element_text(size = 7, margin = ggplot2::margin(t = -255, b = -5)),
+      axis.title.x = ggplot2::element_text(margin = ggplot2::margin(t = 20, b = -10), size = 8, face = "bold", color = colores$color_axis_titles),
+      axis.title.y = ggplot2::element_text(hjust = 0.7,margin = ggplot2::margin(r = 10), 
+                                           size = 8, face = "bold", color = colores$color_axis_titles),
+      panel.grid.major.x = ggplot2::element_blank(),
+      panel.grid.minor.x = ggplot2::element_blank(),
       panel.grid.minor.y = ggplot2::element_blank(),
       legend.position = "bottom",
       legend.key.size = ggplot2::unit(1.2, "lines"),
       legend.key.height = ggplot2::unit(0.02, "lines"),
       legend.text = ggplot2::element_text(size = 7)
     ) +
-    # Agregar líneas verticales con altura ajustable usando geom_segment
-    ggplot2::geom_segment(ggplot2::aes(x = 13.5, xend = 13.5, y = -25, yend = 700),
-                          color = "black", linewidth = 0.65) +
-    ggplot2::geom_segment(ggplot2::aes(x = 26.5, xend = 26.5, y = -25, yend = 700),
-                          color = "black", linewidth = 0.65) +
-    ggplot2::annotate("text", x = c(6, 19, 31), y = -35, label = c("2022",
-                                                                   "2023",
-                                                                   "2024"),
-                      size = 2.4, fontface = "bold") +
     ggplot2::guides(
       fill = ggplot2::guide_legend(
         nrow = 3,
@@ -441,4 +480,3 @@ plot_table_legend <- function(report_data,
     kableExtra::row_spec(seq(1, nrow(report_data) - 1), hline_after = TRUE)
   return(table)
 }
-
