@@ -29,6 +29,9 @@ default:
       - "no_se_procesa"
       - "resultado_indeterminado"
   filmarray_data:
+    file:
+      sheets:
+        skip: [3, 0]
     epiweek: 
       col_valid: "se"
     age_groups:
@@ -48,7 +51,7 @@ default:
   - name: "influenza_a"
     filmarray:
       col_name: influenza_a
-      values: "DETECTADO"
+      values: ["DETECTADO", "POSITIVO"]
     other_viruses:
       col_name: "influenzaaporrtpcrvegeneral"
       values: ["positivo"]
@@ -60,7 +63,7 @@ default:
   - name: "h1n1"
     filmarray:
       col_name: "influenza_a_h1"
-      values: "DETECTADO"
+      values: ["DETECTADO", "POSITIVO"]
     other_viruses:
       col_name: "virusdetectadosvegeneral"
       values: [""]
@@ -68,7 +71,7 @@ default:
   - name: "h1n1_pdm09"
     filmarray:
       col_name: "influenza_a_h1_2009"
-      values: "DETECTADO"
+      values: ["DETECTADO", "POSITIVO"]
     other_viruses:
       col_name: "virusdetectadosvegeneral"
       values: ["h1n1_pdm09", "hn1_pdm09", "pdm09", "a_pdm09", "h1n1pdm09"]
@@ -76,7 +79,7 @@ default:
   - name: "h3n2"
     filmarray:
       col_name: "influenza_a_h3"
-      values: "DETECTADO"
+      values: ["DETECTADO", "POSITIVO"]
     other_viruses:
       col_name: "virusdetectadosvegeneral"
       values: ["a_h3"]
@@ -84,7 +87,7 @@ default:
   - name: "influenza_b"
     filmarray:
       col_name: "influenza_b"
-      values: "DETECTADO"
+      values: ["DETECTADO", "POSITIVO"]
     other_viruses:
       col_name: "influenzabporrtpcrvegeneral"
       values: ["positivo"]
@@ -93,7 +96,7 @@ default:
   - name: "otros_virus"
     filmarray:
       col_name: "rinovirus_enterovirus_humano"
-      values: "DETECTADO"
+      values: ["DETECTADO", "POSITIVO"]
     other_viruses:
       col_name: "virusdetectadosvegeneral"
       values: ["enterovirus", "coronavirus_nl63"]
@@ -109,7 +112,7 @@ default:
   - name: "metapneumovirus"
     filmarray:
       col_name: "metapneumovirus_humano"
-      values: "DETECTADO"
+      values: ["DETECTADO", "POSITIVO"]
     other_viruses:
       col_name: "virusdetectadosvegeneral"
       values: ["metapneumovirus", "metaneumovirus"]
@@ -117,7 +120,7 @@ default:
   - name: "rinovirus"
     filmarray:
       col_name: "rinovirus_enterovirus_humano"
-      values: "DETECTADO"
+      values: ["DETECTADO", "POSITIVO"]
     other_viruses:
       col_name: "virusdetectadosvegeneral"
       values: ["rinovirus", "rhinovirus"]
@@ -125,7 +128,7 @@ default:
   - name: "parainfluenza"
     filmarray:
       col_name: ["virus_parainfluenza_1", "virus_parainfluenza_2", "virus_parainfluenza_3", "virus_parainfluenza_4"]
-      values: "DETECTADO"
+      values: ["DETECTADO", "POSITIVO"]
     other_viruses:
       col_name: "virusdetectadosvegeneral"
       values: ["parainfluenza_tipo_1", "parainfluenza_tipo_2", "parainfluenza_tipo_3", "parainfluenza_1", "piv2", "parainfluenza_3"]
@@ -133,7 +136,7 @@ default:
   - name: "vsr"
     filmarray:
       col_name: "virus_sincitial_respiratorio"
-      values: "DETECTADO"
+      values: ["DETECTADO", "POSITIVO"]
     other_viruses:
       col_name: "virussincitialrespiratoriovsrporrtpcrvegeneral"
       values: ["positivo"]
@@ -142,7 +145,7 @@ default:
   - name: "adenovirus"
     filmarray:
       col_name: ["adenovirus"]
-      values: "DETECTADO"
+      values: ["DETECTADO", "POSITIVO"]
     other_viruses:
       col_name: "adenovirusadvporrtpcrvegeneral"
       values: ["positivo"]
