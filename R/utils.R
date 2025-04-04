@@ -300,20 +300,20 @@ get_table_epiweek_tosferina <- function(report_data, epiweek) {
 
 #' @title Añadir las semanas epidemiológicas faltantes
 #' @export
-add_missing_weeks <- function(dataset, col_epiweek) {
+add_missing_weeks <- function(dataset, col_epiweek,
+                              col_casos = "casos",
+                              col_total = "total_casos",
+                              col_porcentaje = "porcentaje") {
   max_epiweek <-
-    max(as.numeric(dataset[[col_epiweek]]))
+    max(as.numeric(dataset[[col_epiweek]]), na.rm = TRUE)
   if (max_epiweek < 53) {
     diff_epiweek <- 53 - max_epiweek
-    dataset_aux <- data.frame()
-    dataset_aux <- rbind(dataset_aux,
-                         data.frame(semana =
+    dataset_aux <- data.frame(semana =
                                   seq(max_epiweek + 1, 53),
-                                casos = rep(0, diff_epiweek),
-                                total_casos = rep(0, diff_epiweek),
-                                porcentaje = rep(0, diff_epiweek)))
-    names(dataset_aux)[names(dataset_aux)
-                       == "semana"] <- col_epiweek
+                                col_casos = rep(0, diff_epiweek),
+                                col_total = rep(0, diff_epiweek),
+                                col_porcentaje = rep(0.00, diff_epiweek))
+    names(dataset_aux) <- c(col_epiweek, col_casos, col_total, col_porcentaje)
     dataset <- rbind(dataset, dataset_aux)
   }
   return(dataset)
