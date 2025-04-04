@@ -159,6 +159,13 @@ get_cases_filmarray <- function(report_data,
     viruses_age_group <-
       viruses_age_group[-sd_values, ]
   }
+  if (!is.null(epiweek) && nrow(viruses_age_group) > 0) {
+    total_cases_epiweeks <- viruses_age_group %>%
+      dplyr::group_by(!!dplyr::sym(col_epiweek)) %>%
+      dplyr::summarise(total_casos = sum(.data$casos))
+    viruses_age_group <- viruses_age_group %>%
+      dplyr::left_join(total_cases_epiweeks, by = col_epiweek)
+  }
   return(viruses_age_group)
 }
 
