@@ -306,6 +306,7 @@ get_cases_other_viruses <- function(report_data,
   invalid_results <- config::get(file = config_path,
                                  "other_viruses")$invalid_results
   positive_cases <- data.frame()
+  
   col_epiweek <- config::get(file = config_path,
                              "other_viruses")$epiweek$col_valid
   if (!is.null(epiweek) && epiweek != "all") {
@@ -313,6 +314,7 @@ get_cases_other_viruses <- function(report_data,
       dplyr::filter(!!dplyr::sym(col_epiweek) == as.numeric(epiweek))
   }
   if (!is.null(vrs_influenza)) {
+    # Solamente deberia traer lo de otros virus
     cols_viruses <-
       get_influenza_viruses(viruses = cols_viruses,
                             events = vrs_influenza)
@@ -325,53 +327,64 @@ get_cases_other_viruses <- function(report_data,
       if ("valid_result" %in% names(other_vrs)) {
         for (value in invalid_results$values) {
           if (value != "") {
+            # Se asume que no puede tener dos tipos de influenza a la vez
             cases_virus <- cases_virus[which(!stringr::str_detect(
-              invalid_results$col_name, value)), ]
+              cases_virus[[invalid_results$col_name]], value)), ]
           }
         }
       }
       if ("col_subtypes" %in% names(other_vrs)) {
         subtypes_values <-
           get_subtypes_values(viruses = cols_viruses,
-                                        subtypes = virus$subtypes)
+                              subtypes = virus$subtypes)
         other_vrs$values <- subtypes_values
         cases_virus <- cases_virus[
           which(stringr::str_detect(cases_virus[[other_vrs$col_name]],
-                                     other_vrs$original_value)), ]
+                                    other_vrs$original_value)), ]
       }
       positive_cases_virus <- data.frame()
       for (value in other_vrs$values) {
+        aux_cases_virus <- data.frame()
         if (value != "") {
           if ("col_subtypes" %in% names(other_vrs)) {
-            cases_virus <- cases_virus[which(!stringr::str_detect(
+            aux_cases_virus <- cases_virus[which(!stringr::str_detect(
               cases_virus[[other_vrs$col_name]], value)), ]
           } else {
-            cases_virus <- cases_virus[which(stringr::str_detect(
+            aux_cases_virus <- cases_virus[which(stringr::str_detect(
               cases_virus[[other_vrs$col_name]], value)), ]
           }
-          if (!is.null(epiweek)) { 
-            cases_virus <- group_columns_total(disease_data = cases_virus,
-                                         event_name = virus$name,
-                                         col_names = col_epiweek,
-                                         event_label = virus$label)  
-          }
-          positive_cases_virus <- rbind(positive_cases_virus, cases_virus)
+          positive_cases_virus <- rbind(positive_cases_virus, aux_cases_virus)
         }
       }
-      if (age_groups) {
-        cases_age_groups <-
-          generate_age_groups_viruses(report_data = cases_virus,
-                                      event_name = virus$name,
-                                      wt_percentage = TRUE,
-                                      total_cases = nrow(cases_virus),
-                                      event_label = virus$label)
-        cases_age_groups$total_casos <- nrow(cases_virus)
-        positive_cases <- rbind(positive_cases, cases_age_groups)
-      } else {
-        positive_cases_virus$total_casos <- nrow(cases_virus)
-        positive_cases <- rbind(positive_cases, positive_cases_virus)
+      if (nrow(positive_cases_virus) > 0) {
+        if (!is.null(epiweek)) {
+          positive_cases_virus_epiweek <-
+            group_columns_total(disease_data = positive_cases_virus,
+                                event_name = virus$name,
+                                col_names = col_epiweek,
+                                event_label = virus$label)
+          positive_cases <- rbind(positive_cases, positive_cases_virus_epiweek)
+        }
+        if (age_groups) {
+          cases_age_groups <-
+            generate_age_groups_viruses(report_data = positive_cases_virus,
+                                        event_name = virus$name,
+                                        wt_percentage = TRUE,
+                                        total_cases =
+                                          nrow(positive_cases_virus),
+                                        event_label = virus$label)
+          cases_age_groups$total_casos <- nrow(positive_cases_virus)
+          positive_cases <- rbind(positive_cases, cases_age_groups)
+        }
       }
     }
+  }
+  if (!is.null(epiweek)) {
+    total_cases_epiweeks <- positive_cases %>%
+      dplyr::group_by(!!dplyr::sym(col_epiweek)) %>%
+      dplyr::summarise(total_casos = sum(.data$casos))
+    positive_cases <- positive_cases %>%
+      dplyr::left_join(total_cases_epiweeks, by = col_epiweek)
   }
   return(positive_cases)
 }
