@@ -225,15 +225,30 @@ filmarray_data_cleaned <- filmarray_data_cleaned %>%
 ```
 
 ```{r other-viruses-data}
-other_viruses_data <-
+other_viruses_data <- other_viruses_data <-
   import_data_viral_circulation(report_data =
                                   params$other_viruses,
                                 skip = 0,
                                 sheet = 1)
-other_viruses_cleaned_data  <- clean_data_other_viruses(other_viruses_data)
+other_viruses_cleaned_data  <- clean_data_other_viruses(report_data = other_viruses_data)
 other_viruses_age_groups <-
   get_cases_other_viruses(report_data = other_viruses_cleaned_data,
                           age_groups = TRUE)
+```
+
+```{r epiweek_cases}
+other_viruses_epiweeks <- 
+  get_cases_other_viruses(report_data = other_viruses_cleaned_data,
+                          epiweek = "all")
+filmarray_epiweeks <-
+  get_cases_filmarray(report_data = filmarray_data_cleaned,
+                      age_groups = FALSE,
+                      epiweek = "all")
+viruses_epiweeks <- get_dist_fci_other_vrs(fci_data = filmarray_epiweeks,
+                         vrs_data = other_viruses_epiweeks,
+                         col_name = "se",
+                         porcentaje = FALSE,
+                         transpose = TRUE)
 ```
 
 ```{r distribution-age-groups}
