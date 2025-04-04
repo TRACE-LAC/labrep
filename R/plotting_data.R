@@ -412,24 +412,31 @@ plot_table_legend <- function(report_data,
   colors <- get_colors_age_groups(order = TRUE,
                                   hex_cods = TRUE,
                                   include_sars = include_sars)
+  final_colors <- intersect(names(colors), report_data$etiqueta)
+  final_colors <- colors[final_colors]
   col_names <- names(report_data)
   table <- knitr::kable(report_data,
-                        col.names = NULL,
+                        "latex",
+                        col.names = rep("", length(col_names)),
                         align = "c",
-                        longtable = TRUE) %>%
+                        longtable = TRUE,
+                        toprule = '') %>%
     kableExtra::kable_styling(
       full_width = FALSE,
       position = "left",
       latex_options = c("bordered", "hold_position"),
       font_size = 9
     )  %>%
-    kableExtra::column_spec(2, background = colors) %>%
-    kableExtra::column_spec(1, border_left = TRUE) %>%
-    kableExtra::column_spec(length(col_names), border_right = TRUE) %>%
+    kableExtra::column_spec(2, background = final_colors,
+                            border_right = FALSE) %>%
+    kableExtra::column_spec(seq(3, length(col_names)), border_right = TRUE) %>%
     kableExtra::column_spec(column = seq(3, length(col_names)),
                             width = "1.6cm") %>%
-    kableExtra::column_spec(length(col_names), border_right = TRUE,
-                            width = "1.7cm")
+    kableExtra::column_spec(length(col_names),
+                            width = "1.7cm")  %>%
+    kableExtra::row_spec(0, 
+                         color = "white", background = "white") %>%
+    kableExtra::row_spec(seq(1, nrow(report_data) - 1), hline_after = TRUE)
   return(table)
 }
 
