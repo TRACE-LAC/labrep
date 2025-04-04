@@ -184,17 +184,44 @@ plot_historic_epi_time(stacked_data = historic_epi_times$stacked_data,
                        line_data = historic_epi_times$line_data,
                        tabla = tabla)
 ```
+```{r fci-data}
+fci_data <- import_data_viral_circulation(report_data = params$fci_data,
+                                                header = TRUE,
+                                                dataset_name = "fci")
+```
+
+
+```{r panel-data}
+panel_data <- fci_data$panel
+panel_data_cleaned <- clean_filmarray_data(filmarray_data = panel_data)
+
+config_path <- system.file("extdata", "config.yml", package = "labrep")
+panel_parainfluenza <-
+    config::get(file = config_path,
+                "filmarray_data")$parainfluenza$panel$col_name
+filmarray_parainfluenza <-
+    config::get(file = config_path,
+                "filmarray_data")$parainfluenza$filmarray$col_name
+panel_data_cleaned <- panel_data_cleaned %>%
+  dplyr::rename_with(~ filmarray_parainfluenza[1:length(panel_parainfluenza)], 
+                     .cols = panel_parainfluenza)
+
+panel_data_cleaned <-
+  generate_age_categories(dataset = panel_data_cleaned)
+```
+
 
 ```{r filmarray-data}
-filmarray_data <- import_data_viral_circulation(report_data = params$fci_data,
-                                                sheet = 1,
-                                                skip = 3)
+filmarray_data <- fci_data$filmarray
 filmarray_data_cleaned <- clean_filmarray_data(filmarray_data = filmarray_data)
 filmarray_data_cleaned <-
   generate_age_categories(dataset = filmarray_data_cleaned)
 filmarray_age_groups <-
   get_cases_filmarray(report_data = filmarray_data_cleaned,
                       age_groups = TRUE)
+
+filmarray_data_cleaned <- filmarray_data_cleaned %>%
+  dplyr::bind_rows(panel_data_cleaned)
 ```
 
 ```{r other-viruses-data}
