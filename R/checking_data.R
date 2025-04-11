@@ -149,12 +149,9 @@ get_cases_filmarray <- function(report_data,
         }
       }
   }
-  na_values <- which(is.na(
-    viruses_age_group[[col_age_groups]]))
-  if (length(na_values) > 0) {
-    viruses_age_group <-
-      viruses_age_group[-na_values, ]
-  }
+  viruses_age_group <-
+    remove_nan(dataset = viruses_age_group,
+               col_name = col_age_groups)
   sd_values <- which(viruses_age_group[[col_age_groups]]
                       == "SD")
   if (length(sd_values) > 0) {
@@ -162,11 +159,11 @@ get_cases_filmarray <- function(report_data,
       viruses_age_group[-sd_values, ]
   }
   if (!is.null(epiweek) && nrow(viruses_age_group) > 0) {
-    total_cases_epiweeks <- viruses_age_group %>%
-      dplyr::group_by(!!dplyr::sym(col_epiweek)) %>%
-      dplyr::summarise(total_casos = sum(.data$casos))
-    viruses_age_group <- viruses_age_group %>%
-      dplyr::left_join(total_cases_epiweeks, by = col_epiweek)
+    viruses_age_group <- add_indicators(data_grouped = viruses_age_group,
+                                        report_data = report_data,
+                                        col_name = col_epiweek,
+                                        total_samples = total_samples,
+                                        positivity = positivity)
   }
   return(viruses_age_group)
 }
