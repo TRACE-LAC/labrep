@@ -91,6 +91,7 @@ plot_distribution_epiweek <- function(report_data,
                 "H1N1" = "#19AFE5",
                 "Influenza B" = "#B94846")
   }
+  max_epiweek <- max(report_data[[var_x]], na.rm = TRUE)
   report_data[[var_x]] <- factor(report_data[[var_x]])
   plot_epiweek <- ggplot2::ggplot(report_data) +
     ggplot2::geom_col(ggplot2::aes_string(x = var_x,
@@ -104,7 +105,7 @@ plot_distribution_epiweek <- function(report_data,
                                                 size = 14),
                    axis.title = ggplot2::element_text(face = "bold"),
                    legend.title = ggplot2::element_text(face = "bold")) +
-    ggplot2::scale_x_discrete(breaks = seq(1, 52, 2)) +
+    ggplot2::scale_x_discrete(breaks = seq(1, max_epiweek, 2)) +
     ggplot2::scale_fill_manual(values = colors, name = "Virus respiratorios")
   if (!is.null(positives)) {
     max_positives <- max(positives[[var_positives]])
