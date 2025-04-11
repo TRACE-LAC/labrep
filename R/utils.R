@@ -330,8 +330,8 @@ convert_age_groups_as_cols <- function(dataset) {
   data_groups <- dataset %>%
     dplyr::select(.data$etiqueta, .data$grupo_edad, .data$casos) %>% # Seleccionar columnas relevantes
     tidyr::pivot_wider(
-      names_from = .data$grupo_edad, # Columna que se convierte en encabezados
-      values_from = .data$casos      # Valores que llenan la tabla
+      names_from = grupo_edad, # Columna que se convierte en encabezados
+      values_from = casos      # Valores que llenan la tabla
     )
   cols_order <- factor(colnames(data_groups),
                        levels = category_labels)
@@ -339,3 +339,16 @@ convert_age_groups_as_cols <- function(dataset) {
     dplyr::select(dplyr::all_of(levels(cols_order)))
   return(data_groups)
 }
+
+remove_nan <- function(dataset, col_name) {
+  dataset_without_nan <- data.frame()
+  na_values <- which(is.na(
+    dataset[[col_name]]))
+  if (length(na_values) > 0) {
+    dataset_without_nan <-
+      dataset[-na_values, ]
+    return(dataset_without_nan)
+  }
+  return(dataset)
+}
+
