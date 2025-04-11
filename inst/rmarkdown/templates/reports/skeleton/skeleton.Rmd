@@ -59,7 +59,6 @@ editor_options:
     wrap: 72
 ---
 
-
 ```{r setup, echo=FALSE, include=FALSE}
 knitr::opts_chunk$set(
   echo = FALSE,
@@ -84,8 +83,6 @@ print(params$fci_data)
 ```
 
 \includepdf[pages={1}]{cover.pdf}
-
-
 
 ```{=tex}
 \begin{center}
@@ -160,6 +157,7 @@ www.saludcapital.gov.co\\}
 ```{r current-year, include=FALSE}
 current_year <- format(Sys.Date(), "%Y")
 ```
+
 
 Durante `r current_year`, el Laboratorio de Salud Pública (LSP) continúa
 apoyando la vigilancia de la infección respiratoria aguda en Bogotá, mediante el
@@ -296,8 +294,8 @@ plot_historic_epi_time(dataset = respiratory_viruses_last_3_years,
 viruses_age_groups <-
   get_dist_fci_other_vrs(fci_data = filmarray_age_groups,
                          vrs_data = other_viruses_age_groups)
+viruses_age_groups <- na.omit(viruses_age_groups)
 ```
-
 
 ```{r sars-data}
 sars_age_groups <- get_cases_sars(report_data = other_viruses_cleaned_data,
@@ -480,7 +478,7 @@ tabla.
 \arrayrulecolor{colorborder}
 
 ```{r plot-distribution-epiweek, include=TRUE, fig.height=5, fig.width=10, fig.align='center'}
-plot_table_vrs_epiweek(distribution_epiweek,
+plot_table_vrs_epiweek(data_epiweek = distribution_epiweek,
                        epiweek = params$epiweek)
 ```
 
@@ -501,7 +499,7 @@ Dentro de la circulación viral acumulada predominan `r text_vrs_cumulative` cad
 
 \newpage
 
-```{r plot-cumulative-proportion, fig.height=8, fig.width=12, include=TRUE, fig.cap="Proporción acumulada de los virus respiratorios, Laboratorio de Salud Pública"}
+```{r plot-cumulative-proportion, fig.height=8, fig.width=15, include=TRUE, fig.cap="Proporción acumulada de los virus respiratorios, Laboratorio de Salud Pública"}
 plot_cumulative_proportion(data_proportion = viruses_cumulative_proportion)
 ```
 
@@ -578,7 +576,7 @@ Multiplex, que en tiempo real detecta Bordetella pertussis, Bordetella
 parapertussis y Bordetella holmesii.
 
 ```{r tosferina-data}
-tosferina_data <- readxl::read_excel(params$tosferina)
+tosferina_data <- readxl::read_excel(params$tosferina, sheet = 1)
 ```
 
 ```{r distribution-tosferina-epiweek}
