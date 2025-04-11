@@ -1089,4 +1089,67 @@ get_historic_epi_times <- function(dataset_epi_times) {
   return(historic_dataset)
 }
 
+get_epi_times_current_year <- function(data_epiweek, year,
+                                       col_name = "se",
+                                       period_epi = NULL) {
+   data_epi_times <- data_epiweek
+   data_epi_times <- data_epi_times %>%
+    dplyr::mutate(periodo_epidemiologico =
+                    ceiling(!!dplyr::sym(col_name) / 4)) %>%
+     dplyr::group_by(dplyr::across(dplyr::all_of(
+       c("evento", "periodo_epidemiologico")))) %>%
+     dplyr::summarise(casos = sum(.data$casos),
+                      .groups = "drop")
+   
+   data_samples <- data_epiweek %>%
+     dplyr::mutate(periodo_epidemiologico =
+                     ceiling(!!dplyr::sym(col_name) / 4)) %>%
+     dplyr::group_by(dplyr::across(dplyr::all_of(
+       c("periodo_epidemiologico")))) %>%
+     dplyr::distinct(!!dplyr::sym(col_name), .keep_all = TRUE) %>%
+     dplyr::mutate(suma_muestras = sum(.data$total_muestras)) %>%
+     dplyr::group_by(!!dplyr::sym("periodo_epidemiologico")) %>%
+     dplyr::summarise(total_muestras = first(.data$suma_muestras),
+                      .groups = "drop")
+   
+   data_epi_times <- data_epi_times %>%
+     dplyr::left_join(data_samples,
+                      by = "periodo_epidemiologico")
+   
+   # Total de la smuestras de la misma enfermedad?
+  
+   data_indicators <-
+     add_indicators(data_grouped = data_epi_times,
+                    col_name = "periodo_epidemiologico",
+                    total_cases = TRUE,
+                    total_samples = FALSE,
+                    positivity = TRUE,
+                    remove_nan = FALSE,
+                    join = TRUE)
+   
+   data_indicators <- data_indicators %>%
+   dplyr::group_by(!!dplyr::sym("periodo_epidemiologico")) %>%
+     dplyr::summarise(total_casos = first(.data$total_casos),
+                      total_muestras = first(.data$total_muestras),
+                      positividad = first(.data$total_muestras),
+                      .groups = "drop")
+   
+   data_epi_times <- data_epi_times %>% dplyr::select(-"total_muestras")
+   data_epi_times <- data_epi_times %>%
+     tidyr::pivot_wider(names_from = evento,
+                        values_from = casos, values_fn = sum)
+   data_epi_times <- data_epi_times %>%
+       dplyr::left_join(data_indicators, by = "periodo_epidemiologico")
+   
+   data_epi_times$ano <- year
+   
+   data_epi_times[is.na(data_epi_times)] <- 0
+  
+   if (!is.null(period_epi)) {
+     data_epi_times <- data_epi_times %>%
+       dplyr::filter(periodo_epidemiologico <= period_epi)
+   }
+   
+   return(data_epi_times)
+}
 
