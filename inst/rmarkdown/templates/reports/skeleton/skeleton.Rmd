@@ -49,11 +49,15 @@ params:
   epiweek:
     label: "Semana epidemiológica"
     input: text
-    value: 23
-  periodo_epi:
-    label: "Periodo epidemiológica"
-    input: numeric
-    value: 5
+    value: 13
+  period_epi:
+    label: "Período epidemiológico"
+    input: text
+    value: 4
+  year:
+    label: "Año"
+    input: text
+    value: 2025
 editor_options: 
   markdown: 
     wrap: 72
