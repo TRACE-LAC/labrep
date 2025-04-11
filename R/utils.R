@@ -352,3 +352,45 @@ remove_nan <- function(dataset, col_name) {
   return(dataset)
 }
 
+add_indicators <- function(data_grouped,
+                           report_data = NULL,
+                           col_name = NULL,
+                           total_cases = TRUE,
+                           total_samples = FALSE,
+                           positivity = FALSE,
+                           remove_nan = TRUE,
+                           join = TRUE) {
+  if (total_cases) {
+    col_total_cases <- data_grouped %>%
+      dplyr::group_by(!!dplyr::sym(col_name)) %>%
+      dplyr::summarise(total_casos = sum(.data$casos))
+    if (join) {
+      data_grouped <- data_grouped %>%
+        dplyr::left_join(col_total_cases, by = col_name)
+      data_grouped$total_casos[is.na(data_grouped$total_casos)] <- 0
+    }
+  }
+  if (total_samples) {
+    samples <- report_data %>%
+      dplyr::group_by(!!dplyr::sym(col_name)) %>%
+      summarise(total_muestras = n(), .groups = "drop")
+    if (join) {
+      data_grouped <- data_grouped %>%
+        dplyr::left_join(samples, by = col_name)
+      data_grouped$total_muestras[is.na(data_grouped$total_muestras)] <- 0
+    }
+  }
+  if (positivity) {
+    data_grouped <- data_grouped %>%
+      dplyr::mutate(positividad =
+                      round((.data$total_casos / .data$total_muestras) * 100,
+                            digits = 2))
+    data_grouped$positividad[is.na(data_grouped$positividad)] <- 0
+  }
+  if (remove_nan) {
+    data_grouped <-
+      remove_nan(dataset = data_grouped,
+                 col_name = col_name)
+  }
+  return(data_grouped)
+}
