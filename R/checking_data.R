@@ -1153,3 +1153,35 @@ get_epi_times_current_year <- function(data_epiweek, year,
    return(data_epi_times)
 }
 
+combine_epi_periods <- function(data_historic_epi_periods,
+                                data_current_year_epi_periods,
+                                epi_period,
+                                col_name = "periodo_epidemiologico",
+                                year) {
+  historic_epi_periods <- data_historic_epi_periods
+  aux_historic <- historic_epi_periods %>%
+    dplyr::select(-col_name, -"ano")
+  
+  rem_preformat <-
+    which(apply(aux_historic, 1, function(x) all(is.na(x) | x == 0)))
+  
+  if (!identical(rem_preformat, integer(0))) {
+    historic_epi_periods <-
+      historic_epi_periods[-rem_preformat, ]
+  }
+  
+  aux_historic <- historic_epi_periods %>%
+    dplyr::filter(ano == year)
+  
+  miss_epi_periods <- dplyr::setdiff(data_current_year_epi_periods[[col_name]],
+                                     aux_historic[[col_name]])
+  
+  if (!identical(miss_epi_periods, numeric(0))) {
+    add_epi_periods <-
+      data_current_year_epi_periods[data_current_year_epi_periods[[col_name]] %in%
+                                  miss_epi_periods, ]
+    comb_epi_times <- rbind(historic_epi_periods, add_epi_periods)
+    return(comb_epi_times)
+  }
+  return(data_historic_epi_periods)
+}
