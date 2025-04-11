@@ -299,7 +299,9 @@ generate_age_groups_viruses <- function(report_data,
 get_cases_other_viruses <- function(report_data,
                                     epiweek = NULL,
                                     age_groups = FALSE,
-                                    vrs_influenza = NULL) {
+                                    vrs_influenza = NULL,
+                                    total_samples = FALSE,
+                                    positivity = FALSE) {
   config_path <- system.file("extdata", "config.yml", package = "labrep")
   cols_viruses <- config::get(file = config_path, "viruses")
   invalid_results <- config::get(file = config_path,
@@ -379,11 +381,11 @@ get_cases_other_viruses <- function(report_data,
     }
   }
   if (!is.null(epiweek)) {
-    total_cases_epiweeks <- positive_cases %>%
-      dplyr::group_by(!!dplyr::sym(col_epiweek)) %>%
-      dplyr::summarise(total_casos = sum(.data$casos))
-    positive_cases <- positive_cases %>%
-      dplyr::left_join(total_cases_epiweeks, by = col_epiweek)
+    positive_cases <- add_indicators(data_grouped = positive_cases,
+                   report_data = report_data,
+                   col_name = col_epiweek,
+                   total_samples = total_samples,
+                   positivity = positivity)
   }
   return(positive_cases)
 }
