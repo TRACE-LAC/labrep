@@ -2,10 +2,19 @@
 % Please edit documentation in R/cleaning_data.R
 \name{clean_historic_data}
 \alias{clean_historic_data}
-\title{Función que limpia la información historica}
+\title{Limpiar datos históricos epidemiológicos}
 \usage{
-clean_historic_data(tabla)
+clean_historic_data(dataset)
+}
+\arguments{
+\item{dataset}{Un dataset con datos históricos sin procesar.}
+}
+\value{
+Un dataset limpio y listo para análisis.
 }
 \description{
-Función que limpia la información historica
+Aplica varias transformaciones al dataset de datos históricos:
+- Remueve sufijos en nombres de columnas (`clean_colnames_suffixes`).
+- Estandariza los nombres de las columnas (`janitor::clean_names`).
+- Rellena valores faltantes en las columnas `ano` y `periodo_epidemiologico` (`fill_down_column`).
 }

@@ -9,6 +9,8 @@ plot_distribution_epiweek(
   var_x = "semanaepidemiologicavegeneral",
   var_y = "casos",
   var_fill = "etiqueta",
+  var_total = "total_casos",
+  var_positives = "porcentaje",
   influenza = FALSE,
   positives = NULL
 )

@@ -2,10 +2,21 @@
 % Please edit documentation in R/plotting_data.R
 \name{plot_historic_epi_time}
 \alias{plot_historic_epi_time}
-\title{Graficar el tiempo epidemiológico historico}
+\title{Generar gráfico de evolución epidemiológica histórica}
 \usage{
-plot_historic_epi_time(stacked_data, tabla, line_data)
+plot_historic_epi_time(dataset_epi_time, periodo_epi)
+}
+\arguments{
+\item{periodo_epi}{Período epidemiológico a destacar en el gráfico (valor entre 1 y 13).}
+
+\item{dataset_epiTime}{Dataset con datos epidemiológicos, que debe incluir las columnas 
+`ano`, `periodo_epidemiologico`, y los distintos tipos de virus.}
+}
+\value{
+Un objeto `ggplot2` con el gráfico de evolución epidemiológica.
 }
 \description{
-Graficar el tiempo epidemiológico historico
+Crea un gráfico combinado con barras apiladas y una línea de tendencia, 
+representando la evolución de virus respiratorios y la positividad epidemiológica 
+en función del tiempo.
 }

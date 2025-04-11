@@ -8,7 +8,9 @@ get_cases_other_viruses(
   report_data,
   epiweek = NULL,
   age_groups = FALSE,
-  vrs_influenza = NULL
+  vrs_influenza = NULL,
+  total_samples = FALSE,
+  positivity = FALSE
 )
 }
 \description{

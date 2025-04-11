@@ -4,13 +4,7 @@
 \alias{get_cases_epiweeks}
 \title{Obtener la distribución de casos por semana epidemiológica}
 \usage{
-get_cases_epiweeks(
-  report_data,
-  data_grouped,
-  col_epiweek,
-  diseases_epiweek,
-  table = FALSE
-)
+get_cases_epiweeks(report_data, data_grouped, col_epiweek, table = FALSE)
 }
 \description{
 Obtener la distribución de casos por semana epidemiológica

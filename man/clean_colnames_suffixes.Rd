@@ -2,10 +2,17 @@
 % Please edit documentation in R/cleaning_data.R
 \name{clean_colnames_suffixes}
 \alias{clean_colnames_suffixes}
-\title{Función que remueve los sufijos}
+\title{Eliminar sufijos numéricos en los nombres de las columnas}
 \usage{
-clean_colnames_suffixes(df)
+clean_colnames_suffixes(dataset)
+}
+\arguments{
+\item{dataset}{Un dataset con nombres de columna que pueden contener sufijos numéricos.}
+}
+\value{
+Un dataset con nombres de columna sin sufijos numéricos.
 }
 \description{
-Función que remueve los sufijos
+Remueve los sufijos numéricos en los nombres de las columnas que siguen el 
+formato `...1`, `...2`, `...3`, común en datos importados desde archivos CSV o Excel.
 }

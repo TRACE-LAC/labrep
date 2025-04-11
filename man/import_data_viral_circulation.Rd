@@ -7,9 +7,10 @@
 import_data_viral_circulation(
   report_data = NULL,
   header = FALSE,
-  skip = 3,
+  skip = NULL,
   col_names = FALSE,
-  sheet
+  sheet = NULL,
+  dataset_name = NULL
 )
 }
 \description{

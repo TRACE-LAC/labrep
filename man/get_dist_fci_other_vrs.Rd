@@ -5,7 +5,14 @@
 \title{Obtener la distribución de casos de las base de datos Filmarray
 de la Fundación Cardio Infantil y Otros Virus}
 \usage{
-get_dist_fci_other_vrs(fci_data, vrs_data)
+get_dist_fci_other_vrs(
+  fci_data,
+  vrs_data,
+  col_name = "grupo_edad",
+  porcentaje = TRUE,
+  transpose = FALSE,
+  indicators = FALSE
+)
 }
 \description{
 Obtener la distribución de casos de las base de datos Filmarray

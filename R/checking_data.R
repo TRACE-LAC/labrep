@@ -1044,11 +1044,6 @@ get_results_tosferina <- function(report_data, results = "positivo",
   return(data_grouped)
 }
 
-
-
-
-
-
 #' @title Obtener tiempos epidemiológicos de datos históricos
 #'
 #' @description 
@@ -1089,6 +1084,9 @@ get_historic_epi_times <- function(dataset_epi_times) {
   return(historic_dataset)
 }
 
+#' @title Obtener los casos, total muestras y positividad del
+#' año actual
+#' @export
 get_epi_times_current_year <- function(data_epiweek, year,
                                        col_name = "se",
                                        period_epi = NULL) {
@@ -1153,6 +1151,9 @@ get_epi_times_current_year <- function(data_epiweek, year,
    return(data_epi_times)
 }
 
+#' @title Combinar la informacion historica de los virus
+#' con la calculada del año actual
+#' @export
 combine_epi_periods <- function(data_historic_epi_periods,
                                 data_current_year_epi_periods,
                                 epi_period,

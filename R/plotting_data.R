@@ -12,10 +12,9 @@ plot_age_group_distribution <- function(report_data,
     config::get(file = config_path,
                 "age_categories")$age_categories
   plot <- ggplot2::ggplot(report_data,
-                          ggplot2::aes_string(x =
-                                                factor(report_data[[var_x]],
-                                                       levels =
-                                                      category_labels),
+                          ggplot2::aes_string(x = factor(report_data[[var_x]],
+                                                         levels =
+                                                           category_labels),
                                               y = var_y,
                                               fill = var_fill)) +
     ggplot2::geom_bar(position = "fill",

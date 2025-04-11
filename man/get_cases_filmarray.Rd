@@ -10,7 +10,9 @@ get_cases_filmarray(
   positive_value = "DETECTADO",
   age_groups = TRUE,
   epiweek = NULL,
-  vrs_influenza = NULL
+  vrs_influenza = NULL,
+  total_samples = FALSE,
+  positivity = FALSE
 )
 }
 \description{

@@ -4,7 +4,7 @@
 \alias{get_cases_influenza}
 \title{Obtener la distribución de casos de Influenza y sus subtipos}
 \usage{
-get_cases_influenza(filmarray_data, other_virs_data)
+get_cases_influenza(filmarray_data, other_virs_data, epiweek = "all")
 }
 \description{
 Obtener la distribución de casos de Influenza y sus subtipos

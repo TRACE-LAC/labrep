@@ -4,7 +4,13 @@
 \alias{add_missing_weeks}
 \title{Añadir las semanas epidemiológicas faltantes}
 \usage{
-add_missing_weeks(dataset, col_epiweek)
+add_missing_weeks(
+  dataset,
+  col_epiweek,
+  col_casos = "casos",
+  col_total = "total_casos",
+  col_porcentaje = "porcentaje"
+)
 }
 \description{
 Añadir las semanas epidemiológicas faltantes

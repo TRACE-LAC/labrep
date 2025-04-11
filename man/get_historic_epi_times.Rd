@@ -2,10 +2,22 @@
 % Please edit documentation in R/checking_data.R
 \name{get_historic_epi_times}
 \alias{get_historic_epi_times}
-\title{Obtener los tiempos epidemiologicos de los datos historicos}
+\title{Obtener tiempos epidemiológicos de datos históricos}
 \usage{
-get_historic_epi_times(tabla)
+get_historic_epi_times(dataset_epi_times)
+}
+\arguments{
+\item{dataset_epi_times}{Data frame con datos históricos que incluyen las columnas 
+`ano`, `periodo_epidemiologico`, `de_positividad` y las de distintos tipos de virus.}
+}
+\value{
+Una lista con dos data frames:
+- `stacked_data`: Datos en formato largo con tipo de virus y número de casos por semana.
+- `line_data`: Serie de tiempo con la positividad semanal.
 }
 \description{
-Obtener los tiempos epidemiologicos de los datos historicos
+Transforma la tabla de la base de datos 'VIRUS RESPIRATORIOS 2022 A 2024' 
+para generar 2 tablas que facilitan las operaciones para las funciones de visualización. 
+Se crea una tabla con los datos adecuados para un gráfico de línea. 
+Se crea una tabla con las columnas adecuadas para un gráfico de barras apiladas.
 }

@@ -340,6 +340,8 @@ convert_age_groups_as_cols <- function(dataset) {
   return(data_groups)
 }
 
+#' @title Remover NaN
+#' @export
 remove_nan <- function(dataset, col_name) {
   dataset_without_nan <- data.frame()
   na_values <- which(is.na(
@@ -352,6 +354,9 @@ remove_nan <- function(dataset, col_name) {
   return(dataset)
 }
 
+#' @title Adicionar los indicadores como total casos,
+#' total muestras y positividad
+#' @export
 add_indicators <- function(data_grouped,
                            report_data = NULL,
                            col_name = NULL,

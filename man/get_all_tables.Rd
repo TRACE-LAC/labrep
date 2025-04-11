@@ -2,10 +2,17 @@
 % Please edit documentation in R/import_data.R
 \name{get_all_tables}
 \alias{get_all_tables}
-\title{Obtener todas las tables de las bases historicas}
+\title{Extraer todas las tablas de una hoja de Excel}
 \usage{
-get_all_tables(file_name, sheet_name)
+get_all_tables(file_name)
+}
+\arguments{
+\item{file_name}{Ruta del archivo de Excel.}
+}
+\value{
+Lista de dataframes, donde cada elemento representa una tabla identificada dentro de la hoja.
 }
 \description{
-Obtener todas las tables de las bases historicas
+Detecta y extrae múltiples tablas dentro de una hoja de Excel, identificando 
+separaciones mediante filas y columnas en blanco.
 }

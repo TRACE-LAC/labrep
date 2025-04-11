@@ -2,10 +2,17 @@
 % Please edit documentation in R/import_data.R
 \name{get_selected_table}
 \alias{get_selected_table}
-\title{Extraer una tabla específica de la lista y devolverla como data.frame}
+\title{Obtener una tabla específica de una lista de tablas}
 \usage{
-get_selected_table(tables, INDICADOR)
+get_selected_table(list_tables, table)
+}
+\arguments{
+\item{list_of_tables}{Lista de tablas, donde cada elemento es un dataframe.}
+}
+\value{
+Un dataframe correspondiente a la tabla seleccionada.
 }
 \description{
-Extraer una tabla específica de la lista y devolverla como data.frame
+Extrae una tabla de una lista de tablas generada a partir de `get_all_tables`, 
+seleccionándola por su índice en la lista.
 }

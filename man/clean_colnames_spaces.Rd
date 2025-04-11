@@ -2,12 +2,17 @@
 % Please edit documentation in R/cleaning_data.R
 \name{clean_colnames_spaces}
 \alias{clean_colnames_spaces}
-\title{Función para reemplazar espacios en los nombres de las columnas con
-guiones bajos}
+\title{Limpiar espacios en los nombres de las columnas}
 \usage{
-clean_colnames_spaces(df)
+clean_colnames_spaces(dataset)
+}
+\arguments{
+\item{dataset}{Un dataset con nombres de columna a limpiar.}
+}
+\value{
+Un dataset con nombres de columna estandarizados.
 }
 \description{
-Función para reemplazar espacios en los nombres de las columnas con
-guiones bajos
+Reemplaza los espacios y caracteres especiales en los nombres de las columnas 
+por guiones bajos, asegurando una nomenclatura estandarizada.
 }
