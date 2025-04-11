@@ -31,12 +31,18 @@ default:
   filmarray_data:
     file:
       sheets:
+        names: ["FILMARRAY RESPIRATORIO", "PANEL RESPIRATORIO"]
         skip: [3, 0]
     epiweek: 
       col_valid: "se"
     age_groups:
       col_valid: "grupo_edad"
       cols_clean: ["grupo_de_edad"]
+    parainfluenza:
+      panel:
+        col_name: ["parainfluenza_1", "parainfluenza_2", "parainfluenza_3"]
+      filmarray:
+        col_name: ["virus_parainfluenza_1", "virus_parainfluenza_2", "virus_parainfluenza_3", "virus_parainfluenza_4"]  
   tosferina_data:
     age_groups:
       col_valid: "grupo_edad"
@@ -139,6 +145,8 @@ default:
       values: ["rinovirus", "rhinovirus"]
     label: "Rinovirus"
   - name: "parainfluenza"
+    panel:
+      col_name: ["parainfluenza_1", "parainfluenza_2", "parainfluenza_3"]
     filmarray:
       col_name: ["virus_parainfluenza_1", "virus_parainfluenza_2", "virus_parainfluenza_3", "virus_parainfluenza_4"]
       values: ["DETECTADO", "POSITIVO"]
