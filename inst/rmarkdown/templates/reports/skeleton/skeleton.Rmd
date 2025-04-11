@@ -176,13 +176,9 @@ diagnóstico de los principales agentes a los que se les atribuye el
 IRAG.
 
 
-
-```{r dataset_respiratory_viruses_2022_20224}
-#IMPORTING DATASET: "VIRUS RESPIRATORIO 2022 A 2024.xlsx"
-
-all_tables_from_sheet <- get_all_tables(file_name=params$historic_data)
-
-dataset_periodo_epi <- get_selected_table(list_tables=all_tables_from_sheet)
+```{r dataset-historic-respiratory-viruses}
+all_tables_historic_data <- get_all_tables(file_name = params$historic_data)
+dataset_periodo_epi <- get_selected_table(list_tables = all_tables_historic_data)
 ```
 
 ```{r cl_dataset_respiratory_viruses_last_3_years}
