@@ -702,9 +702,9 @@ get_distribution_test <- function(report_data,
                        col_epiweek = col_epiweek,
                        table = FALSE)
   
-  cases_epiweeks <- 
-    add_missing_weeks(dataset = cases_epiweeks,
-                      col_epiweek = col_epiweek)
+  #cases_epiweeks <- 
+   # add_missing_weeks(dataset = cases_epiweeks,
+    #                  col_epiweek = col_epiweek)
   viruses_epiweeks <- 
     get_cases_other_viruses(report_data = report_data_test,
                             epiweek = "all")
@@ -1081,7 +1081,7 @@ get_historic_epi_times <- function(dataset_epi_times) {
                                                       .data$periodo_epidemiologico),
                                    sep = "-")) %>%
     dplyr::select(.data$YearWeek, Percent_Positivity =
-                    .data$percent_de_positividad) %>%
+                    .data$positividad) %>%
     tidyr::drop_na(.data$Percent_Positivity) # Remove any NA values in Percent_Positivity
   
   historic_dataset <- list(stacked_dataset = stacked_dataset,
