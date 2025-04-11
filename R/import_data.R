@@ -132,10 +132,12 @@ get_all_tables <- function(file_name) {
 #'
 #' @return Un dataframe correspondiente a la tabla seleccionada.
 #' @export
-get_selected_table <- function(list_tables) {
+get_selected_table <- function(list_tables, table) {
   
-  config_path <- system.file("extdata", "config.yml", package = "labrep")
-  indicator <-  config::get(file = config_path,"respiratory_viruses_historic_data")$table_number
+  config_path <-
+    system.file("extdata", "config.yml", package = "labrep")
+  indicator <-
+    config::get(file = config_path,"respiratory_viruses_historic_data")$table_number
   indicator <- indicator$value
   
   # Verificar que 'tables' es una lista
