@@ -238,7 +238,6 @@ clean_historic_data <- function(dataset) {
   
   #get texts of the axis from config.yml
   config_path <- system.file("extdata", "config.yml", package = "labrep")
-  config_path <- "C:/Users/willi/GITHUB/labrep/inst/extdata/config.yml"
 
   year_column <-  config::get(file = config_path,"respiratory_viruses_historic_data")$year
   col_year <- year_column$col_name
