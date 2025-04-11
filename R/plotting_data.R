@@ -247,7 +247,7 @@ plot_results_tosferina <- function(report_data,
                                   sec.axis =
                                     ggplot2::sec_axis(~ . / scaling_factor,
                                                       breaks = seq(0,
-                                                                   max_positives, by = 2), 
+                                                                   max_positives, by = 5), 
                                                       labels =
                                                         function(x) sprintf("%.f", x),
                                                       name = "Porcentaje"))
@@ -354,7 +354,8 @@ plot_historic_epi_time <- function(dataset_epi_time, periodo_epi ) {
   #get plot theme parameters
   colores <- get_color_periodo_epidemiologico()
   plot_parameters <- get_axis_config_periodo_epidemiologico()
-  plot_text_years_labels <- get_text_labels_periodo_epidemiologico(dataset_epi_time=dataset_epi_time)
+  plot_text_years_labels <-
+    get_text_labels_periodo_epidemiologico(dataset_epi_time=dataset_epi_time)
   annotate_x_pos <- 0.6727 * periodo_epi + 17.8273
 
   # Generate the plot
@@ -436,11 +437,12 @@ plot_historic_epi_time <- function(dataset_epi_time, periodo_epi ) {
         nrow = 3,
         byrow = TRUE
       ),
-      color = "none") + 
-    ggplot2::annotate("segment", x = 21, xend = 22.2, y = -150, yend = -150,
-                      color = "#E97132", linewidth = 0.7) +
-    ggplot2::annotate("text", x = 22.5, y = -150, label = "% DE POSITIVIDAD",
-                      hjust = 0, color = "black", size = 2)
+      color = "none")
+  #+ 
+   # ggplot2::annotate("segment", x = 21, xend = 22.2, y = -150, yend = -150,
+    #                  color = "#E97132", linewidth = 0.7) +
+    #ggplot2::annotate("text", x = 22.5, y = -150, label = "% DE POSITIVIDAD",
+     #                 hjust = 0, color = "black", size = 2)
 }
 
 #' @title Graficar la tabla de la leyenda
