@@ -47,7 +47,7 @@ group_columns_total <- function(disease_data,
     }
   }
   if ("semanaepidemiologicavegeneral" %in% col_names) {
-    for (i in 1:52) {
+    for (i in 1:53) {
       if (!any(disease_data_grouped$semanaepidemiologicavegeneral == i)
           || is.na(any(disease_data_grouped$semanaepidemiologicavegeneral
                        == i))) {
