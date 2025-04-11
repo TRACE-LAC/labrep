@@ -81,7 +81,9 @@ get_cases_filmarray <- function(report_data,
                                 positive_value = "DETECTADO",
                                 age_groups = TRUE,
                                 epiweek = NULL,
-                                vrs_influenza = NULL) {
+                                vrs_influenza = NULL,
+                                total_samples = FALSE,
+                                positivity = FALSE) {
   config_path <- system.file("extdata", "config.yml", package = "labrep")
   cols_viruses <- config::get(file = config_path, "viruses")
   col_age_groups <- config::get(file = config_path,
