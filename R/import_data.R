@@ -17,7 +17,7 @@ import_data_viral_circulation <- function(report_data = NULL,
       if (file_extension == "xlsx") {
         if (is.null(sheet)) {
           i <- 1
-          sheets <- readxl::excel_sheets(data_path)
+          sheets <- readxl::excel_sheets(data_path)[1:2]
           for (sheet in sheets) {
             temp_data <-
               readxl::read_excel(data_path,
@@ -72,7 +72,9 @@ import_data_viral_circulation <- function(report_data = NULL,
 get_all_tables <- function(file_name) {
   
   config_path <- system.file("extdata", "config.yml", package = "labrep")
-  sheet_name <-  config::get(file = config_path,"respiratory_viruses_historic_data")$excel_sheet_name
+  sheet_name <-
+    config::get(file = config_path,
+                "respiratory_viruses_historic_data")$excel_sheet_name
   sheet_name <- sheet_name$value
 
   
