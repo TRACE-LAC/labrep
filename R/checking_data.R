@@ -396,12 +396,15 @@ get_cases_other_viruses <- function(report_data,
 get_dist_fci_other_vrs <- function(fci_data, vrs_data,
                                    col_name = "grupo_edad",
                                    porcentaje = TRUE,
-                                   transpose = FALSE) {
+                                   transpose = FALSE,
+                                   indicators = FALSE) {
   if (col_name == "se") {
     names(vrs_data)[names(vrs_data)
                     == "semanaepidemiologicavegeneral"] <- col_name
   }
   dist_fci_other_vrs <- rbind(fci_data, vrs_data)
+  dist_epiweek_indicators <- dist_fci_other_vrs
+  
   dist_fci_other_vrs <- dist_fci_other_vrs %>%
     dplyr::group_by(dplyr::across(dplyr::all_of(
       c("evento", col_name,"etiqueta")))) %>%
@@ -414,18 +417,37 @@ get_dist_fci_other_vrs <- function(fci_data, vrs_data,
                   .data$evento,
                   .data$etiqueta,
                   .data$total_casos)
+  
+  if (indicators) {
+    dist_epiweek_indicators <- dist_epiweek_indicators %>%
+      dplyr::group_by(!!dplyr::sym(col_name)) %>%
+      dplyr::summarise(total_casos = dplyr::first(total_casos),
+                       total_muestras = dplyr::first(total_muestras),
+                       .groups = "drop")
+    dist_epiweek_indicators <-
+      add_indicators(data_grouped = dist_epiweek_indicators,
+                     total_cases = FALSE,
+                     total_samples = FALSE,
+                     positivity = TRUE,
+                     remove_nan = FALSE)
+  }
   if (porcentaje) {
     dist_fci_other_vrs <- dist_fci_other_vrs %>%
       dplyr::mutate(porcentaje =
                       round((.data$casos * 100)/.data$total_casos))
   }
   if (transpose) {
-    dist_fci_other_vrs <- dist_fci_other_vrs %>% dplyr::select(-"evento", 
+    dist_fci_other_vrs <- dist_fci_other_vrs %>% dplyr::select(-"etiqueta", 
                                                         -"total_casos")
     dist_fci_other_vrs <- dist_fci_other_vrs %>%
-      tidyr::pivot_wider(names_from = etiqueta,
+      tidyr::pivot_wider(names_from = evento,
                          values_from = casos, values_fn = sum)
   }
+  if (indicators) {
+    dist_fci_other_vrs <- dist_fci_other_vrs %>%
+      dplyr::left_join(dist_epiweek_indicators, by = col_name)
+  }
+  dist_fci_other_vrs[is.na(dist_fci_other_vrs)] <- 0
   return(dist_fci_other_vrs)
 }
 
@@ -490,6 +512,7 @@ get_cases_sars <- function(report_data,
 #' @export
 get_distribution_age_vr_sars <- function(data_vr, data_sars) {
   distribution_age_vr_sars <- rbind(data_vr, data_sars)
+  distribution_age_vr_sars <- na.omit(distribution_age_vr_sars)
   return(distribution_age_vr_sars)
 }
 
