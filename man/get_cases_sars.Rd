@@ -8,7 +8,8 @@ get_cases_sars(
   report_data,
   positive_value = "DETECTADO",
   age_groups = FALSE,
-  epiweek = NULL
+  epiweek = NULL,
+  total_cases = NULL
 )
 }
 \description{

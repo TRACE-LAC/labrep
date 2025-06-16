@@ -5,7 +5,7 @@
 \title{Estandarizar las edades de los datos de la base de datos de la
 Fundación Cardio Infantil}
 \usage{
-clean_filmarray_age(filmarray_data, col_age = "edad")
+clean_filmarray_age(filmarray_data, col_age = "edad", is_panel = FALSE)
 }
 \description{
 Estandarizar las edades de los datos de la base de datos de la

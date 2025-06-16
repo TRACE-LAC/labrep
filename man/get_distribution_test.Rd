@@ -6,7 +6,7 @@
 \usage{
 get_distribution_test(
   report_data,
-  epiweek = 0,
+  epiweek = "all",
   include_sars = FALSE,
   test = NULL,
   col_epiweek = NULL

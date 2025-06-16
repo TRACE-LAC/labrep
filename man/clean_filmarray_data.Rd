@@ -4,7 +4,7 @@
 \alias{clean_filmarray_data}
 \title{Limpiar los datos de la base de la Fundación Cardio Infantil}
 \usage{
-clean_filmarray_data(filmarray_data)
+clean_filmarray_data(filmarray_data, is_panel = FALSE)
 }
 \description{
 Limpiar los datos de la base de la Fundación Cardio Infantil
