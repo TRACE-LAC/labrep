@@ -219,17 +219,18 @@ panel_data_cleaned <-
   generate_age_categories(dataset = panel_data_cleaned)
 ```
 
-```{r filmarray-data}
+```{r filmarray-data, echo=FALSE}
 filmarray_data <- fci_data$filmarray
 filmarray_data_cleaned <- clean_filmarray_data(filmarray_data = filmarray_data)
 filmarray_data_cleaned <-
   generate_age_categories(dataset = filmarray_data_cleaned)
-filmarray_age_groups <-
-  get_cases_filmarray(report_data = filmarray_data_cleaned,
-                      age_groups = TRUE)
 
 filmarray_data_cleaned <- filmarray_data_cleaned %>%
   dplyr::bind_rows(panel_data_cleaned)
+
+filmarray_age_groups <-
+  get_cases_filmarray(report_data = filmarray_data_cleaned,
+                      age_groups = TRUE)
 ```
 
 ```{r other-viruses-data}
