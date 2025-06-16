@@ -405,3 +405,31 @@ add_indicators <- function(data_grouped,
   }
   return(data_grouped)
 }
+
+#' @title Obtener las columnas de un data.frame según los resultados de
+#' str_detect y una validación de NANs
+#' @export
+get_rows_valid_str_detect <- function(cases_virus,
+                                      col_name,
+                                      values,
+                                      is_not = FALSE) {
+  if (!all(is.na(cases_virus[[col_name]]))) {
+    if (is_not) {
+      valid_values <- !stringr::str_detect(
+        cases_virus[[col_name]],
+        paste(values, collapse = "|"))
+    } else {
+      valid_values <- stringr::str_detect(
+        cases_virus[[col_name]],
+        paste(values, collapse = "|"))
+    }
+    if (any(valid_values, na.rm = TRUE)) {
+      cases_virus <- cases_virus[which(!is.na(valid_values) & valid_values), ]
+    } else if (!is_not) {
+      cases_virus <- cases_virus[0, ]
+    }
+  } else if (!is_not) {
+    cases_virus <- cases_virus[0, ]
+  }
+  return(cases_virus)
+}
