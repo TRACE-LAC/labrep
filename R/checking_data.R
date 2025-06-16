@@ -806,28 +806,43 @@ get_distribution_test <- function(report_data,
 
 #' @title Obtener la distribución de casos por semana epidemiológica
 #' @export
-get_cases_epiweeks <- function(report_data,
+get_cases_epiweeks <- function(report_data = NULL,
                                data_grouped,
                                col_epiweek,
-                               table = FALSE) {
+                               table = FALSE,
+                               epiweek = "all") {
+  if (epiweek != "all" && is.numeric(epiweek)) {
+    data_grouped <- data_grouped[
+      data_grouped[[col_epiweek]] <= epiweek, ]
+  }
   if (table) {
     table_epiweeks <- data.frame(Semana = data_grouped[[col_epiweek]],
                                  Positivos = data_grouped$porcentaje)
     return(table_epiweeks)
   }
-  total_positive_cases <- data.frame()
-  total_cases_epiweeks <- report_data %>%
-    dplyr::group_by(dplyr::across(dplyr::all_of(col_epiweek))) %>%
-    dplyr::summarise(total_casos = n())
-  cases_epiweeks <- data_grouped %>%
-    dplyr::group_by(dplyr::across(dplyr::all_of(col_epiweek))) %>%
-    dplyr::summarise(casos = n())
-  cases_epiweeks <- dplyr::inner_join(cases_epiweeks,
-                                      total_cases_epiweeks,
-                                      by = col_epiweek)
-  cases_epiweeks <- cases_epiweeks %>%
-    dplyr::mutate(porcentaje =
-                    round((.data$casos * 100)/.data$total_casos, 1))
+  
+  if (!is.null(report_data)) {
+    total_positive_cases <- data.frame()
+    total_cases_epiweeks <- report_data %>%
+      dplyr::group_by(dplyr::across(dplyr::all_of(col_epiweek))) %>%
+      dplyr::summarise(total_casos = n())
+    cases_epiweeks <- data_grouped %>%
+      dplyr::group_by(dplyr::across(dplyr::all_of(col_epiweek))) %>%
+      dplyr::summarise(casos = n())
+    cases_epiweeks <- dplyr::inner_join(cases_epiweeks,
+                                        total_cases_epiweeks,
+                                        by = col_epiweek)
+    cases_epiweeks <- cases_epiweeks %>%
+      dplyr::mutate(porcentaje =
+                      round((.data$casos * 100)/.data$total_casos, 1))
+  }
+  
+  if ("positividad" %in% names(data_grouped)) {
+    cases_epiweeks <- data_grouped %>%
+      dplyr::group_by(!!dplyr::sym(col_epiweek)) %>%
+      dplyr::summarize(positividad = .data$positividad) %>%
+      unique()
+  }
   return(cases_epiweeks)
 }
 
