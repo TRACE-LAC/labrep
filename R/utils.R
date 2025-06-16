@@ -483,3 +483,34 @@ rename_row <- function(dataset, col_name,
   }
   return(dataset)
 }
+
+#' @title Completar las semana epidemiológicas de un data.frame
+#' @export
+complete_epiweeks <- function(dataset,
+                              col_epiweek) {
+  comp_dataset <- dataset
+  col_names <- names(comp_dataset)
+  if (col_epiweek %in% col_names) {
+    for (i in 1:53) {
+      if (!any(comp_dataset[[col_epiweek]]) == i
+          || is.na(any(comp_dataset[[col_epiweek]] == i))) {
+        new_row <- data.frame(semanaepidemiologicavegeneral = i,
+                              casos = 0,
+                              evento = event_name,
+                              etiqueta = event_label)
+        if ("total_casos" %in% col_names) {
+          total_row <- data.frame(total_casos = 0)
+          new_row <- cbind(new_row, total_row)
+        } else if ("total_casos" %in% col_names) {
+          samples_row <- data.frame(total_muestras = 0)
+          new_row <- cbind(new_row, samples_row)
+        } else if ("porcentaje" %in% col_names) {
+          per_row <- data.frame(porcentaje = 0.0)
+          new_row <- cbind(new_row, per_row)
+        }
+        comp_dataset <- rbind(comp_dataset, new_row)
+      }
+    }
+  }
+  return(comp_dataset)
+}
