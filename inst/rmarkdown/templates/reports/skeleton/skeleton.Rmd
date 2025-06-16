@@ -107,27 +107,31 @@ Manuel Alfredo González Mayorga\\[0.4in]
 
 {\color{colortitles} Directora de Epidemiología, Análisis y Gestión de\\ 
 Políticas de Salud Colectiva\\}
-Diane Moyano Romero\\~\\
+María Belen Jaimes Sanabria\\~\\
 
 
 {\color{colortitles} Subdirectora de Vigilancia en Salud Pública\\}
-Sol Yiber Beltran Aguilera\\[0.5in]
+Diana Marcela Walteros Acero\\[0.2in]
 
+{\color{colortitles} Subdirectora de Laboratorio de Salud Pública\\}
+Mary Luz Gómez Mayorga\\[0.3in]
 
-{\color{colortitles} Autor\\~\\}
+{\color{colortitles} Autoras\\~\\}
 {\color{colortitles} Laboratorio de Salud Pública\\}
 Sandra Liliana Gómez Bautista\\
-Paula Andrea Borda Osuna\\[0.6in]
+Yenny Alexandra Rojas Pérez\\[0.3in]
 
 
 {\color{colortitles} Coordinación Editorial\\~\\}
 
 {\color{colortitles} Oficina Asesora de Comunicaciones en Salud\\}
-María Juliana Silva Amado\\~\\
+
+{\color{colortitles} Jefe Oficina Asesora de Comunicaciones\\}
+Estefanía Fajardo De la Espriella\\~\\
 
 
-{\color{colortitles} Corrección de estilo\\}
-José Aldemar Garzón González\\~\\
+{\color{colortitles} Líder equipo de diseño\\}
+María Camila Rodríguez Roa\\~\\
 
 
 {\color{colortitles} Diseño y diagramación\\}
@@ -135,7 +139,7 @@ Harol Giovanny León Niampira\\~\\
 
 
 {\color{colortitles} Fotografía portada\\}
-www.saludcapital.gov.co\\~\\
+Secretaria Distrital de Salud\\~\\
 
 
 {\color{colortitles}
