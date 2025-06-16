@@ -925,6 +925,40 @@ get_cases_prop_epiweek <- function(filmarray_data,
   return(proportion_epiweek)
 }
 
+#' @title Obtener la proporción acumulada de los virus por semana
+#' epidemiológica
+#' @export
+get_cases_acum_proportion <- function(dist_epiweek_viruses,
+                                      epiweek = "all") {
+  config_path <- system.file("extdata", "config.yml", package = "labrep")
+  col_epiweek <- config::get(file = config_path,
+                             "filmarray_data")$epiweek$col_valid
+  
+  if (epiweek != "all" && is.numeric(epiweek)) {
+    dist_epiweek_viruses <- dist_epiweek_viruses %>%
+      dplyr::filter(!!dplyr::sym(col_epiweek) <= epiweek)
+  }
+  
+  totals <- dist_epiweek_viruses %>%
+    dplyr::distinct(!!dplyr::sym(col_epiweek), .keep_all = TRUE) %>%
+    dplyr::select(.data$total_casos, .data$total_muestras)
+  total_samples <- sum(totals$total_muestras)
+  
+  cases_epiweek <-
+    group_columns_total(dist_epiweek_viruses,
+                        event_name = "",
+                        col_names = c("evento",
+                                      "etiqueta"),
+                        wt_percentage = TRUE,
+                        total_cases = sum(dist_epiweek_viruses$casos),
+                        event_label = "",
+                        sum_cases = TRUE)
+  proportion_epiweek <-
+    list(cases_epiweek = cases_epiweek,
+         total_samples = total_samples)
+  return(proportion_epiweek)
+}
+
 #' @title Obtener la distribución de casos de Influenza y sus subtipos
 #' @export
 get_cases_influenza <- function(filmarray_data,
