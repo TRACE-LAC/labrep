@@ -433,3 +433,42 @@ get_rows_valid_str_detect <- function(cases_virus,
   }
   return(cases_virus)
 }
+
+#' @title Obtener los valores consolidados de los virus que en los datos se
+#' encuentran en múltiples columnas, como por ejemplo Parainfluenza y Otros
+#' coronavirus
+#' @export
+get_consolidated_viruses <- function(dataset,
+                                     col_name = "grupo_edad",
+                                     percentage = TRUE,
+                                     total_cases = TRUE) {
+  evento <- NULL
+  etiqueta <- NULL
+  total_casos <- 0
+  data_parainfluenza <- data.frame()
+  
+  if (nrow(dataset) > 1) {
+    evento <- dataset[["evento"]][1]
+    etiqueta <- dataset[["etiqueta"]][1]
+    data_parainfluenza <- dplyr::group_by(dataset, !!dplyr::sym(col_name)) %>%
+      dplyr::summarise(casos = sum(.data$casos))
+    t_casos <- sum(data_parainfluenza$casos)
+    #print(t_casos)
+  }
+  
+  if (percentage) {
+    data_parainfluenza <- data_parainfluenza %>% dplyr::mutate(
+      porcentaje = round((.data$casos / t_casos) * 100, 1)
+    )
+  }
+  
+  data_parainfluenza$evento <- evento
+  data_parainfluenza$etiqueta <- etiqueta
+  
+  if (total_cases) {
+    data_parainfluenza$total_casos <- t_casos
+  }
+  
+  return(data_parainfluenza)
+}
+
