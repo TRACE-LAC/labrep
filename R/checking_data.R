@@ -90,17 +90,25 @@ get_cases_filmarray <- function(report_data,
                                 "filmarray_data")$age_groups$col_valid
   col_epiweek <- config::get(file = config_path,
                              "filmarray_data")$epiweek$col_valid
+  col_con_viruses <- col_age_groups
+  perc_con_viruses <- TRUE
+  con_viruses <- config::get(file = config_path,
+                             "viruses_consolidate")
   if (!is.null(vrs_influenza)) {
     cols_viruses <-
       get_influenza_viruses(viruses = cols_viruses,
                             events = vrs_influenza)
   }
-  if (!is.null(epiweek) && epiweek != "all") {
-    col_epiweek <- config::get(file = config_path,
-                               "filmarray_data")$epiweek$col_valid
-    report_data <-
-      report_data[which(report_data[[col_epiweek]]
-                              == as.numeric(epiweek)), ]
+  if (!is.null(epiweek)) {
+    col_con_viruses <- col_epiweek
+    perc_con_viruses <- FALSE
+    if (epiweek != "all") {
+      col_epiweek <- config::get(file = config_path,
+                                 "filmarray_data")$epiweek$col_valid
+      report_data <-
+        report_data[which(report_data[[col_epiweek]]
+                          == as.numeric(epiweek)), ]
+    }
   }
   viruses_age_group <- data.frame()
   for (virus in cols_viruses) {
