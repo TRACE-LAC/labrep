@@ -269,8 +269,10 @@ get_subtypes_values <- function(viruses, subtypes) {
   subtypes_values <- NULL
   for (virus in viruses) {
     if (virus$name %in% subtypes) {
-      other_vrs <- virus$other_viruses
-      subtypes_values <- c(subtypes_values, other_vrs$values)
+      values <- virus$other_viruses$values
+      if (any(values != "", na.rm = TRUE)) {
+        subtypes_values <- c(subtypes_values, values)
+      }
     }
   }
   return(subtypes_values)
