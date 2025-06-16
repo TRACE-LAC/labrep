@@ -472,3 +472,14 @@ get_consolidated_viruses <- function(dataset,
   return(data_parainfluenza)
 }
 
+#' @title Renombrar los valores de una o más filas de un data.frame
+#' @export
+rename_row <- function(dataset, col_name,
+                       original_names,
+                       new_name) {
+  for (group in original_names) {
+    dataset[[col_name]][dataset[[col_name]] == group]  <-
+      new_name
+  }
+  return(dataset)
+}
