@@ -306,7 +306,7 @@ plot_table_epiweek_tosferina <- function(data_epiweek,
                                          col_epiweek = "SE",
                                          epiweek) {
   data_table <- data_epiweek %>%
-    dplyr::filter(!!dplyr::sym(col_epiweek) <= epiweek)
+    dplyr::filter(!!dplyr::sym(col_epiweek) <= as.numeric(epiweek))
   init_seq <- 2
   by_val <- 2
   if (nrow(data_table) < 2) {
