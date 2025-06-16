@@ -20,7 +20,8 @@ clean_filmarray_data <- function(filmarray_data) {
 #' Fundación Cardio Infantil
 #' @export
 clean_filmarray_age <- function(filmarray_data,
-                                col_age = "edad") {
+                                col_age = "edad",
+                                is_panel = FALSE) {
   data_age_clean <- filmarray_data
   data_age_clean[[col_age]] <- tolower(data_age_clean[[col_age]])
   config_path <- system.file("extdata", "config.yml", package = "labrep")
@@ -28,14 +29,23 @@ clean_filmarray_age <- function(filmarray_data,
     config::get(file = config_path, "filmarray_data")$age_groups$cols_clean
   col_age_groups <- config::get(file = config_path,
                                 "filmarray_data")$age_groups$col_valid
-  index_col <- which(cols_clean_age_groups %in% names(data_age_clean))
-  if (length(index_col) > 0) {
-    col_clean <- cols_clean_age_groups[index_col]
-    names(data_age_clean)[names(data_age_clean) == col_clean] <- col_age_groups
+  
+  if (!is_panel) {
+    index_col <- which(cols_clean_age_groups %in% names(data_age_clean))
+    if (length(index_col) > 0) {
+        col_clean <- cols_clean_age_groups[index_col]
+        names(data_age_clean)[names(data_age_clean) == col_clean] <-
+          col_age_groups
+        data_age_clean[[col_age_groups]] <-
+          tolower(data_age_clean[[col_age_groups]])
+    }
+  } else {
     data_age_clean[[col_age_groups]] <-
       tolower(data_age_clean[[col_age_groups]])
   }
+  
   if (col_age %in% colnames(data_age_clean)) {
+    # print(col_age)
     patterns <- c(" año", " mes", " dia", " día")
     space_indexes <- NULL
     for (pattern in patterns) {
