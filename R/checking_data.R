@@ -855,11 +855,11 @@ get_viruses_cumulative_proportion <- function(report_data) {
   col_names_cumulative <- "etiqueta"
   viruses_proportion <- report_data %>%
     dplyr::group_by(dplyr::across(dplyr::all_of(col_names))) %>%
-    dplyr::summarise(casos = sum(.data$casos))
+    dplyr::summarise(casos = sum(.data$casos), .groups = "keep")
   total_cases <- sum(viruses_proportion$casos)
   viruses_proportion <- viruses_proportion %>%
     dplyr::mutate(porcentaje =
-                    round((.data$casos * 100) / total_cases, 1))
+                    round((cumsum(.data$casos) * 100) / total_cases, 1))
   return(viruses_proportion)
 }
 
