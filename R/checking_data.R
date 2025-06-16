@@ -1000,6 +1000,17 @@ get_cases_influenza <- function(filmarray_data,
       dplyr::summarise(pruebas = n())
   }
   
+  if (nrow(cases_filmarray) > 0 && nrow(cases_other_virs) > 0) {
+    cases_influenza <- rbind(cases_filmarray, cases_other_virs)
+  } else if (nrow(cases_filmarray) > 0) {
+    cases_influenza <- cases_filmarray
+  } else if (nrow(cases_other_virs) > 0) {
+    cases_influenza <- cases_other_virs
+  } else {
+    distribution_epiweeks <- list(cases_epiweeks = data.frame(),
+                                  influenza_epiweeks = data.frame())
+  }
+  
   cases_influenza <- rbind(cases_filmarray, cases_other_virs)
   cases_influenza <-
     group_columns_total(cases_influenza,
