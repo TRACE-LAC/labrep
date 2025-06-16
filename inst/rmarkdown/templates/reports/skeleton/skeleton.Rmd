@@ -239,7 +239,8 @@ other_viruses_data <- other_viruses_data <-
                                   params$other_viruses,
                                 skip = 0,
                                 sheet = 1)
-other_viruses_cleaned_data  <- clean_data_other_viruses(report_data = other_viruses_data)
+other_viruses_cleaned_data <- 
+  clean_data_other_viruses(report_data = other_viruses_data)
 other_viruses_age_groups <-
   get_cases_other_viruses(report_data = other_viruses_cleaned_data,
                           age_groups = TRUE)
@@ -292,7 +293,7 @@ respiratory_viruses_last_3_years <- cl_dataset_periodo_epi %>%
 ```
 
 
-En el análisis del comportamiento de los virus respiratorios por periodo epidemiológico desde el 2022 se observa que se ha mantenido la circulación de virus como Rinovirus, Adenovirus y VSR. Para los tres años entre los periodos 3 al 6 coincide con el pico respiratorio que se presenta en todos los años (Figura 1).
+En el análisis del comportamiento de los virus respiratorios por periodo epidemiológico desde el 2022, se observa que se ha mantenido la circulación de virus como Rinovirus, Adenovirus y VSR. Para los tres años se muestra el comportamiento del pico respiratorio que se presenta en todos los años (Figura 1).
 
 ```{r plot-historic-data, include=TRUE, fig.height=6, fig.width=8, fig.cap= paste0("Circulación de virus respiratorios por período epidemiológico Año 2022 - ", params$year, " Laboratorio de Salud Pública de Bogotá.")}
 #PLOTTING Figura 1
