@@ -28,6 +28,26 @@ default:
       - "no_cumple"
       - "no_se_procesa"
       - "resultado_indeterminado"
+    age_groups:
+      col_name: "rangodeedadvegeneral"
+      first: 
+        values: "1_ano"
+        category: "<2 años"
+      second: 
+        values: "entre_1_y_4_anos"
+        category: "2 a 4 años"
+      third: 
+        values: ["entre_5_y_9_anos", "entre_10_y_14_anos"]
+        category: "5 a 14 años"
+      fourth: 
+        values: ["entre_15_y_19_anos", "entre_20_y_29_anos", "entre_30_y_39_anos"]
+        category: "15 a 39 años"
+      fifth: 
+        values: ["entre_40_y_49_anos", "entre_50_y_59_anos"]
+        category: "40 a 59 años"
+      sixth: 
+        values: "60_y_mas_anos"
+        category: "60 y más"
   filmarray_data:
     file:
       sheets:
