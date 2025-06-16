@@ -695,38 +695,48 @@ get_distribution_surveillance <- function(report_data,
             !is.na(.data$fluorescenciavegeneral))
     }
   }
-  config_path <- system.file("extdata", "config.yml", package = "labrep")
-  column_names <- config::get(file = config_path, "respiratory_virus_detected")
-  names <- config::get(file = config_path, "respiratory_virus_detected_names")
-  i <- 1
-  for (column in column_names) {
-    positive_cases <- report_data_esi[which(stringr::str_detect(
-      report_data_esi$virusdetectadosvegeneral, column)), ]
-    positive_cases_age_group <- generate_age_groups_viruses(positive_cases, 
-                                                         event_name = column, 
-                                                         wt_percentage = TRUE, 
-                                                         total_cases = nrow(positive_cases), 
-                                                         event_label = names[i])
-    viruses_age_group <- rbind(viruses_age_group, positive_cases_age_group)
-    i <- i + 1
-  }
-  if (include_sars) {
-    positive_cases <- report_data_esi[
-      report_data_esi$resultadonuevocoronavirussarscov2vegeneral 
-      == "positivo_para_nuevo_coronavirus_sars_cov_2", ]
-    positive_cases_virusvgeneral <- report_data_esi[which(stringr::str_detect(
-      report_data_esi$virusdetectadosvegeneral, "covid_19")), ]
-    if (nrow(positive_cases_virusvgeneral) > 1) {
-      positive_cases <- rbind(positive_cases, positive_cases_virusvgeneral)
-    }
-    positive_cases_age_group <-
-      generate_age_groups_viruses(positive_cases,
-                                  event_name = "sars",
-                                  wt_percentage = TRUE,
-                                  total_cases = nrow(positive_cases),
-                                  event_label = "SARS CoV 2")
-    viruses_age_group <- rbind(viruses_age_group, positive_cases_age_group)
-  }
+  
+  viruses_age_group <-
+    get_cases_other_viruses(report_data = report_data_esi, 
+                            age_groups = TRUE)
+  
+  # config_path <- system.file("extdata", "config.yml", package = "labrep")
+  # column_names <- config::get(file = config_path, "respiratory_virus_detected")
+  # names <- config::get(file = config_path, "respiratory_virus_detected_names")
+  # i <- 1
+  # for (column in column_names) {
+    
+  #positive_cases <- report_data_esi[which(stringr::str_detect(
+  #report_data_esi$virusdetectadosvegeneral, column)), ]
+    
+  #positive_cases_age_group <- generate_age_groups_viruses(positive_cases, 
+                                                         #event_name = column, 
+  #wt_percentage = TRUE, 
+  #total_cases = nrow(positive_cases), 
+  #event_label = names[i])
+  #viruses_age_group <- rbind(viruses_age_group, positive_cases_age_group)
+  #i <- i + 1
+  #}
+  #if (include_sars) {
+  # positive_cases <- report_data_esi[
+  #   report_data_esi$resultadonuevocoronavirussarscov2vegeneral 
+  #   == "positivo_para_nuevo_coronavirus_sars_cov_2", ]
+  # positive_cases_virusvgeneral <- report_data_esi[which(stringr::str_detect(
+  #   report_data_esi$virusdetectadosvegeneral, "covid_19")), ]
+  # if (nrow(positive_cases_virusvgeneral) > 1) {
+  #   positive_cases <- rbind(positive_cases, positive_cases_virusvgeneral)
+  # }
+  # positive_cases_age_group <-
+  #   generate_age_groups_viruses(positive_cases,
+  #                               event_name = "sars",
+  #                               wt_percentage = TRUE,
+  #                               total_cases = nrow(positive_cases),
+  #                               event_label = "SARS CoV 2")
+  # viruses_age_group <- rbind(viruses_age_group, positive_cases_age_group)
+  # }
+  positive_cases_age_group <- get_cases_sars(report_data = report_data_esi,
+                                             age_groups = TRUE)
+  viruses_age_group <- rbind(viruses_age_group, positive_cases_age_group)
   return(viruses_age_group)
 }
 
