@@ -274,6 +274,12 @@ plot_table_vrs_epiweek <- function(data_epiweek,
                                    epiweek) {
   data_table <- data_epiweek %>%
     dplyr::filter(!!dplyr::sym(col_epiweek) <= epiweek)
+  init_seq <- 2
+  by_val <- 2
+  if (nrow(data_table) < 2) {
+    init_seq <- 1
+    by_val <- 1
+  }
   table_epiweek <-
     knitr::kable(data_table,
                  col.names = c("Semana Epidemiologica", "% Positivos"),
@@ -284,7 +290,7 @@ plot_table_vrs_epiweek <- function(data_epiweek,
                  epidemiológica, Bogotá 2024 \n ") %>%
     kableExtra::row_spec(0, bold = TRUE,
                          color = "white", background = "#145765") %>%
-    kableExtra::row_spec(seq(2, nrow(data_table), by = 2),
+    kableExtra::row_spec(seq(init_seq, nrow(data_table), by = by_val),
                          background = "#D4EFFB") %>%
     kableExtra::column_spec(1, border_left = TRUE) %>%
     kableExtra::column_spec(2, border_right = TRUE) %>%
@@ -301,6 +307,12 @@ plot_table_epiweek_tosferina <- function(data_epiweek,
                                          epiweek) {
   data_table <- data_epiweek %>%
     dplyr::filter(!!dplyr::sym(col_epiweek) <= epiweek)
+  init_seq <- 2
+  by_val <- 2
+  if (nrow(data_table) < 2) {
+    init_seq <- 1
+    by_val <- 1
+  }
   table_epiweek <-
     knitr::kable(data_table,
                  longtable = TRUE,
@@ -311,7 +323,7 @@ plot_table_epiweek_tosferina <- function(data_epiweek,
                  "latex") %>%
     kableExtra::row_spec(0, bold = TRUE,
                          color = "white", background = "#145765") %>%
-    kableExtra::row_spec(seq(2, nrow(data_table), by = 2),
+    kableExtra::row_spec(seq(init_seq, nrow(data_table), by = by_val),
                          background = "#D4EFFB") %>%
     kableExtra::column_spec(1, border_left = TRUE) %>%
     kableExtra::column_spec(2, border_right = TRUE) %>%
