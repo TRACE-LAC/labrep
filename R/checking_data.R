@@ -743,7 +743,7 @@ get_distribution_surveillance <- function(report_data,
 #' @title Obtener la distribución de casos por tipo de prueba
 #' @export
 get_distribution_test <- function(report_data,
-                                  epiweek = 0,
+                                  epiweek = "all",
                                   include_sars = FALSE,
                                   test = NULL,
                                   col_epiweek = NULL) {
@@ -771,7 +771,7 @@ get_distribution_test <- function(report_data,
            " a la semana epidemiologica")
     }
   }
-  if (epiweek > 0) {
+  if (epiweek != "all" && is.numeric(epiweek)) {
     report_data_test <- report_data_test[
       report_data_test[[col_epiweek]] == epiweek, ]
   }
@@ -780,13 +780,15 @@ get_distribution_test <- function(report_data,
                        data_grouped = report_data_test,
                        col_epiweek = col_epiweek,
                        table = FALSE)
-  
+  #print(cases_epiweeks)
   #cases_epiweeks <- 
    # add_missing_weeks(dataset = cases_epiweeks,
     #                  col_epiweek = col_epiweek)
   viruses_epiweeks <- 
     get_cases_other_viruses(report_data = report_data_test,
                             epiweek = "all")
+  #print(report_data_test)
+  #print(viruses_epiweeks)
   if (include_sars) {
     sars_epiweeks <- get_cases_sars(report_data = report_data_test,
                                     epiweek = "all")
