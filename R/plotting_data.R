@@ -6,6 +6,7 @@ plot_age_group_distribution <- function(report_data,
                                         var_fill = "etiqueta",
                                         stacked_percentage = TRUE,
                                         include_sars = FALSE) {
+  report_data[[var_x]] <- na.omit(report_data[[var_x]])
   colors <- get_colors_age_groups(include_sars = include_sars)
   config_path <- system.file("extdata", "config.yml", package = "labrep")
   category_labels <-
@@ -215,7 +216,7 @@ plot_results_tosferina <- function(report_data,
   }
   max_val_pos <- max(positives[["porcentaje"]])
   max_val_report <- max(report_data[["casos"]])
-  if (!is.null(positives)) {
+  if (!is.null(positives) && !all(positives$casos == 0)) {
     max_positives <- max(positives[["porcentaje"]], na.rm = TRUE)
     scaling_factor <- round(max(report_data[["casos"]], na.rm = TRUE) /
                               max_positives, 
