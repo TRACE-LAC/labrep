@@ -192,5 +192,13 @@ default:
       values: ["positivo"]
       valid_result: TRUE
     label: "Adenovirus"
+  - name: "otros_coronavirus"
+    filmarray:
+      col_name: ["coronavirus_229e", "coronavirus_hku1", "coronavirus_nl63", "coronavirus_oc43", "severe_acute_respiratoriy_syndrome_coronavir"]
+      values: ["DETECTADO", "POSITIVO"]
+    other_viruses:
+      col_name: "virusdetectadosvegeneral"
+      values: ["coronavirus_nl63"]
+    label: "Otros Coronavirus"
   legends:
   - epitime: ["PERÍODO EPIDEMIOLOGICO"]
