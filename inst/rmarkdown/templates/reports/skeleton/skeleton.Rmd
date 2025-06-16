@@ -592,7 +592,7 @@ text_influenza <- get_text_viruses(dataset = total_dist_influenza,
                                    tam = nrow(total_dist_influenza))
 ```
 
-En cuanto al comportamiento de los virus de Influenza acumulado a SE `r params$epiweek` como de costumbre en las primeras semanas del año ha circulado el virus de `r text_influenza` en `r total_cases_influenza` muestras positivas. (Figura 8)
+En cuanto al comportamiento de los virus de Influenza acumulado a SE `r params$epiweek`, la circulación en estas semanas del año, ha sido para el virus de `r text_influenza` en `r total_cases_influenza` muestras positivas. (Figura 6).
 
 ```{r distribution_influeza, include=TRUE, fig.height=5, fig.width=10, fig.cap="Distribución de tipos y subtipos de Influenza, Laboratorio de Salud Pública"}
 plot_distribution_epiweek(report_data = distribution_influenza$influenza_epiweeks,
