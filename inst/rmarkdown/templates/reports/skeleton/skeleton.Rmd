@@ -183,6 +183,7 @@ IRAG.
 
 
 ```{r dataset-historic-respiratory-viruses}
+# Añadir validación
 all_tables_historic_data <- get_all_tables(file_name = params$historic_data)
 dataset_periodo_epi <- get_selected_table(list_tables = all_tables_historic_data)
 ```
@@ -198,9 +199,10 @@ fci_data <- import_data_viral_circulation(report_data = params$fci_data,
                                                 dataset_name = "fci")
 ```
 
-```{r panel-data}
+```{r panel-data, echo=FALSE}
 panel_data <- fci_data$panel
-panel_data_cleaned <- clean_filmarray_data(filmarray_data = panel_data)
+panel_data_cleaned <- clean_filmarray_data(filmarray_data = panel_data,
+                                           is_panel = TRUE)
 
 config_path <- system.file("extdata", "config.yml", package = "labrep")
 panel_parainfluenza <-
