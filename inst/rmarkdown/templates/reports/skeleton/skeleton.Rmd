@@ -171,7 +171,7 @@ Durante `r current_year`, el Laboratorio de Salud Pública (LSP) continúa
 apoyando la vigilancia de la infección respiratoria aguda en Bogotá, mediante el
 procesamiento de muestras remitidas por instituciones centinela de los
 eventos: Enfermedad Similar a Influenza (ESI) que son pacientes
-ambulatorios, de pacientes hospitalizados por Infección Respiratoria
+ambulatorios y de pacientes hospitalizados por Infección Respiratoria
 Aguda Grave (IRAG) y de IRAG inusitado que se presente en cualquier
 institución de la ciudad.
 
