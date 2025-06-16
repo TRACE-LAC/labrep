@@ -273,7 +273,7 @@ plot_table_vrs_epiweek <- function(data_epiweek,
                                    col_epiweek = "Semana",
                                    epiweek) {
   data_table <- data_epiweek %>%
-    dplyr::filter(!!dplyr::sym(col_epiweek) <= epiweek)
+    dplyr::filter(!!dplyr::sym(col_epiweek) <= as.numeric(epiweek))
   init_seq <- 2
   by_val <- 2
   if (nrow(data_table) < 2) {
@@ -287,7 +287,7 @@ plot_table_vrs_epiweek <- function(data_epiweek,
                  "latex",
                  longtable = TRUE,
                  caption = "Positividad de virus respiratorios por semana 
-                 epidemiológica, Bogotá 2024 \n ") %>%
+                 epidemiológica, Bogotá 2025 \n ") %>%
     kableExtra::row_spec(0, bold = TRUE,
                          color = "white", background = "#145765") %>%
     kableExtra::row_spec(seq(init_seq, nrow(data_table), by = by_val),
@@ -319,7 +319,7 @@ plot_table_epiweek_tosferina <- function(data_epiweek,
                  col.names = c("SE", "% Positivos"),
                  align = "c",
                  caption = "Positividad de tosferina por semana epidemiológica,
-                 Bogotá 2024",
+                 Bogotá 2025",
                  "latex") %>%
     kableExtra::row_spec(0, bold = TRUE,
                          color = "white", background = "#145765") %>%
