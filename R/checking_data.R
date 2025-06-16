@@ -125,22 +125,36 @@ get_cases_filmarray <- function(report_data,
               positive_cases <- rbind(positive_cases, aux_positive_cases)
             }
           }
-          if (nrow(positive_cases) > 0) {
+          #if (nrow(positive_cases) > 0) {
             if (!is.null(epiweek)) {
               positive_cases <-
-                group_columns_total(disease_data = positive_cases,
-                                    event_name = virus$name,
-                                    col_names = col_epiweek,
-                                    event_label = virus$label) 
+                positive_cases[!is.na(positive_cases[[col_epiweek]]), ]
+              
+              if (nrow(positive_cases) > 0) {
+                positive_cases <-
+                  group_columns_total(disease_data = positive_cases,
+                                      event_name = virus$name,
+                                      col_names = col_epiweek,
+                                      event_label = virus$label)
+              }
             }
             if (age_groups) {
-              positive_cases_age_group <-
-                group_columns_total(positive_cases,
-                                    col_age_groups,
-                                    event_name = virus$name,
-                                    wt_percentage = TRUE,
-                                    total_cases = nrow(positive_cases),
-                                    event_label = virus$label)
+              positive_cases <-
+                positive_cases[!is.na(positive_cases[[col_age_groups]]), ]
+              if (nrow(positive_cases) <= 0) {
+                positive_cases_age_group <- 
+                  data.frame(grupo_edad = "2 a 4 años", casos = 0,
+                             porcentaje = 0.0, evento = virus$name,
+                             etiqueta = virus$label)
+              } else {
+                positive_cases_age_group <-
+                  group_columns_total(positive_cases,
+                                      col_age_groups,
+                                      event_name = virus$name,
+                                      wt_percentage = TRUE,
+                                      total_cases = nrow(positive_cases),
+                                      event_label = virus$label)
+              }
               positive_cases_age_group <-
                 complete_age_categories(data_grouped = positive_cases_age_group,
                                         event_name = virus$name,
@@ -149,11 +163,11 @@ get_cases_filmarray <- function(report_data,
                 nrow(positive_cases)
               viruses_age_group <-
                 rbind(viruses_age_group, positive_cases_age_group)
-            } else {
+            } else if (nrow(positive_cases) > 0) {
               viruses_age_group <-
                 rbind(viruses_age_group, positive_cases)
             } 
-          }
+          #}
         }
       }
   }
