@@ -472,25 +472,29 @@ get_dist_fci_other_vrs <- function(fci_data, vrs_data,
     dplyr::summarise(casos = sum(casos),
                      total_casos = sum(total_casos),
                      .groups = "drop")
+  
+  #print(dist_fci_other_vrs)
   dist_fci_other_vrs <- dist_fci_other_vrs %>%
     dplyr::select(.data[[col_name]],
                   .data$casos,
                   .data$evento,
                   .data$etiqueta,
                   .data$total_casos)
-  
+  #print(dist_fci_other_vrs)
   if (indicators) {
     dist_epiweek_indicators <- dist_epiweek_indicators %>%
       dplyr::group_by(!!dplyr::sym(col_name)) %>%
       dplyr::summarise(total_casos = dplyr::first(total_casos),
                        total_muestras = dplyr::first(total_muestras),
                        .groups = "drop")
+    #print(dist_epiweek_indicators)
     dist_epiweek_indicators <-
       add_indicators(data_grouped = dist_epiweek_indicators,
                      total_cases = FALSE,
                      total_samples = FALSE,
                      positivity = TRUE,
                      remove_nan = FALSE)
+    #print(dist_epiweek_indicators)
   }
   if (porcentaje) {
     dist_fci_other_vrs <- dist_fci_other_vrs %>%
@@ -505,6 +509,8 @@ get_dist_fci_other_vrs <- function(fci_data, vrs_data,
                          values_from = casos, values_fn = sum)
   }
   if (indicators) {
+    dist_fci_other_vrs <- dist_fci_other_vrs %>%
+      dplyr::rename(total_casos_positivos = total_casos)
     dist_fci_other_vrs <- dist_fci_other_vrs %>%
       dplyr::left_join(dist_epiweek_indicators, by = col_name)
   }
