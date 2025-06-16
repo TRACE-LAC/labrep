@@ -523,7 +523,8 @@ get_dist_fci_other_vrs <- function(fci_data, vrs_data,
 get_cases_sars <- function(report_data,
                            positive_value = "DETECTADO",
                            age_groups = FALSE,
-                           epiweek = NULL) {
+                           epiweek = NULL,
+                           total_cases = NULL) {
   config_path <- system.file("extdata", "config.yml", package = "labrep")
   col_epiweek <- config::get(file = config_path,
                              "other_viruses")$epiweek$col_valid
@@ -544,15 +545,16 @@ get_cases_sars <- function(report_data,
                           event_name = "sars",
                           col_names = col_epiweek,
                           event_label = "SARS CoV 2")
-    sars_epiweeks <-
-      get_cases_epiweeks(report_data = report_data,
-                         data_grouped = sars_epiweeks,
-                         col_epiweek = col_epiweek)
+    # sars_epiweeks <-
+      # get_cases_epiweeks(report_data = report_data,
+        #                 data_grouped = sars_epiweeks,
+         #                col_epiweek = col_epiweek)
     sars_epiweeks$evento <- "sars"
     sars_epiweeks$etiqueta <- "SARS CoV 2"
+    
     if (epiweek != "all") {
       sars_epiweeks <- sars_epiweeks %>%
-        dplyr::filter(!!dplyr::sym(col_epiweek) == as.numeric(epiweek))
+        dplyr::filter(!!dplyr::sym(col_epiweek) <= as.numeric(epiweek))
     }
     return(sars_epiweeks)
   }
