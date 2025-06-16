@@ -329,22 +329,20 @@ perc_sars_age_group <-
   get_perc_viruses_age(dataset = sars_viruses_age_groups)
 ```
 
-Para esta semana, por grupo de edad, el `r perc_vrs_age_group`% de pacientes positivos para virus respiratorios diferentes al SARS-CoV-2 en `r current_year` corresponden a
-la población de menores de 5 años (figura 2) y si se incluye al
-SARS-CoV-2 los menores corresponden al `r perc_sars_age_group` % (figura 3).
+Para esta semana del año `r current_year`, por grupo de edad, el `r perc_sars_age_group`% de pacientes positivos para virus respiratorios  corresponden a 
+la población de menores de 5 años (figura 2).
 
 ```{r plot-viruses-age-groups, include=TRUE, fig.height=4, fig.width=5.7,fig.cap="Distribución porcentual de virus respiratorios por grupo de edad, Laboratorio de Salud Pública Bogotá.", fig.align='right'}
 # ESTA BIEN
-plot_age_group_distribution(viruses_age_groups)
+#plot_age_group_distribution(viruses_age_groups)
 ```
 \arrayrulecolor{colorbdtableplot}
 
 ```{r table-viruses-age-groups, fig.align='right'}
-trans_viruses_age_groups <-
-  convert_age_groups_as_cols(dataset = viruses_age_groups)
-plot_table_legend(report_data = trans_viruses_age_groups)
+#trans_viruses_age_groups <-
+#  convert_age_groups_as_cols(dataset = viruses_age_groups)
+#plot_table_legend(report_data = #trans_viruses_age_groups)
 ```
-
 
 ```{r paragraph-viruses-age-groups}
 text_cons_viruses <-
@@ -353,11 +351,8 @@ text_cons_viruses <-
                             se presentan casos de ")
 ```
 
-En la figura 3 se presenta el consolidado de los virus respiratorios por los diferentes grupos de edad, en los niños menores de 2 años las mayores frecuencias son de casos de `r text_cons_viruses`.
+```{r plot-distribution-sars, include=TRUE, fig.height=4, fig.width=5.7, fig.align='right', fig.cap="Distribución porcentual de virus respiratorios por grupo de edad, Laboratorio de Salud Pública Bogotá."}
 
-\newpage
-
-```{r plot-distribution-sars, include=TRUE, fig.height=4, fig.width=5.7, fig.align='right', fig.cap="Distribución porcentual de virus respiratorios y SARS-CoV-2 por grupo de edad, Laboratorio de Salud Pública Bogotá."}
 plot_age_group_distribution(sars_viruses_age_groups, var_y = "casos",
                             include_sars = TRUE)
 ```
@@ -376,13 +371,12 @@ text_cons_vrs_sars <-
 años, ")
 ```
 
-Al incluir el virus de SARS-CoV-2 en la cuenta de los virus
-respiratorios, se observa que, en los menores de 2 años años las
-frecuencias son para `r text_cons_vrs_sars`. A continuación, se presenta la circulación acumulada de 
-los virus respiratorios de forma desagregada por tipo de vigilancia, 
-según grupo de edad (figura 4). También se ha incluido al SARS-CoV-2.
 
-\newpage
+En la figura 2 se presenta el consolidado de los virus respiratorios por los diferentes grupos de edad, en los niños menores de 2 años, las mayores frecuencias se presentan para: `r text_cons_vrs_sars`.
+
+A continuación, se presenta la circulación acumulada de 
+los virus respiratorios de forma desagregada por tipo de vigilancia, 
+según grupo de edad (figura 3).
 
 ```{r distribution-esi-age-groups}
 # Se debe hacer por semana
@@ -455,7 +449,7 @@ plot_table_legend(report_data = trans_irag_grave_age_groups,
                   include_sars = TRUE)
 ```
 
-En la figura 5 se puede observar el comportamiento de los virus
+En la figura 4 se puede observar el comportamiento de los virus
 identificados tanto por la vigilancia centinela como por la vigilancia
 del IRAG inusitado, mediante las dos metodologías: panel respiratorio Allplex y
 RT-PCR.
@@ -465,6 +459,7 @@ test_distribution_epiweek <-
   get_distribution_test(report_data = other_viruses_cleaned_data,
                         include_sars = FALSE)
 ```
+\newpage
 
 ```{r plot-distribution-test-epiweek, include=TRUE, fig.height=7, fig.width=12, fig.cap="Circulación de virus respiratorios en casos de IRAG identificados por por panel respiratorio Allplex y prueba molecular, Laboratorio de Salud Pública."}
 plot_distribution_epiweek(report_data =
