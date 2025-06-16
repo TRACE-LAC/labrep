@@ -15,6 +15,7 @@ default:
   influeza_events: [ "influenza_a", "h1n1", "h1n1_pdm09", "h3n2", "influenza_b"]
   influeza_columns_names: [ "Influenza B", "H3N2", "H1N1 2009"]
   respiratory_virus_test_exceptions: [ "muestra_insuficiente_no_se_procesa", "no_se_procesa_ifi_tiempo_de_toma_de_muestra_superior_a_7_dias_nota_2", "no_se_observan_virus_respiratorios", "muestra_escasa_de_celulas"]
+  viruses_consolidate: ["parainfluenza", "otros_coronavirus"]
   other_viruses:
     epiweek: 
       col_valid: "semanaepidemiologicavegeneral"
