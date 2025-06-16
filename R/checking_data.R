@@ -360,49 +360,69 @@ get_cases_other_viruses <- function(report_data,
   }
   for (virus in cols_viruses) {
     other_vrs <- virus$other_viruses
+    #print("other_vrs")
+    #print(other_vrs)
     if (other_vrs$col_name %in% names(report_data) &&
         !("" %in% other_vrs$values)) {
       cases_virus <- report_data
       if ("valid_result" %in% names(other_vrs)) {
-        for (value in invalid_results$values) {
-          if (value != "") {
-            # Se asume que no puede tener dos tipos de influenza a la vez
-            cases_virus <- cases_virus[which(!stringr::str_detect(
-              cases_virus[[invalid_results$col_name]], value)), ]
-          }
-        }
+            # Se tiene en cuenta la columna virusdetectadosvegeneral con valores
+            # invalidos los cuales se remueven o se obtienen solo las filas que
+            # no los tengan (SE ASUME QUE SOLO SE PUEDE TENER UNA FLU)
+            cases_virus <-
+              get_rows_valid_str_detect(cases_virus = cases_virus,
+                                        col_name = invalid_results$col_name,
+                                        values = invalid_results$values,
+                                        is_not = TRUE)
+            #print("cases_virus")
+            #print(cases_virus)
       }
-      if ("col_subtypes" %in% names(other_vrs)) {
+    }
+    #print("HOLAAAA")
+    #print(cases_virus[[invalid_results$col_name]])
+    positive_cases_virus <- data.frame() 
+    if ("col_subtypes" %in% names(other_vrs)) {
         subtypes_values <-
           get_subtypes_values(viruses = cols_viruses,
                               subtypes = virus$subtypes)
-        other_vrs$values <- subtypes_values
-        cases_virus <- cases_virus[
-          which(stringr::str_detect(cases_virus[[other_vrs$col_name]],
-                                    other_vrs$original_value)), ]
-      }
-      positive_cases_virus <- data.frame()
-      for (value in other_vrs$values) {
-        aux_cases_virus <- data.frame()
-        if (value != "") {
-          if ("col_subtypes" %in% names(other_vrs)) {
-            aux_cases_virus <- cases_virus[which(!stringr::str_detect(
-              cases_virus[[other_vrs$col_name]], value)), ]
-          } else {
-            aux_cases_virus <- cases_virus[which(stringr::str_detect(
-              cases_virus[[other_vrs$col_name]], value)), ]
-          }
-          positive_cases_virus <- rbind(positive_cases_virus, aux_cases_virus)
-        }
-      }
-      if (nrow(positive_cases_virus) > 0) {
+        # other_vrs$values <- subtypes_values
+        cases_virus <-
+          get_rows_valid_str_detect(cases_virus = cases_virus,
+                                    col_name = other_vrs$col_name,
+                                    values = other_vrs$values,
+                                    is_not = FALSE)
+        # Se asume que no puede tener dos tipos de influenza a la vez
+        # SE DEBE VALIDAR
+        positive_cases_virus <-
+          get_rows_valid_str_detect(cases_virus = cases_virus,
+                                    col_name = other_vrs$col_name,
+                                    values = subtypes_values,
+                                    is_not = TRUE)
+     } else {
+       positive_cases_virus <-
+         get_rows_valid_str_detect(cases_virus = cases_virus,
+                                   col_name = other_vrs$col_name,
+                                   values = other_vrs$values,
+                                   is_not = FALSE)
+     }
+     if (other_vrs$col_name == "influenzabporrtpcrvegeneral") {
+       # print(positive_cases_virus)
+     }
+     #print("positive_cases_virus")
+     #print(positive_cases_virus)
+      #if (nrow(positive_cases_virus) > 0) {
         if (!is.null(epiweek)) {
-          positive_cases_virus_epiweek <-
-            group_columns_total(disease_data = positive_cases_virus,
-                                event_name = virus$name,
-                                col_names = col_epiweek,
-                                event_label = virus$label)
-          positive_cases <- rbind(positive_cases, positive_cases_virus_epiweek)
+          if (nrow(positive_cases_virus) > 0) {
+            positive_cases_virus_epiweek <-
+              group_columns_total(disease_data = positive_cases_virus,
+                                  event_name = virus$name,
+                                  col_names = col_epiweek,
+                                  event_label = virus$label)
+            positive_cases <- rbind(positive_cases,
+                                    positive_cases_virus_epiweek)
+          }
+          #print("positive_cases_virus_epiweek")
+          #print(positive_cases_virus_epiweek)
         }
         if (age_groups) {
           cases_age_groups <-
@@ -412,13 +432,16 @@ get_cases_other_viruses <- function(report_data,
                                         total_cases =
                                           nrow(positive_cases_virus),
                                         event_label = virus$label)
-          cases_age_groups$total_casos <- nrow(positive_cases_virus)
+          
+          cases_age_groups$total_casos <- sum(cases_age_groups$casos)
+          if (other_vrs$col_name == "influenzabporrtpcrvegeneral") {
+            # print(cases_age_groups)
+          }
           positive_cases <- rbind(positive_cases, cases_age_groups)
         }
-      }
+      #}
     }
-  }
-  if (!is.null(epiweek)) {
+  if (!is.null(epiweek) && nrow(positive_cases) > 0) {
     positive_cases <- add_indicators(data_grouped = positive_cases,
                    report_data = report_data,
                    col_name = col_epiweek,
