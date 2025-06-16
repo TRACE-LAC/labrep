@@ -1,10 +1,12 @@
 #' @title Limpiar los datos de la base de la Fundación Cardio Infantil
 #' @export
-clean_filmarray_data <- function(filmarray_data) {
+clean_filmarray_data <- function(filmarray_data,
+                                 is_panel = FALSE) {
   data_clean <- filmarray_data
   names(data_clean) <-
     epitrix::clean_labels(names(data_clean))
-  data_clean <- clean_filmarray_age(data_clean)
+  data_clean <- clean_filmarray_age(data_clean,
+                                    is_panel = is_panel)
   config_path <- system.file("extdata", "config.yml", package = "labrep")
   col_epiweek <- config::get(file = config_path,
                              "filmarray_data")$epiweek$col_valid
