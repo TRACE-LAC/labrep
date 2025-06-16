@@ -180,6 +180,27 @@ get_cases_filmarray <- function(report_data,
     viruses_age_group <-
       viruses_age_group[-sd_values, ]
   }
+  for (virus in c("parainfluenza", "otros_coronavirus")) {
+    #print(viruses_age_group)
+    data_parainfluenza <- viruses_age_group %>% 
+      dplyr::filter(evento == virus)
+    # print(perc_parainfluenza)
+    data_parainfluenza <- 
+      get_consolidated_viruses(dataset = data_parainfluenza,
+                               col_name = col_con_viruses,
+                               percentage = perc_con_viruses,
+                               total_cases = perc_con_viruses)
+    #print(data_parainfluenza)
+    if (nrow(data_parainfluenza) > 1) {
+      viruses_age_group <- viruses_age_group %>% 
+        dplyr::filter(evento != virus)
+      # print("PARAINFLUENZA")
+      # print(names(data_parainfluenza))
+      # print("ORIGINAL")
+      # print(names(viruses_age_group))
+      viruses_age_group <- rbind(viruses_age_group, data_parainfluenza)
+    }
+  }
   if (!is.null(epiweek) && nrow(viruses_age_group) > 0) {
     viruses_age_group <- add_indicators(data_grouped = viruses_age_group,
                                         report_data = report_data,
