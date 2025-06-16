@@ -262,77 +262,72 @@ generate_age_groups_viruses <- function(report_data,
                                      wt_percentage = FALSE,
                                      total_cases = 0,
                                      event_label) {
-  data_grouped  <- report_data %>% dplyr::group_by(
-    dplyr::across(
-      dplyr::all_of("rangodeedadvegeneral"))) %>%
-    dplyr::summarise(casos = dplyr::n(), .groups = "drop")
-  third_group_age <- 
-    sum(data_grouped$casos[data_grouped$rangodeedadvegeneral ==
-                             "entre_5_y_9_anos"][1],
-        data_grouped$casos[data_grouped$rangodeedadvegeneral ==
-                             "entre_10_y_14_anos"][1], 
-        na.rm = TRUE)
-  four_group_age <- 
-    sum(data_grouped$casos[data_grouped$rangodeedadvegeneral ==
-                             "entre_15_y_19_anos"][1],
-        data_grouped$casos[data_grouped$rangodeedadvegeneral ==
-                             "entre_20_y_29_anos"][1],
-        data_grouped$casos[data_grouped$rangodeedadvegeneral ==
-                             "entre_30_y_39_anos"][1],
-        na.rm = TRUE)
-  five_group_age <- 
-    sum(data_grouped$casos[data_grouped$rangodeedadvegeneral ==
-                             "entre_40_y_49_anos"][1],
-        data_grouped$casos[data_grouped$rangodeedadvegeneral ==
-                             "entre_50_y_59_anos"][1], 
-        na.rm = TRUE)
-  data_grouped$rangodeedadvegeneral[data_grouped$rangodeedadvegeneral ==
-                                      "1_ano"]  <- "< 2 años"
-  data_grouped$rangodeedadvegeneral[data_grouped$rangodeedadvegeneral ==
-                                      "entre_1_y_4_anos"]  <- "2 a 4 años"
-  data_grouped$rangodeedadvegeneral[data_grouped$rangodeedadvegeneral ==
-                                      "60_y_mas_anos"]  <- "60 y más"
-  data_grouped$rangodeedadvegeneral[data_grouped$rangodeedadvegeneral ==
-                                      "entre_5_y_9_anos"]  <- "5 a 14 años"
-  data_grouped$casos[data_grouped$rangodeedadvegeneral == "5 a 14 años"] <-
-    third_group_age
+  data_grouped  <- report_data
   
-  data_grouped$rangodeedadvegeneral[data_grouped$rangodeedadvegeneral ==
-                                      "entre_15_y_19_anos"]  <- "15 a 39 años"
-  data_grouped$casos[data_grouped$rangodeedadvegeneral == "15 a 39 años"] <-
-    four_group_age
+  if (nrow(data_grouped) > 0) {
+    config_path <- system.file("extdata", "config.yml", package = "labrep")
+    age_groups <- config::get(file = config_path,
+                              "other_viruses")$age_groups
+    
+    data_grouped <- rename_row(dataset = data_grouped,
+                               col_name = age_groups$col_name,
+                               original_names = age_groups$third$values,
+                               new_name = age_groups$third$category)
+    
+    data_grouped <- rename_row(dataset = data_grouped,
+                               col_name = age_groups$col_name,
+                               original_names = age_groups$fourth$values,
+                               new_name = age_groups$fourth$category)
+    
+    data_grouped <- rename_row(dataset = data_grouped,
+                               col_name = age_groups$col_name,
+                               original_names = age_groups$fifth$values,
+                               new_name = age_groups$fifth$category)
+    
+    data_grouped  <- data_grouped %>% dplyr::group_by(
+      dplyr::across(
+        dplyr::all_of(age_groups$col_name))) %>%
+      dplyr::summarise(casos = dplyr::n(), .groups = "drop")
+    
+    data_grouped$rangodeedadvegeneral[data_grouped$rangodeedadvegeneral ==
+                                        age_groups$first$values]  <-
+      age_groups$first$category
+    data_grouped$rangodeedadvegeneral[data_grouped$rangodeedadvegeneral ==
+                                        age_groups$second$values]  <-
+      age_groups$second$category
+    data_grouped$rangodeedadvegeneral[data_grouped$rangodeedadvegeneral ==
+                                        age_groups$sixth$values]  <-
+      age_groups$sixth$category
+    
+    if (length(which(stringr::str_detect(data_grouped[[age_groups$col_name]],
+                                         "_"))) > 0) {
+      data_grouped <-
+        data_grouped[-which(
+          stringr::str_detect(data_grouped[[age_groups$col_name]],
+                              "_")), ]
+    }
+    if (length(which(is.na(data_grouped[[age_groups$col_name]]))) > 0) {
+      data_grouped <-
+        data_grouped[-which(is.na(data_grouped[[age_groups$col_name]])), ]
+    }
+    colnames(data_grouped)[colnames(data_grouped) == age_groups$col_name] <-
+      "grupo_edad"
+    if (total_cases > 0) {
+      data_grouped  <-  data_grouped %>% dplyr::mutate(
+        porcentaje = round((data_grouped$casos/total_cases)*100, 1))
+    } else {
+      data_grouped  <-  data_grouped %>% dplyr::mutate(
+        porcentaje = 0.0)
+    }
+    
+    data_grouped  <-  data_grouped %>%
+      dplyr::mutate(evento = event_name, etiqueta = event_label)
+  }
   
-  data_grouped$rangodeedadvegeneral[data_grouped$rangodeedadvegeneral ==
-                                      "entre_40_y_49_anos"]  <- "40 a 59 años"
-  data_grouped$casos[data_grouped$rangodeedadvegeneral == "40 a 59 años"] <-
-    five_group_age
-  
-  if (length(which(stringr::str_detect(data_grouped$rangodeedadvegeneral,
-                                       "_"))) > 0) {
-    data_grouped <-
-      data_grouped[-which(stringr::str_detect(data_grouped$rangodeedadvegeneral,
-                                              "_")), ]
-  }
-  if (length(which(is.na(data_grouped$rangodeedadvegeneral))) > 0) {
-    data_grouped <-
-      data_grouped[-which(is.na(data_grouped$rangodeedadvegeneral)), ]
-  }
-  colnames(data_grouped)[colnames(data_grouped) == "rangodeedadvegeneral"] <-
-    "grupo_edad"
-  if (total_cases > 0) {
-    data_grouped  <-  data_grouped %>% dplyr::mutate(
-      porcentaje = round((data_grouped$casos/total_cases)*100, 1))
-  } else {
-    data_grouped  <-  data_grouped %>% dplyr::mutate(
-      porcentaje = 0.0)
-  }
-  data_grouped  <-  data_grouped %>%
-    dplyr::mutate(evento = event_name, etiqueta = event_label)
   data_grouped <-
     complete_age_categories(data_grouped = data_grouped,
                             event_name = event_name,
                             event_label = event_label)
-  
   return(data_grouped)
   
 }
