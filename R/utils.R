@@ -10,6 +10,7 @@ row_to_header <- function(data, row_num = 1) {
 #' @title Generar las categorias de edad
 #' @export
 generate_age_categories <- function(dataset) {
+  # print("holllaa")
   if (!any(names(dataset) == "grupo_edad")) {
     data_ages <- cbind(dataset, grupo_edad = NA)
     data_ages[, ncol(data_ages)] <- sapply(data_ages$edad,
@@ -23,19 +24,24 @@ generate_age_categories <- function(dataset) {
 #' @title Definir las categorias de edad
 #' @keywords internal
 define_age_category <- function(age) {
+  # print("holllaa")
   config_path <- system.file("extdata", "config.yml", package = "labrep")
   category_conditionals <- config::get(file = config_path,
                                        "age_categories")$conditionals
   category_labels <- config::get(file = config_path,
                                  "age_categories")$categories
+  # print(category_labels)
   age_values <- unlist(strsplit(age, " ", fixed = TRUE))
+  # print(age_values)
   category <- category_labels[1]
-  print(age)
+  # print(category)
   if ("años" %in% age_values) {
     i <- 1
     for (conditional in category_conditionals) {
       if (eval(parse(text = conditional))) {
         category <- category_labels[i]
+        # print("SOYYY CATEGORIA")
+        # print(category)
       }
       i <- i + 1
     }
