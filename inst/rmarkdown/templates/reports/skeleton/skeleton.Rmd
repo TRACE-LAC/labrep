@@ -630,7 +630,7 @@ table_epiweek <- get_table_epiweek_tosferina(cases_epiweeks_tosferina,
                                              epiweek = params$epiweek)
 ```
 
-Se ha observado la siguiente positividad en `r total_cases_tosferina` muestras analizadas como se aprecia en la tabla 2:
+Se ha observado la siguiente positividad en `r total_cases_tosferina` muestras analizadas como se aprecia en la siguiente tabla:
 
 ```{r table-tosferina-epiweek, include=TRUE, fig.height=5, fig.width=10}
 plot_table_epiweek_tosferina(data_epiweek = table_epiweek,
@@ -655,8 +655,8 @@ per_tosferina_group_0 <- sum(tosferina_group_0$porcentaje)
 tosferina_group_2 <- results_ages_tosferina %>%
   dplyr::filter(grupo_edad == "2 a 3 meses")
 per_tosferina_group_2 <- sum(tosferina_group_0$porcentaje)
+# Validar que grupos de edad se deben tener
 ```
-
 
 El comportamiento de la tosferina por grupo de edad indica que el `r per_tosferina_group_0` % de las muestras recibidas pertenecen al grupo de niños < o = 1 mes, seguido del grupo de 2 a 3 meses con el `r per_tosferina_group_2`% (figura 10).
 
