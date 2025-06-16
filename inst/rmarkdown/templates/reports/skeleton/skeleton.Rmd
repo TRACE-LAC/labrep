@@ -295,7 +295,7 @@ respiratory_viruses_last_3_years <- cl_dataset_periodo_epi %>%
 
 En el análisis del comportamiento de los virus respiratorios por periodo epidemiológico desde el 2022, se observa que se ha mantenido la circulación de virus como Rinovirus, Adenovirus y VSR. Para los tres años se muestra el comportamiento del pico respiratorio que se presenta en todos los años (Figura 1).
 
-```{r plot-historic-data, include=TRUE, fig.height=6, fig.width=8, fig.cap= paste0("Circulación de virus respiratorios por período epidemiológico Año 2022 - ", params$year, " Laboratorio de Salud Pública de Bogotá.")}
+```{r plot-historic-data, include=TRUE, fig.height=6, fig.width=8, fig.cap= paste0("Circulación de virus respiratorios por período epidemiológico.\\newline Año 2022 - ", params$year)}
 #PLOTTING Figura 1
 
 plot_historic_epi_time(dataset = respiratory_viruses_last_3_years,
