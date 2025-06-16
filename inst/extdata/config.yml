@@ -138,7 +138,7 @@ default:
       values: ["DETECTADO", "POSITIVO"]
     other_viruses:
       col_name: "virusdetectadosvegeneral"
-      values: ["enterovirus", "coronavirus_nl63"]
+      values: ["enterovirus"]
     label: "Otros Virus"
   - name: "bocavirus"
     filmarray:
