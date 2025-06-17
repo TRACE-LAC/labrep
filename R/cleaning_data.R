@@ -5,7 +5,7 @@ clean_filmarray_data <- function(filmarray_data,
   data_clean <- filmarray_data
   names(data_clean) <-
     epitrix::clean_labels(names(data_clean))
-  data_clean <- clean_filmarray_age(data_clean,
+  data_clean <- clean_filmarray_age(filmarray_data = data_clean,
                                     is_panel = is_panel)
   config_path <- system.file("extdata", "config.yml", package = "labrep")
   col_epiweek <- config::get(file = config_path,
@@ -38,13 +38,11 @@ clean_filmarray_age <- function(filmarray_data,
         col_clean <- cols_clean_age_groups[index_col]
         names(data_age_clean)[names(data_age_clean) == col_clean] <-
           col_age_groups
-        data_age_clean[[col_age_groups]] <-
-          tolower(data_age_clean[[col_age_groups]])
     }
-  } else {
-    data_age_clean[[col_age_groups]] <-
-      tolower(data_age_clean[[col_age_groups]])
   }
+  
+  data_age_clean[[col_age_groups]] <-
+    tolower(data_age_clean[[col_age_groups]])
   
   if (col_age %in% colnames(data_age_clean)) {
     # print(col_age)
@@ -68,6 +66,8 @@ clean_filmarray_age <- function(filmarray_data,
     data_age_clean[[col_age_groups]][data_age_clean[[col_age_groups]]
                                      == "60 y mas"] <- "60 y más"
   }
+  data_age_clean <- data_age_clean[!(is.na(data_age_clean[[col_age_groups]]) 
+                         & is.na(data_age_clean[[col_age]])), ]
   return(data_age_clean)
 }
 
