@@ -53,7 +53,7 @@ define_age_category <- function(age) {
 #' @keywords internal
 add_character <- function(value, char) {
   init_pos <- regexpr("años|año|mes|meses|día|días|dias", value)[1]
-  if (init_pos > -1) {
+  if (!is.na(init_pos) && init_pos > -1) {
     value <- paste0(substring(value, 1, init_pos - 1),
                     char,
                     substring(value, init_pos))
