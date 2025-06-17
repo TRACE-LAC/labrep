@@ -415,7 +415,7 @@ get_rows_valid_str_detect <- function(cases_virus,
                                       col_name,
                                       values,
                                       is_not = FALSE) {
-  if (!all(is.na(cases_virus[[col_name]]))) {
+  if (!all(is.na(cases_virus[[col_name]])) && !all(values == "")) {
     if (is_not) {
       valid_values <- !stringr::str_detect(
         cases_virus[[col_name]],
