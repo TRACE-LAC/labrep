@@ -106,7 +106,7 @@ default:
       values: ["DETECTADO", "POSITIVO"]
     other_viruses:
       col_name: "virusdetectadosvegeneral"
-      values: [""]
+      values: ["h1n1"]
     label: "H1N1"
   - name: "h1n1_pdm09"
     filmarray:
