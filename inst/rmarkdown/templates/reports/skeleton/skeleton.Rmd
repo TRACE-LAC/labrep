@@ -533,7 +533,6 @@ text_vrs_cumulative <- get_text_viruses(dataset = viruses_cumulative_proportion,
                                         tam = 4)
 ```
 
-\newpage
 
 ```{r plot-cumulative-proportion, fig.height=8, fig.width=15, include=TRUE, fig.cap="Proporción acumulada de los virus respiratorios, Laboratorio de Salud Pública"}
 #plot_cumulative_proportion(data_proportion = viruses_cumulative_proportion)
@@ -565,21 +564,17 @@ sars_prop_text <-
   get_prop_text(dataset = sars_prop_epiweeks$cases_epiweek)
 ```
 
-
 Dentro de la circulación viral acumulada a SE`r params$epiweek` en la distribución de los virus respiratorios, se observa `r sars_prop_text` de las `r sars_prop_epiweeks$total_samples` muestras positivas de las `r total_samples_prop` muestras analizadas (figura 5).
 
 ```{r plot-cumulative-proportion-sars, fig.height=8, fig.width=15, include=TRUE, fig.cap="Proporción acumulada de los virus respiratorios, Laboratorio de Salud Pública"}
  plot_cumulative_proportion(sars_prop_epiweeks$cases_epiweek)
 ```
-
 \newpage
-
 ```{r distribution-influenza}
 distribution_influenza <-
   get_cases_influenza(other_virs_data = other_viruses_cleaned_data,
                       filmarray_data = filmarray_data_cleaned) 
 ```
-
 
 ```{r paragraph-influenza}
 total_dist_influenza <-
@@ -660,9 +655,6 @@ per_tosferina_group_2 <- sum(tosferina_group_0$porcentaje)
 
 El comportamiento de la tosferina por grupo de edad indica que el `r per_tosferina_group_0` % de las muestras recibidas pertenecen al grupo de niños < o = 1 mes, seguido del grupo de 2 a 3 meses con el `r per_tosferina_group_2`% (figura 10).
 
-\newpage
-
-
 ```{r plotdistribution_tosferina_ages, echo=FALSE, error=FALSE, fig.height=4, fig.width=10, warning=FALSE, include=TRUE, message=FALSE, fig.cap="Distribución porcentual de casos de tosferina confirmados en el Laboratorio de Salud Pública por grupo de edad"}
 plot_results_tosferina(report_data = results_ages_tosferina,
                        column = "grupo_edad",
@@ -683,6 +675,8 @@ total_dist_tosferina <-
 ```{r paragraph-tosferina-sex}
 tosferina_text_sex <- get_tosferina_text_sex(total_dist_tosferina, figure = 11)
 ```
+
+\newpage
 
 `r tosferina_text_sex$text`
 
