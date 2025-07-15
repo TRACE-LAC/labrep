@@ -403,9 +403,9 @@ plot_historic_epi_time <- function(dataset_epi_time, periodo_epi ) {
     ggplot2::scale_x_discrete(labels = dataset_epi_time$periodo_epidemiologico) +
     # Custom fill colors
     ggplot2::scale_fill_manual(values = c(
-      "a_h1n1_pdm09" = colores$color_a_h1n1_pdm09,
-      "a_no_subtipificado" = colores$color_a_no_subtipificado,
-      "a_h3" = colores$color_a_h3,
+      "h1n1_pdm09" = colores$color_a_h1n1_pdm09,
+      "influenza_a" = colores$color_a_no_subtipificado,
+      "h3n2" = colores$color_a_h3,
       "influenza_b" = colores$color_influenza_b,
       "parainfluenza" = colores$color_parainfluenza,
       "vsr" = colores$color_vsr,
@@ -416,9 +416,9 @@ plot_historic_epi_time <- function(dataset_epi_time, periodo_epi ) {
       "otros_virus" = colores$color_otros_virus
     ),
     labels = c(
-      "a_h1n1_pdm09" = "H1N1 2009",
-      "a_no_subtipificado" = "A no subtipificado",
-      "a_h3" = "H3N2",
+      "h1n1_pdm09" = "H1N1 2009",
+      "influenza_a" = "A no subtipificado",
+      "h3n2" = "H3N2",
       "influenza_b" = "Influenza B",
       "parainfluenza" = "Parainfluenza",
       "vsr" = "VSR",
