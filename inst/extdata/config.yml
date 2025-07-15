@@ -86,7 +86,16 @@ default:
       value: "POR PERIODO"
     table_number:
       value: 2
-    
+    cols_file_save:
+      - name: "se"
+        label: "SEMANAS EPIDEMIOLOGICAS"
+      - name: "total_casos"
+        label: "MUESTRAS POSITIVAS"
+      - name: "total_muestras"
+        label: "MUESTRAS ANALIZADAS"
+      - name: "positividad"
+        label: "POSITIVIDAD"
+
   viruses:
   - name: "influenza_a"
     filmarray:
