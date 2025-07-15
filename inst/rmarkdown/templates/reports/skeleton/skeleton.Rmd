@@ -58,6 +58,10 @@ params:
     label: "Año"
     input: text
     value: 2025
+  save_current_viruses_epiweeks:
+    label: "¿Desea guardar los datos de los virus respistorios del año del reporte?              Se recomienda efectuar esta acción al finalizar el año epidemiológico para generar la gráfica histórica de virus respiratorios del siguiente año"
+    input: checkbox
+    value: FALSE
 editor_options: 
   markdown: 
     wrap: 72
@@ -265,6 +269,11 @@ viruses_epiweeks <- get_dist_fci_other_vrs(fci_data = dist_epiweek_filmarray,
                                            porcentaje = FALSE,
                                            indicators = TRUE,
                                            transpose = FALSE)
+
+if (params$save_current_viruses_epiweeks) {
+  save_vals_cases_epiweeks(viruses_epiweeks = viruses_epiweeks,
+                         year = params$year)
+}
 
 viruses_epitimes <- get_epi_times_current_year(data_epiweek = viruses_epiweeks,
                                                col_name = "se",
