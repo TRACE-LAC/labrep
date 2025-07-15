@@ -411,24 +411,22 @@ get_cases_other_viruses <- function(report_data,
                                    values = other_vrs$values,
                                    is_not = FALSE)
      }
-     if (other_vrs$col_name == "influenzabporrtpcrvegeneral") {
-       # print(positive_cases_virus)
-     }
-     #print("positive_cases_virus")
-     #print(positive_cases_virus)
-      #if (nrow(positive_cases_virus) > 0) {
         if (!is.null(epiweek)) {
-          if (nrow(positive_cases_virus) > 0) {
-            positive_cases_virus_epiweek <-
-              group_columns_total(disease_data = positive_cases_virus,
-                                  event_name = virus$name,
-                                  col_names = col_epiweek,
-                                  event_label = virus$label)
-            positive_cases <- rbind(positive_cases,
-                                    positive_cases_virus_epiweek)
-          }
-          #print("positive_cases_virus_epiweek")
-          #print(positive_cases_virus_epiweek)
+          if (nrow(positive_cases_virus) <= 0) {
+            positive_cases_virus <- 
+              data.frame(semanaepidemiologicavegeneral = 1, casos = 0,
+                         evento = virus$name,
+                         etiqueta = virus$label)
+            names(positive_cases_virus)[names(positive_cases_virus) == "semana"] <- 
+              col_epiweek
+          } 
+          positive_cases_virus_epiweek <-
+            group_columns_total(disease_data = positive_cases_virus,
+                                event_name = virus$name,
+                                col_names = col_epiweek,
+                                event_label = virus$label)
+          positive_cases <- rbind(positive_cases,
+                                  positive_cases_virus_epiweek)
         }
         if (age_groups) {
           cases_age_groups <-
