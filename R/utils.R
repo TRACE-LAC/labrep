@@ -422,13 +422,11 @@ add_indicators <- function(data_grouped,
                            remove_nan = TRUE,
                            join = TRUE) {
   if (total_cases) {
-    col_total_cases <- data_grouped %>%
-      dplyr::group_by(!!dplyr::sym(col_name)) %>%
-      dplyr::summarise(total_casos = sum(.data$casos))
+    vals_total_cases <- get_total_cases(data_grouped = data_grouped,
+                                        col_name = col_name,
+                                        join = join)
     if (join) {
-      data_grouped <- data_grouped %>%
-        dplyr::left_join(col_total_cases, by = col_name)
-      data_grouped$total_casos[is.na(data_grouped$total_casos)] <- 0
+      data_grouped <- vals_total_cases
     }
   }
   if (total_samples) {
