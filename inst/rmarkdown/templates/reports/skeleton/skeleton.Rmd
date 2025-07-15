@@ -294,11 +294,11 @@ respiratory_viruses_last_3_years <- cl_dataset_periodo_epi %>%
 ```
 
 ```{r combine-epitimes}
-#respiratory_viruses_last_3_years <-
- # combine_epi_periods(data_historic_epi_periods = respiratory_viruses_last_3_years,
-  #                    data_current_year_epi_periods = viruses_epitimes,
-   #                   epi_period = params$period_epi,
-    #                  year = params$year)
+respiratory_viruses_last_3_years <-
+  combine_epi_periods(data_historic_epi_periods = respiratory_viruses_last_3_years,
+                      data_current_year_epi_periods = viruses_epitimes,
+                      epi_period = params$period_epi,
+                      year = params$year)
 ```
 
 
