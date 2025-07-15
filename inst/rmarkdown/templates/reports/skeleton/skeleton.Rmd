@@ -247,20 +247,20 @@ other_viruses_age_groups <-
 ```
 
 ```{r epiweek_cases}
-other_viruses_epiweeks <- 
-  get_cases_other_viruses(report_data = other_viruses_cleaned_data,
-                          epiweek = "all",
-                          total_samples = TRUE,
-                          positivity = TRUE)
-filmarray_epiweeks <-
+dist_epiweek_filmarray <-
   get_cases_filmarray(report_data = filmarray_data_cleaned,
                       age_groups = FALSE,
                       epiweek = "all",
-                      total_samples = TRUE,
-                      positivity = TRUE)
+                      total_samples = TRUE)
 
-viruses_epiweeks <- get_dist_fci_other_vrs(fci_data = filmarray_epiweeks,
-                                           vrs_data = other_viruses_epiweeks,
+dist_epieweek_other_viruses <-
+  get_cases_other_viruses(report_data = other_viruses_cleaned_data,
+                          epiweek = "all",
+                          age_groups = FALSE,
+                          total_samples = TRUE)
+
+viruses_epiweeks <- get_dist_fci_other_vrs(fci_data = dist_epiweek_filmarray,
+                                           vrs_data = dist_epieweek_other_viruses,
                                            col_name = "se",
                                            porcentaje = FALSE,
                                            indicators = TRUE,
@@ -471,19 +471,6 @@ plot_distribution_epiweek(report_data =
 ```
 
 ```{r distribution-epiweek}
-dist_epiweek_filmarray <-
-  get_cases_filmarray(report_data = filmarray_data_cleaned,
-                      age_groups = FALSE,
-                      epiweek = "all",
-                      total_samples = TRUE)
-
-dist_epieweek_other_viruses <-
-  get_cases_other_viruses(report_data = other_viruses_cleaned_data,
-                          epiweek = "all",
-                          age_groups = FALSE,
-                          total_samples = TRUE)
-
-
 dist_epiweek_sars <- get_cases_sars(report_data = other_viruses_cleaned_data,
                                     epiweek = "all")
 
