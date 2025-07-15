@@ -129,14 +129,20 @@ get_cases_filmarray <- function(report_data,
             if (!is.null(epiweek)) {
               positive_cases <-
                 positive_cases[!is.na(positive_cases[[col_epiweek]]), ]
-              
-              if (nrow(positive_cases) > 0) {
-                positive_cases <-
+              if (nrow(positive_cases) <= 0) {
+                positive_cases <- 
+                  data.frame(semana = 1, casos = 0,
+                             evento = virus$name,
+                             etiqueta = virus$label)
+                names(positive_cases)[names(positive_cases) == "semana"] <- 
+                  col_epiweek
+                
+              } 
+              positive_cases <-
                   group_columns_total(disease_data = positive_cases,
                                       event_name = virus$name,
                                       col_names = col_epiweek,
                                       event_label = virus$label)
-              }
             }
             if (age_groups) {
               positive_cases <-
