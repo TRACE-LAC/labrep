@@ -430,13 +430,12 @@ add_indicators <- function(data_grouped,
     }
   }
   if (total_samples) {
-    samples <- report_data %>%
-      dplyr::group_by(!!dplyr::sym(col_name)) %>%
-      summarise(total_muestras = n(), .groups = "drop")
+    samples <- get_total_samples(data_grouped = data_grouped,
+                                 report_data = report_data,
+                                 col_name = col_name,
+                                 join = TRUE)
     if (join) {
-      data_grouped <- data_grouped %>%
-        dplyr::left_join(samples, by = col_name)
-      data_grouped$total_muestras[is.na(data_grouped$total_muestras)] <- 0
+      data_grouped <- samples
     }
   }
   if (positivity) {
