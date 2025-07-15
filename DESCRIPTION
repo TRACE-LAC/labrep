@@ -27,7 +27,8 @@ Imports:
     showtext,
     kableExtra,
     plotrix,
-    tidyr
+    tidyr,
+    writexl
 Suggests: 
     knitr,
     rmarkdown,
