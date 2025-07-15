@@ -250,11 +250,13 @@ clean_historic_data <- function(dataset) {
   
   #get texts of the axis from config.yml
   config_path <- system.file("extdata", "config.yml", package = "labrep")
-
+    
   year_column <-  config::get(file = config_path,"respiratory_viruses_historic_data")$year
   col_year <- year_column$col_name
   periodo_epidemiologico <- config::get(file = config_path,"respiratory_viruses_historic_data")$periodo_epidemiologico
   col_periodo <- periodo_epidemiologico$col_name
+  
+  cols_viruses <- config::get(file = config_path, "viruses")
   
   dataset <- dataset %>%
     clean_colnames_suffixes() %>%
@@ -262,6 +264,18 @@ clean_historic_data <- function(dataset) {
     fill_down_column(col_year) %>%
     fill_down_column(col_periodo)
   
-  return(dataset)
+  year_column <-  config::get(file = config_path,"respiratory_viruses_historic_data")$year
   
+  #names(dataset)[names(dataset) == "a_h3"] <- "nuevo_nombre"
+  
+  for (virus in cols_viruses) {
+    if ("historic_data" %in% names(virus)) {
+      historic_viruses <- virus$historic_data
+      if (historic_viruses$col_name %in% names(dataset)) {
+        names(dataset)[names(dataset) == historic_viruses$col_name] <-
+          virus$name
+      }
+    }
+  }
+  return(dataset)
 }
