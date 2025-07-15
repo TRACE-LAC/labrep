@@ -362,6 +362,26 @@ remove_nan <- function(dataset, col_name) {
   return(dataset)
 }
 
+#' @title Obtener el total de casos
+#' @export
+get_total_cases <- function(data_grouped = NULL,
+                            col_name = NULL,
+                            join = TRUE) {
+  col_total_cases <- 0
+  if (!is.null(data_grouped) && !is.null(col_name)) {
+    col_total_cases <- data_grouped %>%
+      dplyr::group_by(!!dplyr::sym(col_name)) %>%
+      dplyr::summarise(total_casos = sum(.data$casos))
+    if (join) {
+      data_grouped <- data_grouped %>%
+        dplyr::left_join(col_total_cases, by = col_name)
+      data_grouped$total_casos[is.na(data_grouped$total_casos)] <- 0
+      return(data_grouped)
+    }
+  }
+  return(col_total_cases)
+}
+
 #' @title Adicionar los indicadores como total casos,
 #' total muestras y positividad
 #' @export
