@@ -161,3 +161,37 @@ get_selected_table <- function(list_tables, table) {
   # Devolver la tabla seleccionada como data.frame
   return(selected_table)
 }
+
+#' @title Crear y guardar el archivo de virus respiratorios por semana
+#' epidemiológica del año actual del reporte
+#'
+#' @description
+#' @export
+save_vals_cases_epiweeks <- function(viruses_epiweeks,
+                                     year) {
+  data_epiweek <- data.frame()
+  config_path <- system.file("extdata", "config.yml", package = "labrep")
+  cols_file <-
+    config::get(file = config_path,
+                "respiratory_viruses_historic_data")$cols_file_save
+  cols_labels <- c()
+  if (is.data.frame(viruses_epiweeks) && nrow(viruses_epiweeks) > 0) {
+    data_epiweek <- viruses_epiweeks
+    for (col in cols_file) {
+      if (col$name %in% names(data_epiweek)) {
+        names(data_epiweek)[names(data_epiweek)
+                            == col$name ] <- col$label
+        cols_labels <- c(cols_labels, col$label)
+      }
+    }
+    cols_labels <- cols_labels[-1]
+    data_epiweek <- data_epiweek %>%
+      dplyr::select(-"evento") %>%
+      tidyr::pivot_wider(names_from = etiqueta,
+                         values_from = casos, values_fn = sum)
+    data_epiweek <- data_epiweek %>% dplyr::relocate(cols_labels,
+                                                     .after = last_col())
+    writexl::write_xlsx(data_epiweek,
+                        paste0("VIRUS RESPIRATORIOS ", year, ".xlsx"))
+  }
+}
