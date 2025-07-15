@@ -98,6 +98,8 @@ default:
       col_subtypes: "virusdetectadosvegeneral"
       original_value: ["positivo"]
       valid_result: TRUE
+    historic_data:
+      col_name: "a_no_subtipificado"
     label: "A no subtipificado"
     subtypes: ["h1n1", "h1n1_pdm09", "h3n2"]
   - name: "h1n1"
@@ -115,6 +117,8 @@ default:
     other_viruses:
       col_name: "virusdetectadosvegeneral"
       values: ["h1n1_pdm09", "hn1_pdm09", "pdm09", "a_pdm09", "h1n1pdm09"]
+    historic_data:
+      col_name: "a_h1n1_pdm09"
     label: "H1N1 2009"
   - name: "h3n2"
     filmarray:
@@ -123,6 +127,8 @@ default:
     other_viruses:
       col_name: "virusdetectadosvegeneral"
       values: ["a_h3"]
+    historic_data:
+      col_name: "a_h3"
     label: "H3N2"
   - name: "influenza_b"
     filmarray:
