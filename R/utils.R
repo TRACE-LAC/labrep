@@ -382,6 +382,34 @@ get_total_cases <- function(data_grouped = NULL,
   return(col_total_cases)
 }
 
+#' @title Obtener el total de muestras
+#' @export
+get_total_samples <- function(data_grouped = NULL,
+                              report_data = NULL,
+                              col_name = NULL,
+                              join = TRUE) {
+  samples <- data.frame()
+  if (!is.null(col_name)) {
+    if (!is.null(report_data)) {
+      samples <- report_data %>%
+        dplyr::group_by(!!dplyr::sym(col_name)) %>%
+        summarise(total_muestras = n(), .groups = "drop")
+      
+    } else if (!is.null(data_grouped)) {
+      samples <- data_grouped %>%
+        dplyr::group_by(!!dplyr::sym(col_name)) %>%
+        dplyr::mutate(total_muestras = sum(unique(.data$total_muestras)))
+    }
+    if (join && !is.null(data_grouped)) {
+      data_grouped <- data_grouped %>%
+        dplyr::left_join(samples, by = col_name)
+      data_grouped$total_muestras[is.na(data_grouped$total_muestras)] <- 0
+      return(data_grouped)
+    }
+  }
+  return(samples)
+}
+
 #' @title Adicionar los indicadores como total casos,
 #' total muestras y positividad
 #' @export
