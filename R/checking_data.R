@@ -1235,7 +1235,9 @@ get_historic_epi_times <- function(dataset_epi_times) {
 #' @export
 get_epi_times_current_year <- function(data_epiweek, year,
                                        col_name = "se",
-                                       period_epi = NULL) {
+                                       period_epi = NULL,
+                                       remove_cols = c("h1n1",
+                                                       "otros_coronavirus")) {
    data_epi_times <- data_epiweek
    data_epi_times <- data_epi_times %>%
     dplyr::mutate(periodo_epidemiologico =
@@ -1251,9 +1253,20 @@ get_epi_times_current_year <- function(data_epiweek, year,
      dplyr::group_by(dplyr::across(dplyr::all_of(
        c("periodo_epidemiologico")))) %>%
      dplyr::distinct(!!dplyr::sym(col_name), .keep_all = TRUE) %>%
-     dplyr::mutate(suma_muestras = sum(.data$total_muestras)) %>%
-     dplyr::group_by(!!dplyr::sym("periodo_epidemiologico")) %>%
-     dplyr::summarise(total_muestras = first(.data$suma_muestras),
+     dplyr::mutate(total_muestras = sum(.data$total_muestras)) 
+   
+   data_samples <- data_samples %>%
+     dplyr::group_by(dplyr::across(dplyr::all_of(
+       c("periodo_epidemiologico", "total_muestras")))) %>%
+     dplyr::summarise(total_muestras = first(.data$total_muestras),
+                      .groups = "drop")
+   
+   # Total de la smuestras de la misma enfermedad?
+   
+   data_epi_times <- data_epi_times %>%
+     dplyr::group_by(dplyr::across(dplyr::all_of(
+       c("evento", "periodo_epidemiologico")))) %>%
+     dplyr::summarise(casos = sum(.data$casos),
                       .groups = "drop")
    
    data_epi_times <- data_epi_times %>%
