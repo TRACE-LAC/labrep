@@ -250,7 +250,7 @@ other_viruses_age_groups <-
                           age_groups = TRUE)
 ```
 
-```{r epiweek_cases}
+```{r epiweek-cases}
 dist_epiweek_filmarray <-
   get_cases_filmarray(report_data = filmarray_data_cleaned,
                       age_groups = FALSE,
@@ -281,6 +281,16 @@ viruses_epitimes <- get_epi_times_current_year(data_epiweek = viruses_epiweeks,
                                                period_epi = params$period_epi)
 ```
 
+```{r dataset-historic-respiratory-viruses}
+all_tables_historic_data <- get_all_tables(file_name = params$historic_data)
+dataset_periodo_epi <- get_selected_table(list_tables = all_tables_historic_data)
+```
+
+```{r cl-dataset-respiratory-viruses-last-3-years}
+cl_dataset_periodo_epi <- clean_historic_data(dataset = dataset_periodo_epi)
+```
+
+```{r filtered-dataset-respiratory-viruses-years}
 respiratory_viruses_last_3_years <- cl_dataset_periodo_epi %>%
     filter((cl_dataset_periodo_epi$ano == params$year & periodo_epidemiologico <= params$period_epi) | cl_dataset_periodo_epi$ano != params$year)
 
