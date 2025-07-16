@@ -185,15 +185,6 @@ cadena de la polimerasa con transcriptasa inversa (RT-PCR) para el
 diagnóstico de los principales agentes a los que se les atribuye el
 IRAG.
 
-
-```{r dataset-historic-respiratory-viruses}
-# Añadir validación
-all_tables_historic_data <- get_all_tables(file_name = params$historic_data)
-dataset_periodo_epi <- get_selected_table(list_tables = all_tables_historic_data)
-```
-
-```{r cl_dataset_respiratory_viruses_last_3_years}
-cl_dataset_periodo_epi <- clean_historic_data(dataset = dataset_periodo_epi)
 ```
 
 
@@ -308,7 +299,6 @@ respiratory_viruses_last_3_years <-
 En el análisis del comportamiento de los virus respiratorios por periodo epidemiológico desde el 2022, se observa que se ha mantenido la circulación de virus como Rinovirus, Adenovirus y VSR. Para los tres años se muestra el comportamiento del pico respiratorio que se presenta en todos los años (Figura 1).
 
 ```{r plot-historic-data, include=TRUE, fig.height=6, fig.width=8, fig.cap= paste0("Circulación de virus respiratorios por período epidemiológico.\\newline Año 2022 - ", params$year)}
-
 plot_historic_epi_time(dataset = respiratory_viruses_last_3_years,
                        periodo_epi = params$periodo_epi)
 ```
@@ -526,7 +516,6 @@ sars_prop_epiweeks <-
                               distribution_epiweeks_viruses,
                             epiweek = params$epiweek)
 
- # get_prop_text(dataset = viruses_prop_epiweek$cases_epiweek)
 sars_prop_text <-
   get_prop_text(dataset = sars_prop_epiweeks$cases_epiweek)
 ```
