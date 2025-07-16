@@ -1273,8 +1273,6 @@ get_epi_times_current_year <- function(data_epiweek, year,
      dplyr::left_join(data_samples,
                       by = "periodo_epidemiologico")
    
-   # Total de la smuestras de la misma enfermedad?
-  
    data_indicators <-
      add_indicators(data_grouped = data_epi_times,
                     col_name = "periodo_epidemiologico",
@@ -1284,30 +1282,27 @@ get_epi_times_current_year <- function(data_epiweek, year,
                     remove_nan = FALSE,
                     join = TRUE)
    
-   data_indicators <- data_indicators %>%
-   dplyr::group_by(!!dplyr::sym("periodo_epidemiologico")) %>%
-     dplyr::summarise(total_casos = first(.data$total_casos),
-                      total_muestras = first(.data$total_muestras),
-                      positividad = first(.data$total_muestras),
-                      .groups = "drop")
-   
-   data_epi_times <- data_epi_times %>% dplyr::select(-"total_muestras")
-   data_epi_times <- data_epi_times %>%
+
+   epi_times <- data_indicators %>%
      tidyr::pivot_wider(names_from = evento,
                         values_from = casos, values_fn = sum)
-   data_epi_times <- data_epi_times %>%
-       dplyr::left_join(data_indicators, by = "periodo_epidemiologico")
    
-   data_epi_times$ano <- year
+   epi_times$ano <- year
    
-   data_epi_times[is.na(data_epi_times)] <- 0
-  
+   if (any(is.na(epi_times))) {
+     epi_times[is.na(epi_times)] <- 0
+   }
+   
    if (!is.null(period_epi)) {
      data_epi_times <- data_epi_times %>%
        dplyr::filter(periodo_epidemiologico <= period_epi)
    }
    
-   return(data_epi_times)
+   if (!is.null(remove_cols)) {
+     epi_times <- epi_times %>% dplyr::select(-all_of(remove_cols))
+   }
+   
+   return(epi_times)
 }
 
 #' @title Combinar la informacion historica de los virus
