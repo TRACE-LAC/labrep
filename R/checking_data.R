@@ -496,13 +496,16 @@ get_dist_fci_other_vrs <- function(fci_data,
   
   if (indicators) {
     dist_epiweek_indicators <- dist_epiweek_indicators %>%
-      dplyr::group_by(!!dplyr::sym(col_name)) %>%
-      dplyr::summarise(total_casos = dplyr::first(total_casos),
-                       total_muestras = dplyr::first(total_muestras),
-                       .groups = "drop")
-    #print(dist_epiweek_indicators)
-    dist_epiweek_indicators <-
-      add_indicators(data_grouped = dist_epiweek_indicators,
+      dplyr::select(.data[[col_name]], .data$total_muestras)
+    samples <- get_total_samples(data_grouped = dist_epiweek_indicators,
+                                 col_name = col_name,
+                                 join = FALSE)
+    samples <- unique(samples)
+    dist_fci_other_vrs <- dist_fci_other_vrs %>%
+      dplyr::left_join(samples, by = col_name)
+    
+    dist_fci_other_vrs <-
+      add_indicators(data_grouped = dist_fci_other_vrs,
                      total_cases = FALSE,
                      total_samples = FALSE,
                      positivity = TRUE,
@@ -515,12 +518,6 @@ get_dist_fci_other_vrs <- function(fci_data,
     dist_fci_other_vrs <- dist_fci_other_vrs %>%
       tidyr::pivot_wider(names_from = evento,
                          values_from = casos, values_fn = sum)
-  }
-  if (indicators) {
-    dist_fci_other_vrs <- dist_fci_other_vrs %>%
-      dplyr::rename(total_casos_positivos = total_casos)
-    dist_fci_other_vrs <- dist_fci_other_vrs %>%
-      dplyr::left_join(dist_epiweek_indicators, by = col_name)
   }
   dist_fci_other_vrs[is.na(dist_fci_other_vrs)] <- 0
   return(dist_fci_other_vrs)
