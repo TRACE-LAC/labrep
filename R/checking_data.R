@@ -1209,7 +1209,7 @@ get_results_tosferina <- function(report_data, results = "positivo",
 get_historic_epi_times <- function(dataset_epi_times) {
   dataset <- dataset_epi_times 
   stacked_dataset <- dataset %>%
-    tidyr::pivot_longer(cols = .data$a_h1n1_pdm09:.data$otros_virus, 
+    tidyr::pivot_longer(cols = .data$h1n1_pdm09:.data$otros_virus, 
                         names_to = "Virus_Type", 
                         values_to = "Cases") %>%
     dplyr::mutate(YearWeek = paste(.data$ano,
