@@ -308,7 +308,6 @@ respiratory_viruses_last_3_years <-
 En el análisis del comportamiento de los virus respiratorios por periodo epidemiológico desde el 2022, se observa que se ha mantenido la circulación de virus como Rinovirus, Adenovirus y VSR. Para los tres años se muestra el comportamiento del pico respiratorio que se presenta en todos los años (Figura 1).
 
 ```{r plot-historic-data, include=TRUE, fig.height=6, fig.width=8, fig.cap= paste0("Circulación de virus respiratorios por período epidemiológico.\\newline Año 2022 - ", params$year)}
-#PLOTTING Figura 1
 
 plot_historic_epi_time(dataset = respiratory_viruses_last_3_years,
                        periodo_epi = params$periodo_epi)
@@ -333,7 +332,6 @@ top_sars_age_groups <-
                       etiqueta = FALSE)
 ```
 
-
 ```{r paragraph-viruses}
 perc_vrs_age_group <-
   get_perc_viruses_age(dataset = viruses_age_groups)
@@ -344,17 +342,7 @@ perc_sars_age_group <-
 Para esta semana del año `r current_year`, por grupo de edad, el `r perc_sars_age_group`% de pacientes positivos para virus respiratorios  corresponden a 
 la población de menores de 5 años (figura 2).
 
-```{r plot-viruses-age-groups, include=TRUE, fig.height=4, fig.width=5.7,fig.cap="Distribución porcentual de virus respiratorios por grupo de edad, Laboratorio de Salud Pública Bogotá.", fig.align='right'}
-# ESTA BIEN
-#plot_age_group_distribution(viruses_age_groups)
-```
 \arrayrulecolor{colorbdtableplot}
-
-```{r table-viruses-age-groups, fig.align='right'}
-#trans_viruses_age_groups <-
-#  convert_age_groups_as_cols(dataset = viruses_age_groups)
-#plot_table_legend(report_data = #trans_viruses_age_groups)
-```
 
 ```{r paragraph-viruses-age-groups}
 text_cons_viruses <-
@@ -383,7 +371,6 @@ text_cons_vrs_sars <-
 años, ")
 ```
 
-
 En la figura 2 se presenta el consolidado de los virus respiratorios por los diferentes grupos de edad, en los niños menores de 2 años, las mayores frecuencias se presentan para: `r text_cons_vrs_sars`.
 
 A continuación, se presenta la circulación acumulada de 
@@ -391,7 +378,6 @@ los virus respiratorios de forma desagregada por tipo de vigilancia,
 según grupo de edad (figura 3).
 
 ```{r distribution-esi-age-groups}
-# Se debe hacer por semana
 esi_age_groups <-
   get_distribution_surveillance(report_data = other_viruses_cleaned_data,
                                 include_sars = TRUE,
@@ -532,24 +518,7 @@ text_vrs_cumulative <- get_text_viruses(dataset = viruses_cumulative_proportion,
                                         tam = 4)
 ```
 
-
-```{r plot-cumulative-proportion, fig.height=8, fig.width=15, include=TRUE, fig.cap="Proporción acumulada de los virus respiratorios, Laboratorio de Salud Pública"}
-#plot_cumulative_proportion(data_proportion = viruses_cumulative_proportion)
-```
-
-
 ```{r distribution-epiweek-todo}
-#viruses_prop_epiweek <-
- # get_cases_prop_epiweek(filmarray_data = filmarray_data_cleaned,
-  #                       other_virs_data = other_viruses_cleaned_data,
-   #                      epiweek = params$epiweek)
-#sars_prop_epiweeks <-
- # get_cases_prop_epiweek(filmarray_data = filmarray_data_cleaned,
-  #                       other_virs_data = other_viruses_cleaned_data,
-   #                      include_sars = TRUE,
-    #                     epiweek = "all")
-#sars_prop_epiweeks$total_samples <- sum(sars_prop_epiweeks$cases_epiweek$casos)
-
 total_samples_prop <- nrow(filmarray_data_cleaned) + nrow(other_viruses_cleaned_data)
 
 sars_prop_epiweeks <-
@@ -557,7 +526,6 @@ sars_prop_epiweeks <-
                               distribution_epiweeks_viruses,
                             epiweek = params$epiweek)
 
-#viruses_prop_text <-
  # get_prop_text(dataset = viruses_prop_epiweek$cases_epiweek)
 sars_prop_text <-
   get_prop_text(dataset = sars_prop_epiweeks$cases_epiweek)
@@ -597,7 +565,6 @@ plot_distribution_epiweek(report_data = distribution_influenza$influenza_epiweek
                           influenza = TRUE,
                           positives = distribution_influenza$cases_epiweeks)
 ```
-
 
 ```{=tex}
 \begin{flushleft}
@@ -649,7 +616,6 @@ per_tosferina_group_0 <- sum(tosferina_group_0$porcentaje)
 tosferina_group_2 <- results_ages_tosferina %>%
   dplyr::filter(grupo_edad == "2 a 3 meses")
 per_tosferina_group_2 <- sum(tosferina_group_0$porcentaje)
-# Validar que grupos de edad se deben tener
 ```
 
 El comportamiento de la tosferina por grupo de edad indica que el `r per_tosferina_group_0` % de las muestras recibidas pertenecen al grupo de niños < o = 1 mes, seguido del grupo de 2 a 3 meses con el `r per_tosferina_group_2`% (figura 10).
