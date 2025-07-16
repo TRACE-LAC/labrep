@@ -458,7 +458,8 @@ get_cases_other_viruses <- function(report_data,
 #' @title Obtener la distribución de casos de las base de datos Filmarray
 #' de la Fundación Cardio Infantil y Otros Virus
 #' @export
-get_dist_fci_other_vrs <- function(fci_data, vrs_data,
+get_dist_fci_other_vrs <- function(fci_data,
+                                   vrs_data,
                                    col_name = "grupo_edad",
                                    porcentaje = TRUE,
                                    transpose = FALSE,
@@ -467,6 +468,7 @@ get_dist_fci_other_vrs <- function(fci_data, vrs_data,
     names(vrs_data)[names(vrs_data)
                     == "semanaepidemiologicavegeneral"] <- col_name
   }
+  
   dist_fci_other_vrs <- rbind(fci_data, vrs_data)
   dist_epiweek_indicators <- dist_fci_other_vrs
   
@@ -474,7 +476,6 @@ get_dist_fci_other_vrs <- function(fci_data, vrs_data,
     dplyr::group_by(dplyr::across(dplyr::all_of(
       c("evento", col_name,"etiqueta")))) %>%
     dplyr::summarise(casos = sum(casos),
-                     total_casos = sum(total_casos),
                      .groups = "drop")
   
   #print(dist_fci_other_vrs)
@@ -484,7 +485,13 @@ get_dist_fci_other_vrs <- function(fci_data, vrs_data,
                   .data$evento,
                   .data$etiqueta,
                   .data$total_casos)
-  #print(dist_fci_other_vrs)
+
+  if (porcentaje) {
+    dist_fci_other_vrs <- dist_fci_other_vrs %>%
+      dplyr::mutate(porcentaje =
+                      round((.data$casos * 100)/.data$total_casos))
+  }
+  
   if (indicators) {
     dist_epiweek_indicators <- dist_epiweek_indicators %>%
       dplyr::group_by(!!dplyr::sym(col_name)) %>%
@@ -498,12 +505,7 @@ get_dist_fci_other_vrs <- function(fci_data, vrs_data,
                      total_samples = FALSE,
                      positivity = TRUE,
                      remove_nan = FALSE)
-    #print(dist_epiweek_indicators)
-  }
-  if (porcentaje) {
-    dist_fci_other_vrs <- dist_fci_other_vrs %>%
-      dplyr::mutate(porcentaje =
-                      round((.data$casos * 100)/.data$total_casos))
+
   }
   if (transpose) {
     dist_fci_other_vrs <- dist_fci_other_vrs %>% dplyr::select(-"etiqueta", 
