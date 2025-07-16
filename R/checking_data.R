@@ -478,7 +478,9 @@ get_dist_fci_other_vrs <- function(fci_data,
     dplyr::summarise(casos = sum(casos),
                      .groups = "drop")
   
-  #print(dist_fci_other_vrs)
+  dist_fci_other_vrs <- get_total_cases(data_grouped = dist_fci_other_vrs,
+                                        col_name = col_name)
+  
   dist_fci_other_vrs <- dist_fci_other_vrs %>%
     dplyr::select(.data[[col_name]],
                   .data$casos,
