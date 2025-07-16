@@ -187,23 +187,16 @@ get_cases_filmarray <- function(report_data,
       viruses_age_group[-sd_values, ]
   }
   for (virus in c("parainfluenza", "otros_coronavirus")) {
-    #print(viruses_age_group)
     data_parainfluenza <- viruses_age_group %>% 
       dplyr::filter(evento == virus)
-    # print(perc_parainfluenza)
     data_parainfluenza <- 
       get_consolidated_viruses(dataset = data_parainfluenza,
                                col_name = col_con_viruses,
                                percentage = perc_con_viruses,
                                total_cases = perc_con_viruses)
-    #print(data_parainfluenza)
     if (nrow(data_parainfluenza) > 1) {
       viruses_age_group <- viruses_age_group %>% 
         dplyr::filter(evento != virus)
-      # print("PARAINFLUENZA")
-      # print(names(data_parainfluenza))
-      # print("ORIGINAL")
-      # print(names(viruses_age_group))
       viruses_age_group <- rbind(viruses_age_group, data_parainfluenza)
     }
   }
@@ -366,8 +359,6 @@ get_cases_other_viruses <- function(report_data,
   }
   for (virus in cols_viruses) {
     other_vrs <- virus$other_viruses
-    #print("other_vrs")
-    #print(other_vrs)
     if (other_vrs$col_name %in% names(report_data) &&
         !("" %in% other_vrs$values)) {
       cases_virus <- report_data
@@ -380,12 +371,8 @@ get_cases_other_viruses <- function(report_data,
                                         col_name = invalid_results$col_name,
                                         values = invalid_results$values,
                                         is_not = TRUE)
-            #print("cases_virus")
-            #print(cases_virus)
       }
     }
-    #print("HOLAAAA")
-    #print(cases_virus[[invalid_results$col_name]])
     positive_cases_virus <- data.frame() 
     if ("col_subtypes" %in% names(other_vrs)) {
         subtypes_values <-
@@ -438,12 +425,8 @@ get_cases_other_viruses <- function(report_data,
                                         event_label = virus$label)
           
           cases_age_groups$total_casos <- sum(cases_age_groups$casos)
-          if (other_vrs$col_name == "influenzabporrtpcrvegeneral") {
-            # print(cases_age_groups)
-          }
           positive_cases <- rbind(positive_cases, cases_age_groups)
         }
-      #}
     }
   if (!is.null(epiweek) && nrow(positive_cases) > 0) {
     positive_cases <- add_indicators(data_grouped = positive_cases,
@@ -785,15 +768,12 @@ get_distribution_test <- function(report_data,
                        data_grouped = report_data_test,
                        col_epiweek = col_epiweek,
                        table = FALSE)
-  #print(cases_epiweeks)
   #cases_epiweeks <- 
    # add_missing_weeks(dataset = cases_epiweeks,
     #                  col_epiweek = col_epiweek)
   viruses_epiweeks <- 
     get_cases_other_viruses(report_data = report_data_test,
                             epiweek = "all")
-  #print(report_data_test)
-  #print(viruses_epiweeks)
   if (include_sars) {
     sars_epiweeks <- get_cases_sars(report_data = report_data_test,
                                     epiweek = "all")
