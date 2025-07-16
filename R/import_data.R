@@ -164,8 +164,7 @@ get_selected_table <- function(list_tables, table) {
 
 #' @title Crear y guardar el archivo de virus respiratorios por semana
 #' epidemiológica del año actual del reporte
-#'
-#' @description
+#' 
 #' @export
 save_vals_cases_epiweeks <- function(viruses_epiweeks,
                                      year) {
