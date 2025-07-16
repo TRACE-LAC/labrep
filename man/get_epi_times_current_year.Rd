@@ -9,7 +9,8 @@ get_epi_times_current_year(
   data_epiweek,
   year,
   col_name = "se",
-  period_epi = NULL
+  period_epi = NULL,
+  remove_cols = c("h1n1", "otros_coronavirus")
 )
 }
 \description{

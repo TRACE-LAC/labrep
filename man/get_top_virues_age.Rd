@@ -7,7 +7,7 @@
 get_top_virues_age(
   dataset,
   col_age = "grupo_edad",
-  age_groups = c("< 2 A<U+00D1>OS", "2 A 4 A<U+00D1>OS")
+  age_groups = c("< 2 AÑOS", "2 A 4 AÑOS")
 )
 }
 \description{
