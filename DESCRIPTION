@@ -28,7 +28,8 @@ Imports:
     kableExtra,
     plotrix,
     tidyr,
-    writexl
+    writexl,
+    future
 Suggests: 
     knitr,
     rmarkdown,
