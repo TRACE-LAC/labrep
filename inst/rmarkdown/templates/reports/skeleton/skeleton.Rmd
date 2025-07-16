@@ -281,13 +281,6 @@ viruses_epitimes <- get_epi_times_current_year(data_epiweek = viruses_epiweeks,
                                                period_epi = params$period_epi)
 ```
 
-```{r filtered_dataset_respiratory_viruses_years}
-# PROCESSING
-# pr = processed
-cl_dataset_periodo_epi <- cl_dataset_periodo_epi %>%
-  dplyr::rename(positividad = .data$percent_de_positividad, 
-                total_muestras = .data$total_muestras_procvesadas,
-                total_casos = .data$total_positivas)
 respiratory_viruses_last_3_years <- cl_dataset_periodo_epi %>%
     filter((cl_dataset_periodo_epi$ano == params$year & periodo_epidemiologico <= params$period_epi) | cl_dataset_periodo_epi$ano != params$year)
 

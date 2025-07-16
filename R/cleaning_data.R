@@ -277,5 +277,10 @@ clean_historic_data <- function(dataset) {
       }
     }
   }
+  
+  dataset <- dataset %>%
+    dplyr::rename(positividad = .data$percent_de_positividad, 
+                  total_muestras = .data$total_muestras_procvesadas,
+                  total_casos = .data$total_positivas)
   return(dataset)
 }
