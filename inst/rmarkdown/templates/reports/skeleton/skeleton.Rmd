@@ -496,8 +496,9 @@ text_vrs_cumulative <- get_text_viruses(dataset = viruses_cumulative_proportion,
                                         tam = 4)
 ```
 
-```{r distribution-epiweek-todo}
-total_samples_prop <- nrow(filmarray_data_cleaned) + nrow(other_viruses_cleaned_data)
+```{r distribution-epiweek-all}
+total_samples_prop <-
+  nrow(filmarray_data_cleaned) + nrow(other_viruses_cleaned_data)
 
 sars_prop_epiweeks <-
   get_cases_acum_proportion(dist_epiweek_viruses =
@@ -526,14 +527,16 @@ total_dist_influenza <-
                       sum_cases = TRUE, col_names = "etiqueta",
                       wt_percentage = TRUE, col_order = "porcentaje",
                       etiqueta = FALSE)
+
 total_cases_influenza <- sum(total_dist_influenza$casos)
+
 text_influenza <- get_text_viruses(dataset = total_dist_influenza,
                                    tam = nrow(total_dist_influenza))
 ```
 
 En cuanto al comportamiento de los virus de Influenza acumulado a SE `r params$epiweek`, la circulación en estas semanas del año, ha sido para el virus de `r text_influenza` en `r total_cases_influenza` muestras positivas. (Figura 6).
 
-```{r distribution_influeza, include=TRUE, fig.height=5, fig.width=10, fig.cap="Distribución de tipos y subtipos de Influenza, Laboratorio de Salud Pública"}
+```{r plot-distribution-influeza, include=TRUE, fig.height=5, fig.width=10, fig.cap="Distribución de tipos y subtipos de Influenza, Laboratorio de Salud Pública"}
 plot_distribution_epiweek(report_data = distribution_influenza$influenza_epiweeks,
                           var_x = "semanaepidemiologicavegeneral",
                           var_y = "casos",
@@ -576,7 +579,6 @@ plot_table_epiweek_tosferina(data_epiweek = table_epiweek,
                              epiweek = params$epiweek)
 ```
 
-
 ```{r distribution-tosferina-ages}
 group_ages_tosferina <- get_cases_tosferina(tosferina_cleaned_data,
                                             column = "grupo_edad")
@@ -584,7 +586,6 @@ results_ages_tosferina <-
   get_results_tosferina(report_data = tosferina_cleaned_data,
                         columns = "grupo_edad")
 ```
-
 
 ```{r paragraph-tosferina}
 tosferina_group_0 <- results_ages_tosferina %>%
@@ -597,7 +598,7 @@ per_tosferina_group_2 <- sum(tosferina_group_0$porcentaje)
 
 El comportamiento de la tosferina por grupo de edad indica que el `r per_tosferina_group_0` % de las muestras recibidas pertenecen al grupo de niños < o = 1 mes, seguido del grupo de 2 a 3 meses con el `r per_tosferina_group_2`% (figura 10).
 
-```{r plotdistribution_tosferina_ages, echo=FALSE, error=FALSE, fig.height=4, fig.width=10, warning=FALSE, include=TRUE, message=FALSE, fig.cap="Distribución porcentual de casos de tosferina confirmados en el Laboratorio de Salud Pública por grupo de edad"}
+```{r plot-distribution-tosferina-ages, echo=FALSE, error=FALSE, fig.height=4, fig.width=10, warning=FALSE, include=TRUE, message=FALSE, fig.cap="Distribución porcentual de casos de tosferina confirmados en el Laboratorio de Salud Pública por grupo de edad"}
 plot_results_tosferina(report_data = results_ages_tosferina,
                        column = "grupo_edad",
                        positives = group_ages_tosferina$cases_age_group,
@@ -622,7 +623,7 @@ tosferina_text_sex <- get_tosferina_text_sex(total_dist_tosferina, figure = 11)
 
 `r tosferina_text_sex$text`
 
-```{r distribution_tosferina_sex, include=TRUE, fig.height=4.5, fig.width=10, fig.cap="Distribución porcentual de casos de tosferina confirmados en el Laboratorio de Salud Pública, según género"}
+```{r plot-distribution-tosferina-sex, include=TRUE, fig.height=4.5, fig.width=10, fig.cap="Distribución porcentual de casos de tosferina confirmados en el Laboratorio de Salud Pública, según género"}
 plot_results_tosferina(results_sex_tosferina,
                        column = "genero",
                        label_x = "Genero",
@@ -631,8 +632,7 @@ plot_results_tosferina(results_sex_tosferina,
 
 \includepdf[pages={1}]{back_cover.pdf}
 
-
-```{r save-file, echo = FALSE, include = FALSE, error = FALSE, results='hide', message = FALSE, warning = FALSE}
+```{r save-file-epiweeks, echo = FALSE, include = FALSE, error = FALSE, results='hide', message = FALSE, warning = FALSE}
 if (params$save_current_viruses_epiweeks) {
   save_vals_cases_epiweeks(viruses_epiweeks = viruses_epiweeks,
                          year = params$year)
