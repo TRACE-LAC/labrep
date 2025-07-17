@@ -267,34 +267,28 @@ viruses_epitimes <- get_epi_times_current_year(data_epiweek = viruses_epiweeks,
                                                period_epi = params$period_epi)
 ```
 
-```{r dataset-historic-respiratory-viruses}
-all_tables_historic_data <- get_all_tables(file_name = params$historic_data)
-dataset_periodo_epi <- get_selected_table(list_tables = all_tables_historic_data)
+```{r historic-data}
+historic_data <- import_data_historic(file_name = params$historic_data)
+historic_data_cleaned <- clean_historic_data(dataset = historic_data)
 ```
 
-```{r cl-dataset-respiratory-viruses-last-3-years}
-cl_dataset_periodo_epi <- clean_historic_data(dataset = dataset_periodo_epi)
-```
-
-```{r filtered-dataset-respiratory-viruses-years}
-respiratory_viruses_last_3_years <- cl_dataset_periodo_epi %>%
-    filter((cl_dataset_periodo_epi$ano == params$year & periodo_epidemiologico <= params$period_epi) | cl_dataset_periodo_epi$ano != params$year)
-
+```{r filter-historic-data-last-3-years}
+historic_data_last_3_years <- historic_data_cleaned %>%
+    filter((historic_data_cleaned$ano == params$year & periodo_epidemiologico <= params$period_epi) | historic_data_cleaned$ano != params$year)
 ```
 
 ```{r combine-epitimes}
-respiratory_viruses_last_3_years <-
-  combine_epi_periods(data_historic_epi_periods = respiratory_viruses_last_3_years,
+historic_data_last_3_years <-
+  combine_epi_periods(data_historic_epi_periods = historic_data_last_3_years,
                       data_current_year_epi_periods = viruses_epitimes,
                       epi_period = params$period_epi,
                       year = params$year)
 ```
 
-
 En el análisis del comportamiento de los virus respiratorios por periodo epidemiológico desde el 2022, se observa que se ha mantenido la circulación de virus como Rinovirus, Adenovirus y VSR. Para los tres años se muestra el comportamiento del pico respiratorio que se presenta en todos los años (Figura 1).
 
 ```{r plot-historic-data, include=TRUE, fig.height=6, fig.width=8, fig.cap= paste0("Circulación de virus respiratorios por período epidemiológico.\\newline Año 2022 - ", params$year)}
-plot_historic_epi_time(dataset = respiratory_viruses_last_3_years,
+plot_historic_epi_time(dataset = historic_data_last_3_years,
                        periodo_epi = params$periodo_epi)
 ```
 
@@ -302,7 +296,6 @@ plot_historic_epi_time(dataset = respiratory_viruses_last_3_years,
 viruses_age_groups <-
   get_dist_fci_other_vrs(fci_data = filmarray_age_groups,
                          vrs_data = other_viruses_age_groups)
-viruses_age_groups <- na.omit(viruses_age_groups)
 ```
 
 ```{r sars-data}
