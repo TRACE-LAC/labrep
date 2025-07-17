@@ -185,9 +185,6 @@ cadena de la polimerasa con transcriptasa inversa (RT-PCR) para el
 diagnóstico de los principales agentes a los que se les atribuye el
 IRAG.
 
-```
-
-
 ```{r fci-data}
 fci_data <- import_data_viral_circulation(report_data = params$fci_data,
                                                 header = TRUE,
