@@ -140,7 +140,7 @@ get_all_tables <- function(file_name) {
 #'
 #' @return Un dataframe correspondiente a la tabla seleccionada.
 #' @export
-get_selected_table <- function(list_tables, table) {
+get_selected_table <- function(list_tables) {
   
   config_path <-
     system.file("extdata", "config.yml", package = "labrep")
