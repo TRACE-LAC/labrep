@@ -59,6 +59,14 @@ import_data_viral_circulation <- function(report_data = NULL,
   return(viral_circulation_data)
 }
 
+#' @title Importar los datos de Tosferina
+#' @export
+import_data_tosferina <- function(file_path) {
+  tosferina_data <-
+    readxl::read_excel(file_path, sheet = 1)
+  return(tosferina_data)
+}
+
 #' @title Extraer todas las tablas de una hoja de Excel 
 #'
 #' @description
