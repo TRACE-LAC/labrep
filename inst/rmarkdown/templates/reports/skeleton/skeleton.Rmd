@@ -261,11 +261,6 @@ viruses_epiweeks <- get_dist_fci_other_vrs(fci_data = dist_epiweek_filmarray,
                                            indicators = TRUE,
                                            transpose = FALSE)
 
-if (params$save_current_viruses_epiweeks) {
-  save_vals_cases_epiweeks(viruses_epiweeks = viruses_epiweeks,
-                         year = params$year)
-}
-
 viruses_epitimes <- get_epi_times_current_year(data_epiweek = viruses_epiweeks,
                                                col_name = "se",
                                                year = params$year,
@@ -642,3 +637,11 @@ plot_results_tosferina(results_sex_tosferina,
 ```
 
 \includepdf[pages={1}]{back_cover.pdf}
+
+
+```{r save-file, echo = FALSE, include = FALSE, error = FALSE, results='hide', message = FALSE, warning = FALSE}
+if (params$save_current_viruses_epiweeks) {
+  save_vals_cases_epiweeks(viruses_epiweeks = viruses_epiweeks,
+                         year = params$year)
+}
+```
