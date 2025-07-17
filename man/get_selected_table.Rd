@@ -4,7 +4,7 @@
 \alias{get_selected_table}
 \title{Obtener una tabla específica de una lista de tablas}
 \usage{
-get_selected_table(list_tables, table)
+get_selected_table(list_tables)
 }
 \arguments{
 \item{list_of_tables}{Lista de tablas, donde cada elemento es un dataframe.}
