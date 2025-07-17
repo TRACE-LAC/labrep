@@ -187,8 +187,8 @@ IRAG.
 
 ```{r fci-data}
 fci_data <- import_data_viral_circulation(report_data = params$fci_data,
-                                                header = TRUE,
-                                                dataset_name = "fci")
+                                          header = TRUE,
+                                          dataset_name = "fci")
 ```
 
 ```{r panel-data, echo=FALSE}
@@ -251,13 +251,16 @@ dist_epieweek_other_viruses <-
                           age_groups = FALSE,
                           total_samples = TRUE)
 
-viruses_epiweeks <- get_dist_fci_other_vrs(fci_data = dist_epiweek_filmarray,
-                                           vrs_data = dist_epieweek_other_viruses,
-                                           col_name = "se",
-                                           porcentaje = FALSE,
-                                           indicators = TRUE,
-                                           transpose = FALSE)
+viruses_epiweeks <-
+  get_dist_fci_other_vrs(fci_data = dist_epiweek_filmarray,
+                         vrs_data = dist_epieweek_other_viruses,
+                         col_name = "se",
+                         porcentaje = FALSE,
+                         indicators = TRUE,
+                         transpose = FALSE)
+```
 
+```{r epitimes-cases}
 viruses_epitimes <- get_epi_times_current_year(data_epiweek = viruses_epiweeks,
                                                col_name = "se",
                                                year = params$year,
