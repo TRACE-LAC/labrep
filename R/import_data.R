@@ -170,6 +170,14 @@ get_selected_table <- function(list_tables, table) {
   return(selected_table)
 }
 
+#' @title Importar los datos historicos de los virus respiratorios
+#' @export
+import_data_historic <- function(file_name) {
+  historic_data <- get_all_tables(file_name = file_name) %>%
+    get_selected_table()
+  return(historic_data)
+}
+
 #' @title Crear y guardar el archivo de virus respiratorios por semana
 #' epidemiológica del año actual del reporte
 #' 
