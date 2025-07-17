@@ -559,7 +559,7 @@ Multiplex, que en tiempo real detecta Bordetella pertussis, Bordetella
 parapertussis y Bordetella holmesii.
 
 ```{r tosferina-data}
-tosferina_data <- readxl::read_excel(params$tosferina, sheet = 1)
+tosferina_data <- import_data_tosferina(file_path = params$tosferina)
 ```
 
 ```{r distribution-tosferina-epiweek}
