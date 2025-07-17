@@ -298,7 +298,7 @@ viruses_age_groups <-
                          vrs_data = other_viruses_age_groups)
 ```
 
-```{r sars-data}
+```{r sars-age-groups}
 sars_age_groups <- get_cases_sars(report_data = other_viruses_cleaned_data,
                                   age_groups = TRUE)
 sars_viruses_age_groups <- get_distribution_age_vr_sars(viruses_age_groups,
@@ -317,8 +317,8 @@ perc_sars_age_group <-
   get_perc_viruses_age(dataset = sars_viruses_age_groups)
 ```
 
-Para esta semana del año `r current_year`, por grupo de edad, el `r perc_sars_age_group`% de pacientes positivos para virus respiratorios  corresponden a 
-la población de menores de 5 años (figura 2).
+Para esta semana del año `r current_year`, por grupo de edad, el `r perc_sars_age_group`% de pacientes positivos para virus respiratorios 
+corresponden a la población de menores de 5 años (figura 2).
 
 \arrayrulecolor{colorbdtableplot}
 
@@ -329,13 +329,12 @@ text_cons_viruses <-
                             se presentan casos de ")
 ```
 
-```{r plot-distribution-sars, include=TRUE, fig.height=4, fig.width=5.7, fig.align='right', fig.cap="Distribución porcentual de virus respiratorios por grupo de edad, Laboratorio de Salud Pública Bogotá."}
-
+```{r plot-distribution-sars-age-groups, include=TRUE, fig.height=4, fig.width=5.7, fig.align='right', fig.cap="Distribución porcentual de virus respiratorios por grupo de edad, Laboratorio de Salud Pública Bogotá."}
 plot_age_group_distribution(sars_viruses_age_groups, var_y = "casos",
                             include_sars = TRUE)
 ```
 
-```{r table-distribution-sars, fig.align='right'}
+```{r table-distribution-sars-age-groups, fig.align='right'}
 trans_sars_age_groups <-
   convert_age_groups_as_cols(dataset = sars_viruses_age_groups)
 plot_table_legend(report_data = trans_sars_age_groups,
