@@ -15,6 +15,18 @@ clean_filmarray_data <- function(filmarray_data,
     data_clean[[col_epiweek]] <- as.numeric(data_clean[[col_epiweek]])
     data_clean <- subset(data_clean, !is.na(data_clean[[col_epiweek]]))
   }
+  if (is_panel) {
+    config_path <- system.file("extdata", "config.yml", package = "labrep")
+    panel_parainfluenza <-
+      config::get(file = config_path,
+                  "filmarray_data")$parainfluenza$panel$col_name
+    filmarray_parainfluenza <-
+      config::get(file = config_path,
+                  "filmarray_data")$parainfluenza$filmarray$col_name
+    data_clean <- data_clean %>%
+      dplyr::rename_with(~ filmarray_parainfluenza[1:length(panel_parainfluenza)], 
+                         .cols = panel_parainfluenza)
+  }
   return(data_clean)
 }
 
